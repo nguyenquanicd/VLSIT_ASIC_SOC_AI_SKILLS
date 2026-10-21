@@ -196,40 +196,40 @@ The bridge captures one APB request, presents it as one TL-UL A-channel request,
 
 Port names follow REF-003 PRT-01: `<i|o>_<protocol>_<signal>`. TileLink has no tag in REF-003; the conventional tag `tl` is used. The TL-UL port set is the OpenTitan `tl_h2d_t` and `tl_d2h_t` signals, flattened. The width of o_tl_a_size is SZW = 2 for a 4-byte bus.
 
-| Port | Direction | Width | Meaning | Clock domain | Reset / idle value | Timing / sampling | Configurations |
-|---|---|---:|---|---|---|---|---|
-| i_clk_apb | Input | 1 | Clock for both interfaces | CLK-APB | Not applicable (clock) | Rising edge | All |
-| i_rst_n_apb | Input | 1 | Active-low reset | RST-APB | Not applicable (reset) | Asynchronous assertion, synchronized release by the SoC | All |
-| i_apb_psel | Input | 1 | APB select | CLK-APB | Sampled low in reset | Sampled every cycle in IDLE | All |
-| i_apb_penable | Input | 1 | APB enable (access phase) | CLK-APB | Sampled low in reset | Sampled with PSEL | All |
-| i_apb_pwrite | Input | 1 | 1 = write | CLK-APB | Not used in reset | Captured in IDLE | All |
-| i_apb_paddr | Input | PARA_ADDR_W | Byte address | CLK-APB | Not used in reset | Captured in IDLE | All |
-| i_apb_pprot | Input | 3 | Protection type | CLK-APB | Not used | Ignored (DEC-003) | All |
-| i_apb_pstrb | Input | 4 | Write strobes | CLK-APB | Not used in reset | Captured in IDLE | All |
-| i_apb_pwdata | Input | 32 | Write data | CLK-APB | Not used in reset | Captured in IDLE | All |
-| o_apb_pready | Output | 1 | Transfer ready | CLK-APB | 0 | Registered; 1 cycle in RESP | All |
-| o_apb_prdata | Output | 32 | Read data | CLK-APB | 0 | Valid with o_apb_pready | All |
-| o_apb_pslverr | Output | 1 | Transfer error | CLK-APB | 0 | Valid with o_apb_pready | All |
-| o_tl_a_valid | Output | 1 | Request valid | CLK-APB | 0 | Registered; held until i_tl_a_ready | All |
-| i_tl_a_ready | Input | 1 | Request accepted | CLK-APB | Not used in reset | Sampled in SEND | All |
-| o_tl_a_opcode | Output | 3 | Request opcode (0 PutFullData, 1 PutPartialData, 4 Get) | CLK-APB | 0 | Stable while valid | All |
-| o_tl_a_param | Output | 3 | Reserved, always 0 | CLK-APB | 0 | Constant | All |
-| o_tl_a_size | Output | 2 | log2 of the request size in bytes | CLK-APB | 0 | Stable while valid | All |
-| o_tl_a_source | Output | PARA_TL_SRC_W | Request identifier, always 0 | CLK-APB | 0 | Constant | All |
-| o_tl_a_address | Output | PARA_ADDR_W | Request address | CLK-APB | 0 | Stable while valid | All |
-| o_tl_a_mask | Output | 4 | Write byte lanes | CLK-APB | 0 | Stable while valid | All |
-| o_tl_a_data | Output | 32 | Write data | CLK-APB | 0 | Stable while valid | All |
-| o_tl_a_user | Output | PARA_TL_AUSER_W | A-channel user bits, all-zero default (DEC-002) | CLK-APB | 0 | Constant | All |
-| i_tl_d_valid | Input | 1 | Response valid | CLK-APB | Not used in reset | Sampled when o_tl_d_ready is high | All |
-| o_tl_d_ready | Output | 1 | Response accepted | CLK-APB | 0 | Registered state decode | All |
-| i_tl_d_opcode | Input | 3 | Response opcode (0 AccessAck, 1 AccessAckData) | CLK-APB | Not used in reset | Checked on d_valid and d_ready | All |
-| i_tl_d_param | Input | 3 | Response parameter, expected 0 | CLK-APB | Not used in reset | Checked | All |
-| i_tl_d_size | Input | 2 | Response size | CLK-APB | Not used in reset | Checked | All |
-| i_tl_d_source | Input | PARA_TL_SRC_W | Response identifier, expected 0 | CLK-APB | Not used in reset | Checked | All |
-| i_tl_d_sink | Input | PARA_TL_SINK_W | Sink identifier | CLK-APB | Not used in reset | Ignored | All |
-| i_tl_d_data | Input | 32 | Read data | CLK-APB | Not used in reset | Captured with the response | All |
-| i_tl_d_user | Input | PARA_TL_DUSER_W | D-channel user bits | CLK-APB | Not used in reset | Ignored (DEC-002) | All |
-| i_tl_d_error | Input | 1 | Response error | CLK-APB | Not used in reset | Captured with the response | All |
+| Port | Direction | Width | Meaning (function) | Clock domain | Signal type | Reset / idle value | Timing / sampling | Configurations |
+|---|---|---:|---|---|---|---|---|---|
+| i_clk_apb | Input | 1 | Clock for both interfaces | CLK-APB | Clock | Not applicable (clock) | Rising edge | All |
+| i_rst_n_apb | Input | 1 | Active-low reset | RST-APB | Reset (asynchronous assertion, level) | Not applicable (reset) | Asynchronous assertion, synchronized release by the SoC | All |
+| i_apb_psel | Input | 1 | APB select | CLK-APB | Level (high for the whole transfer) | Sampled low in reset | Sampled every cycle in IDLE | All |
+| i_apb_penable | Input | 1 | APB enable (access phase) | CLK-APB | Level (high during the access phase) | Sampled low in reset | Sampled with PSEL | All |
+| i_apb_pwrite | Input | 1 | 1 = write | CLK-APB | Data (valid with i_apb_psel) | Not used in reset | Captured in IDLE | All |
+| i_apb_paddr | Input | PARA_ADDR_W | Byte address | CLK-APB | Data (valid with i_apb_psel) | Not used in reset | Captured in IDLE | All |
+| i_apb_pprot | Input | 3 | Protection type | CLK-APB | Data (ignored) | Not used | Ignored (DEC-003) | All |
+| i_apb_pstrb | Input | 4 | Write strobes | CLK-APB | Data (valid with i_apb_psel) | Not used in reset | Captured in IDLE | All |
+| i_apb_pwdata | Input | 32 | Write data | CLK-APB | Data (valid with i_apb_psel) | Not used in reset | Captured in IDLE | All |
+| o_apb_pready | Output | 1 | Transfer ready | CLK-APB | Pulse (1 cycle per transfer) | 0 | Registered; 1 cycle in RESP | All |
+| o_apb_prdata | Output | 32 | Read data | CLK-APB | Data (valid with o_apb_pready) | 0 | Valid with o_apb_pready | All |
+| o_apb_pslverr | Output | 1 | Transfer error | CLK-APB | Level (valid with o_apb_pready) | 0 | Valid with o_apb_pready | All |
+| o_tl_a_valid | Output | 1 | Request valid | CLK-APB | Level (held until i_tl_a_ready) | 0 | Registered; held until i_tl_a_ready | All |
+| i_tl_a_ready | Input | 1 | Request accepted | CLK-APB | Level | Not used in reset | Sampled in SEND | All |
+| o_tl_a_opcode | Output | 3 | Request opcode (0 PutFullData, 1 PutPartialData, 4 Get) | CLK-APB | Data (valid with o_tl_a_valid) | 0 | Stable while valid | All |
+| o_tl_a_param | Output | 3 | Reserved, always 0 | CLK-APB | Static (constant 0) | 0 | Constant | All |
+| o_tl_a_size | Output | 2 | log2 of the request size in bytes | CLK-APB | Data (valid with o_tl_a_valid) | 0 | Stable while valid | All |
+| o_tl_a_source | Output | PARA_TL_SRC_W | Request identifier, always 0 | CLK-APB | Static (constant 0) | 0 | Constant | All |
+| o_tl_a_address | Output | PARA_ADDR_W | Request address | CLK-APB | Data (valid with o_tl_a_valid) | 0 | Stable while valid | All |
+| o_tl_a_mask | Output | 4 | Write byte lanes | CLK-APB | Data (valid with o_tl_a_valid) | 0 | Stable while valid | All |
+| o_tl_a_data | Output | 32 | Write data | CLK-APB | Data (valid with o_tl_a_valid) | 0 | Stable while valid | All |
+| o_tl_a_user | Output | PARA_TL_AUSER_W | A-channel user bits, all-zero default (DEC-002) | CLK-APB | Static (constant default) | 0 | Constant | All |
+| i_tl_d_valid | Input | 1 | Response valid | CLK-APB | Level | Not used in reset | Sampled when o_tl_d_ready is high | All |
+| o_tl_d_ready | Output | 1 | Response accepted | CLK-APB | Level | 0 | Registered state decode | All |
+| i_tl_d_opcode | Input | 3 | Response opcode (0 AccessAck, 1 AccessAckData) | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Checked on d_valid and d_ready | All |
+| i_tl_d_param | Input | 3 | Response parameter, expected 0 | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Checked | All |
+| i_tl_d_size | Input | 2 | Response size | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Checked | All |
+| i_tl_d_source | Input | PARA_TL_SRC_W | Response identifier, expected 0 | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Checked | All |
+| i_tl_d_sink | Input | PARA_TL_SINK_W | Sink identifier | CLK-APB | Data (ignored) | Not used in reset | Ignored | All |
+| i_tl_d_data | Input | 32 | Read data | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Captured with the response | All |
+| i_tl_d_user | Input | PARA_TL_DUSER_W | D-channel user bits | CLK-APB | Data (ignored) | Not used in reset | Ignored (DEC-002) | All |
+| i_tl_d_error | Input | 1 | Response error | CLK-APB | Data (valid with i_tl_d_valid) | Not used in reset | Captured with the response | All |
 
 Test and interrupt ports: none. See section 16 for DFT.
 
@@ -360,6 +360,18 @@ Unused encodings of the 3-bit state register recover to ENUM_ST_IDLE (REF-003 EN
 | OP-006 | APB read | Get, size 2, mask 4'b1111, address = {PADDR[AW-1:2], 2'b00} | AccessAckData: PRDATA = d_data | 3-cycle access phase typical |
 
 ### 10.3 Cycle-level behavior
+
+**Waveform plan (rule R-024).** The waveforms below were agreed with the user (illustrative in this worked example): one per main operation of 10.2, the success and error case of each interface, and the special cases.
+
+| Waveform ID | Function / operation | Scenario (success / error / corner) | Signals shown | Figure | Confirmed by user |
+|---|---|---|---|---|---|
+| WF-001 | OP-001 full write (PutFullData) | success | APB write, TL-UL channels A and D, state | figures/vlsit_apb_write_putfull.svg | 2026-10-18 |
+| WF-002 | OP-006 read (Get) | success | APB read, channels A and D, read data | figures/vlsit_apb_read_get.svg | 2026-10-18 |
+| WF-003 | OP-003 two-lane partial write (PutPartialData) | success | PSTRB, a_size, a_mask, a_address | figures/vlsit_apb_write_partial.svg | 2026-10-18 |
+| WF-004 | OP-001 with a TL-UL error response (ERR-001) | error | d_error, PSLVERR | figures/vlsit_apb_write_error.svg | 2026-10-18 |
+| WF-005 | Response timeout and drain (ERR-004) | corner | timeout counter, DRAIN, late response | figures/vlsit_apb_write_timeout_drain.svg | 2026-10-18 |
+| WF-006 | OP-002 one-lane partial write, OP-004 zero strobe, OP-005 unsupported strobe | corner | Not applicable | **Not required (confirmed by user, 2026-10-18):** same shape as WF-003, or no TL-UL activity; see the cycle table below | 2026-10-18 |
+
 
 Active edge: rising edge of i_clk_apb. Inputs are sampled at the edge that ends the cycle; outputs change after the edge that starts it. The table follows Figure 6-1 (write with PutFullData, device responds one cycle after acceptance).
 

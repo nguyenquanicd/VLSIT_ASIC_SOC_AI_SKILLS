@@ -58,7 +58,7 @@ what it does / does not do; reply-language line; precedence line
 ## Output          where results go; what to report
 ```
 
-File names (R-042): every file the skill uses, in `reference/`, `scripts/`, `templates/` and examples, starts with `vlsit_` (for example `reference/vlsit_question_bank.md`). Only `SKILL.md`, `rule.md`, `README.md`, `LICENSE` and third-party files under `assets/` keep their names. Write each file name in full wherever it is mentioned.
+File names (R-042): every file the skill uses, in `reference/`, `scripts/`, `templates/` and examples, starts with `vlsit_` (for example `reference/vlsit_writing_rules.md`). Only `SKILL.md`, `rule.md`, `README.md`, `LICENSE` and third-party files under `assets/` keep their names. Write each file name in full wherever it is mentioned.
 
 The template in [templates/vlsit_SKILL.md.tpl](templates/vlsit_SKILL.md.tpl) has this shape.
 

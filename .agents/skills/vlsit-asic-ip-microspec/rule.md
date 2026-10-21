@@ -92,10 +92,15 @@ MUST define software-visible registers only in the VLSIT CSR workbook, filled by
 - Why: the workbook is the single source for the generated register RTL, so a second copy would drift.
 - Check: `scripts/vlsit_csr_tool.py validate` prints PASS; manual - section 11 holds no register table.
 
+### R-025 Signal description table
+MUST describe every port of section 6.2 with its function, its clock domain (or asynchronous) and its signal type, where the type starts with level, pulse (with its width in cycles), clock, reset, data (with the qualifier that makes it valid) or static, and ask the user when the type or the clock domain of a port is not known.
+- Why: integrators and verification engineers must know which input is a pulse that can be missed and which is a level, and in which clock domain it is sampled, before they connect the IP.
+- Check: `scripts/vlsit_spec_tool.py check` reports a port without a function, a clock domain or a valid signal type; manual - pulse widths and clock domains agree with sections 7 and 10.
+
 ## Diagrams and waveforms
 
 ### R-017 Block diagram and key waveforms
-MUST include in every specification a block diagram in section 5.2 and the key waveform of each important transaction of every external interface (at least one success case and one error case per interface), each as an image file with its source file beside it.
+MUST include in every specification a block diagram in section 5.2 and the key waveform of each important transaction of every external interface (at least one success case and one error case per interface), each as an image file with its source file beside it. The complete list of waveforms is agreed with the user under R-024.
 - Why: a reader checks a protocol bridge by looking at its handshakes, and an image with a source can be reviewed and edited.
 - Check: manual - section 5.2 links a block diagram and the interface sections link waveform images whose `.json` or `.tex` sources exist.
 
@@ -113,6 +118,11 @@ MUST use draw.io only after the user declined LaTeX and agreed to draw.io, build
 MUST follow the conventions of `reference/drawio/VLSIT_daigram_reference.drawio` in every draw.io diagram: black and white only, 18 pt text, rectangular blocks inside an enclosing frame whose name is at the top right, protocol names on the arrows, and no grid.
 - Why: the reference diagram is the user's approved look, and a uniform style lets the diagrams of many IP be compared.
 - Check: `scripts/vlsit_library_symbols.py validate --diagram FILE` prints PASS; manual - compare the diagram with the reference pages.
+
+### R-024 Waveform plan confirmed by the user
+MUST propose to the user, before drawing any waveform, a list that covers every operation of section 10.2, the success and the error case of every interface, and every special case of the IP (reset, backpressure, back-to-back, boundary and timeout cases); ask the user to confirm or change the minimum set with the question format of R-003; record the confirmed list as the waveform plan table of section 10.3 with the confirmation date; and draw every waveform of the plan.
+- Why: waveforms cost effort to draw and to review, and only the user knows which functions must be shown, so a confirmed list prevents both missing key behavior and pictures nobody needs.
+- Check: `scripts/vlsit_spec_tool.py check` reports a missing plan table, an operation of 10.2 that is neither in the plan nor declined with a dated Not required line, and a figure or its `.json` or `.tex` source that does not exist; manual - the question was asked before the first waveform was drawn.
 
 ## Scripts and tools
 

@@ -6,7 +6,7 @@ A complete output of the skill `vlsit-asic-ip-microspec` for a protocol bridge b
 |---|---|
 | `vlsit_m_apb_tlul_bridge_Design_Specification.md` | The specification in the VLSIT template (22 sections, 26 requirements, 18 tests, 7 assertions, 3 coverage items). `vlsit_spec_tool.py check` reports PASS |
 | `figures/vlsit_block_diagram.json`, `.tex`, `.svg`, `.png`, `.drawio` | The block diagram from one JSON description: TikZ source, rendered image, and the draw.io export that uses the VLSIT library (`vlsit_library_symbols.py validate` reports PASS) |
-| `figures/apb_*.json`, `figures/apb_*.svg` | Key waveforms: full write, read, error response, partial write, timeout with drain |
+| `figures/vlsit_apb_*.json`, `figures/vlsit_apb_*.svg` | Key waveforms of the waveform plan in section 10.3: full write, read, error response, partial write, timeout with drain. Section 6.2 shows the signal-type column |
 | `research/vlsit_reference_ip_log.md` | Reference-IP research with the evidence filter |
 | `vlsit_qa_log.md` | The question style of the skill (simulated answers) |
 

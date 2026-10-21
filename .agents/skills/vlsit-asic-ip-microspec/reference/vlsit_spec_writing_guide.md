@@ -1,6 +1,6 @@
 # Specification writing guide
 
-Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to R-017). The template is `templates/VLSIT_ASIC_IP_Design_Specification_Template.md`; follow its section titles exactly.
+Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to R-017, R-024, R-025). The template is `templates/VLSIT_ASIC_IP_Design_Specification_Template.md`; follow its section titles exactly.
 
 | Section | What to put there | Typical questions to the user |
 |---|---|---|
@@ -9,11 +9,11 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to
 | 3 Requirements | One shall per requirement with REQ-ID, source, applicability and verification method | Which behaviors are mandatory and how are they verified? |
 | 4 Features and configurations | Configuration table; optional features absent, tied off or runtime-disabled | Which configurations ship? |
 | 5 Architecture | Blocks, block diagram (R-017), dataflow, invariants | What are the blocks and what is stored? |
-| 6 Interfaces and ports | Interface inventory, full port list with reset values, protocol behavior and key waveforms, interrupts | Which ports, widths, reset values, error and unsupported cases? |
+| 6 Interfaces and ports | Interface inventory, full port list with the function, clock domain, signal type (level or pulse) and reset value of every port (R-025), protocol behavior and key waveforms, interrupts | Which ports, widths, reset values, error and unsupported cases? Is each input a level or a pulse, and in which clock domain? |
 | 7 Clock, reset, power | Domains, CDC, resets, power intent | How many clocks and resets? Any low-power mode? |
 | 8 Parameters | Parameter table, VLSIT comment lines, configurations, illegal values | Which values may change, and which are illegal? |
 | 9 Data representation | Widths, endianness, encodings, invalid behavior | Which encodings and overflow rules? |
-| 10 Functional behavior | States, operations, cycle tables, throughput, memories | What happens cycle by cycle, with backpressure? |
+| 10 Functional behavior | States, operations, the waveform plan confirmed by the user (R-024), cycle tables, throughput, memories | What happens cycle by cycle, with backpressure? Which waveforms are the minimum? |
 | 11 Registers | Pointer to the CSR workbook and software sequences | Which registers? (fill the workbook) |
 | 12 Errors | Error table, precedence, recovery, waveforms | What are the errors and how does the system recover? |
 | 13 PPA | Hard requirements and goals with conditions | Frequency, area, power targets and corners? |
@@ -25,6 +25,25 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to
 | 19 Traceability | Every REQ to module, test, method, configuration | Generated from sections 3 and 15 |
 | 20 Assumptions, decisions | Assumptions, dependencies, decisions, open items, TBD with impact | Which points remain open? |
 | 21 Glossary, 22 References | Terms and the sources actually used | Not applicable |
+
+## Port table of 6.2 (rule R-025)
+
+Columns: Port, Direction, Width, Meaning (function), Clock domain, Signal type, Reset / idle value, Timing / sampling, Configurations. `vlsit_spec_tool.py init` creates them.
+
+| Signal type | Write it as | Example |
+|---|---|---|
+| Level | `Level` and, when useful, how long it is held | `Level (held until i_tl_a_ready)` |
+| Pulse | `Pulse (N cycles)`, with the minimum width and what happens if it is missed | `Pulse (1 cycle per transfer)` |
+| Clock | `Clock` | `Clock` |
+| Reset | `Reset`, with its polarity and whether assertion is asynchronous | `Reset (asynchronous assertion, level)` |
+| Data | `Data (valid with <qualifier>)` | `Data (valid with o_valid)` |
+| Static | `Static`, for a constant or a configuration input that does not change in operation | `Static (constant 0)` |
+
+The Clock domain cell names the domain (for example `CLK-CORE`) or `async` with the synchronizer that receives the signal.
+
+## Waveform plan (rule R-024)
+
+The table sits at the start of section 10.3, with the columns Waveform ID, Function / operation, Scenario, Signals shown, Figure and Confirmed by user. Build it from the operations of 10.2 and the interface cases of 6.3, add the special cases of the IP, show it to the user, and draw only what the user confirms. Typical entries: one success waveform per operation, one error waveform per error mechanism, reset, backpressure, back-to-back transfers, full and empty boundaries, timeout. A declined waveform stays in the table with a dated Not required line in the Figure cell, so `vlsit_spec_tool.py check` can see that the operation was considered.
 
 ## Names (from VLSIT_RTL_Design_Rule.md)
 
