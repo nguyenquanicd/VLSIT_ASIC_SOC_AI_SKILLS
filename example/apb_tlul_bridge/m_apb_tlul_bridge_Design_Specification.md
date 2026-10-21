@@ -163,7 +163,7 @@ The bridge has two modules below a structural top. The APB-facing module `m_apb_
 |---|---|---|---|---|
 | Setup detect and legality check (in `m_apb_if`) | Detects Setup phase, checks PSTRB and PADDR[1:0], raises launch or local error | APB request to w_req_launch, w_req_wr, w_req_addr, w_req_wdata, local error | CLK-CORE / RST-CORE | None (combinational) |
 | APB FSM and response flops (in `m_apb_if`) | Sequences IDLE, BUSY, DONE; drives o_apb_pready, o_apb_prdata, o_apb_pslverr | w_resp_valid, w_resp_err, w_resp_rdata to APB completion | CLK-CORE / RST-CORE | reg_fsm_apb_current_state, reg_pready, reg_pslverr, reg_prdata |
-| A-channel flops and TL-UL FSM (in `m_tlul_if`) | Loads the request at the Setup edge, holds it until accepted, tracks the outstanding request | w_req_* to TL-UL channel A | CLK-CORE / RST-CORE | reg_fsm_tlul_current_state, reg_a_valid, reg_a_rd, reg_a_address, reg_a_data, reg_d_ready |
+| A-channel flops and TL-UL FSM (in `m_tlul_if`) | Loads the request at the Setup edge, holds it until accepted, tracks the outstanding request | w_req_* to TL-UL channel A | CLK-CORE / RST-CORE | reg_fsm_tlul_current_state, reg_a_valid, reg_a_rd, reg_a_addr, reg_a_data, reg_d_ready |
 | D-channel checker (in `m_tlul_if`) | Detects a valid response, checks d_error, d_opcode, d_source, forms read data | TL-UL channel D to w_resp_* | CLK-CORE / RST-CORE | None (combinational) |
 
 Internal interface between the two modules (all wires, no register crosses the boundary):
@@ -220,42 +220,42 @@ If the device answers in the cycle in which it accepts the request (A1), the res
 
 Port names follow REF-003 PRT-01: `i_` or `o_`, then the protocol tag, then the signal mnemonic, with the tag `apb` for APB and the tag `tlul` for TL-UL (REF-003 has no TL-UL entry). The clock and reset are named `i_clk_core` and `i_rst_n_core` because one clock serves both buses (DEC-012). The TL-UL signal set is the OpenTitan `tl_h2d_t` and `tl_d2h_t` set, flattened. The inputs d_param, d_size, d_sink and d_user are present for integration but no logic reads them (DEC-006). Output ports marked "flop" come directly from a flip-flop; ports marked "constant" are tie-offs (DEC-005).
 
-| Port | Direction | Width | Meaning | Clock domain | Reset / idle value | Timing / sampling | Configurations |
-|---|---|---|---|---|---|---|---|
-| i_clk_core | Input | 1 | Clock for both interfaces | CLK-CORE | Not applicable (clock) | Rising edge | All |
-| i_rst_n_core | Input | 1 | Active-low reset | RST-CORE | Not applicable (reset) | Asynchronous assertion, synchronous release by the SoC | All |
-| i_apb_psel | Input | 1 | APB select | CLK-CORE | Not used in reset | Sampled every cycle on the APB-idle state | All |
-| i_apb_penable | Input | 1 | APB enable (Access phase) | CLK-CORE | Not used in reset | Sampled with PSEL | All |
-| i_apb_pwrite | Input | 1 | 1 = write | CLK-CORE | Not used in reset | Captured at the Setup edge | All |
-| i_apb_paddr | Input | PARA_ADDR_W | Byte address | CLK-CORE | Not used in reset | Captured at the Setup edge; bits [1:0] must be 0 | All |
-| i_apb_pprot | Input | 3 | Protection type | CLK-CORE | Not used | Ignored (DEC-007) | All |
-| i_apb_pstrb | Input | 4 | Write strobes | CLK-CORE | Not used in reset | Checked at the Setup edge; must be 4'b1111 for a write | All |
-| i_apb_pwdata | Input | 32 | Write data | CLK-CORE | Not used in reset | Captured at the Setup edge | All |
-| o_apb_pready | Output (flop) | 1 | Transfer ready | CLK-CORE | 0 | High for one cycle per transfer | All |
-| o_apb_prdata | Output (flop) | 32 | Read data | CLK-CORE | 0 | Valid with o_apb_pready; holds its last value otherwise (DEC-009) | All |
-| o_apb_pslverr | Output (flop) | 1 | Transfer error | CLK-CORE | 0 | High only with o_apb_pready | All |
-| o_tlul_a_valid | Output (flop) | 1 | Request valid | CLK-CORE | 0 | Set at the Setup edge, held until i_tlul_a_ready | All |
-| i_tlul_a_ready | Input | 1 | Request accepted | CLK-CORE | Not used in reset | Sampled while o_tlul_a_valid is high | All |
-| o_tlul_a_opcode | Output | 3 | Request opcode: bit 2 from a flop (1 = Get); bits [1:0] constant 0 (PutFullData 3'b000, Get 3'b100) | CLK-CORE | 0 | Stable while valid | All |
-| o_tlul_a_param | Output (constant) | 3 | Reserved, always 3'b000 | CLK-CORE | 3'b000 | Constant | All |
-| o_tlul_a_size | Output (constant) | 2 | Request size, always 2'b10 (4 bytes) | CLK-CORE | 2'b10 | Constant | All |
-| o_tlul_a_source | Output (constant) | PARA_SRC_W | Request identifier, always PARA_SRC_ID | CLK-CORE | PARA_SRC_ID | Constant | All |
-| o_tlul_a_address | Output | PARA_ADDR_W | Request address: bits [PARA_ADDR_W-1:2] from flops, bits [1:0] constant 0 | CLK-CORE | 0 | Stable while valid | All |
-| o_tlul_a_mask | Output (constant) | 4 | Byte lanes, always 4'b1111 | CLK-CORE | 4'b1111 | Constant | All |
-| o_tlul_a_data | Output (flop) | 32 | Write data (copy of PWDATA; unused by the device on Get) | CLK-CORE | 0 | Stable while valid | All |
-| o_tlul_a_user | Output (constant) | PARA_A_USER_W | A-channel user bits, always '0 (DEC-004) | CLK-CORE | '0 | Constant | All |
-| i_tlul_d_valid | Input | 1 | Response valid | CLK-CORE | Not used in reset | Sampled while o_tlul_d_ready is high | All |
-| o_tlul_d_ready | Output (flop) | 1 | Response accepted | CLK-CORE | 0 in reset, then 1 (DEC-010) | Constant 1 after the first clock edge following reset release | All |
-| i_tlul_d_opcode | Input | 3 | Response opcode (3'b000 AccessAck, 3'b001 AccessAckData) | CLK-CORE | Not used in reset | Checked with a valid response | All |
-| i_tlul_d_source | Input | PARA_SRC_W | Response identifier, expected PARA_SRC_ID | CLK-CORE | Not used in reset | Checked with a valid response | All |
-| i_tlul_d_data | Input | 32 | Read data | CLK-CORE | Not used in reset | Captured with a valid read response | All |
-| i_tlul_d_error | Input | 1 | Response error | CLK-CORE | Not used in reset | Captured with a valid response | All |
-| i_tlul_d_param | Input | 3 | Response parameter (reserved) | CLK-CORE | Not used in reset | Unused, no logic reads it (DEC-006) | All |
-| i_tlul_d_size | Input | 2 | Response size | CLK-CORE | Not used in reset | Unused, not checked (DEC-006) | All |
-| i_tlul_d_sink | Input | PARA_D_SINK_W | Response sink identifier | CLK-CORE | Not used in reset | Unused (DEC-006) | All |
-| i_tlul_d_user | Input | PARA_D_USER_W | Response user bits | CLK-CORE | Not used in reset | Unused (DEC-006) | All |
+| Port | Direction | Width | Meaning (function) | Clock domain | Signal type | Reset / idle value | Timing / sampling | Configurations |
+|---|---|---|---|---|---|---|---|---|
+| i_clk_core | Input | 1 | Clock for both interfaces | CLK-CORE | Clock | Not applicable (clock) | Rising edge | All |
+| i_rst_n_core | Input | 1 | Active-low reset | RST-CORE | Reset (asynchronous assertion, level) | Not applicable (reset) | Asynchronous assertion, synchronous release by the SoC | All |
+| i_apb_psel | Input | 1 | APB select | CLK-CORE | Level (high for the whole transfer) | Not used in reset | Sampled every cycle on the APB-idle state | All |
+| i_apb_penable | Input | 1 | APB enable (Access phase) | CLK-CORE | Level (high during the Access phase) | Not used in reset | Sampled with PSEL | All |
+| i_apb_pwrite | Input | 1 | 1 = write | CLK-CORE | Data (valid with i_apb_psel) | Not used in reset | Captured at the Setup edge | All |
+| i_apb_paddr | Input | PARA_ADDR_W | Byte address | CLK-CORE | Data (valid with i_apb_psel) | Not used in reset | Captured at the Setup edge; bits [1:0] must be 0 | All |
+| i_apb_pprot | Input | 3 | Protection type | CLK-CORE | Data (ignored) | Not used | Ignored (DEC-007) | All |
+| i_apb_pstrb | Input | 4 | Write strobes | CLK-CORE | Data (valid with i_apb_psel) | Not used in reset | Checked at the Setup edge; must be 4'b1111 for a write | All |
+| i_apb_pwdata | Input | 32 | Write data | CLK-CORE | Data (valid with i_apb_psel) | Not used in reset | Captured at the Setup edge | All |
+| o_apb_pready | Output (flop) | 1 | Transfer ready | CLK-CORE | Pulse (1 cycle per transfer) | 0 | High for one cycle per transfer | All |
+| o_apb_prdata | Output (flop) | 32 | Read data | CLK-CORE | Data (valid with o_apb_pready) | 0 | Valid with o_apb_pready; holds its last value otherwise (DEC-009) | All |
+| o_apb_pslverr | Output (flop) | 1 | Transfer error | CLK-CORE | Level (high only with o_apb_pready) | 0 | High only with o_apb_pready | All |
+| o_tlul_a_valid | Output (flop) | 1 | Request valid | CLK-CORE | Level (set at the Setup edge, held until i_tlul_a_ready) | 0 | Set at the Setup edge, held until i_tlul_a_ready | All |
+| i_tlul_a_ready | Input | 1 | Request accepted | CLK-CORE | Level (handshake with o_tlul_a_valid) | Not used in reset | Sampled while o_tlul_a_valid is high | All |
+| o_tlul_a_opcode | Output | 3 | Request opcode: bit 2 from a flop (1 = Get); bits [1:0] constant 0 (PutFullData 3'b000, Get 3'b100) | CLK-CORE | Data (valid with o_tlul_a_valid) | 0 | Stable while valid | All |
+| o_tlul_a_param | Output (constant) | 3 | Reserved, always 3'b000 | CLK-CORE | Static (constant 3'b000) | 3'b000 | Constant | All |
+| o_tlul_a_size | Output (constant) | 2 | Request size, always 2'b10 (4 bytes) | CLK-CORE | Static (constant 2'b10) | 2'b10 | Constant | All |
+| o_tlul_a_source | Output (constant) | PARA_SRC_W | Request identifier, always PARA_SRC_ID | CLK-CORE | Static (constant PARA_SRC_ID) | PARA_SRC_ID | Constant | All |
+| o_tlul_a_address | Output | PARA_ADDR_W | Request address: bits [PARA_ADDR_W-1:2] from flops, bits [1:0] constant 0 | CLK-CORE | Data (valid with o_tlul_a_valid) | 0 | Stable while valid | All |
+| o_tlul_a_mask | Output (constant) | 4 | Byte lanes, always 4'b1111 | CLK-CORE | Static (constant 4'b1111) | 4'b1111 | Constant | All |
+| o_tlul_a_data | Output (flop) | 32 | Write data (copy of PWDATA; unused by the device on Get) | CLK-CORE | Data (valid with o_tlul_a_valid) | 0 | Stable while valid | All |
+| o_tlul_a_user | Output (constant) | PARA_A_USER_W | A-channel user bits, always '0 (DEC-004) | CLK-CORE | Static (constant 0) | '0 | Constant | All |
+| i_tlul_d_valid | Input | 1 | Response valid | CLK-CORE | Level (handshake with o_tlul_d_ready) | Not used in reset | Sampled while o_tlul_d_ready is high | All |
+| o_tlul_d_ready | Output (flop) | 1 | Response accepted | CLK-CORE | Level (0 in reset, then constant 1) | 0 in reset, then 1 (DEC-010) | Constant 1 after the first clock edge following reset release | All |
+| i_tlul_d_opcode | Input | 3 | Response opcode (3'b000 AccessAck, 3'b001 AccessAckData) | CLK-CORE | Data (valid with i_tlul_d_valid) | Not used in reset | Checked with a valid response | All |
+| i_tlul_d_source | Input | PARA_SRC_W | Response identifier, expected PARA_SRC_ID | CLK-CORE | Data (valid with i_tlul_d_valid) | Not used in reset | Checked with a valid response | All |
+| i_tlul_d_data | Input | 32 | Read data | CLK-CORE | Data (valid with i_tlul_d_valid) | Not used in reset | Captured with a valid read response | All |
+| i_tlul_d_error | Input | 1 | Response error | CLK-CORE | Data (valid with i_tlul_d_valid) | Not used in reset | Captured with a valid response | All |
+| i_tlul_d_param | Input | 3 | Response parameter (reserved) | CLK-CORE | Data (ignored) | Not used in reset | Unused, no logic reads it (DEC-006) | All |
+| i_tlul_d_size | Input | 2 | Response size | CLK-CORE | Data (ignored) | Not used in reset | Unused, not checked (DEC-006) | All |
+| i_tlul_d_sink | Input | PARA_D_SINK_W | Response sink identifier | CLK-CORE | Data (ignored) | Not used in reset | Unused (DEC-006) | All |
+| i_tlul_d_user | Input | PARA_D_USER_W | Response user bits | CLK-CORE | Data (ignored) | Not used in reset | Unused (DEC-006) | All |
 
-Test and interrupt ports: none. See section 16 for DFT. The inputs i_tlul_d_param, i_tlul_d_size, i_tlul_d_sink and i_tlul_d_user and the APB input i_apb_pprot are unused; they need a lint waiver (section 14.3).
+Signal types: a level is held until it is acknowledged or changed; the only pulse is o_apb_pready, one cycle per transfer, which the APB requester samples in that cycle; data signals are qualified by the signal named in their type; static signals never change after reset. All signals are in the clock domain CLK-CORE except i_rst_n_core, whose release is synchronized by the SoC. Test and interrupt ports: none. See section 16 for DFT. The inputs i_tlul_d_param, i_tlul_d_size, i_tlul_d_sink and i_tlul_d_user and the APB input i_apb_pprot are unused; they need a lint waiver (section 14.3).
 
 ### 6.3 Protocol behavior
 
@@ -314,9 +314,9 @@ Test and interrupt ports: none. See section 16 for DFT. The inputs i_tlul_d_para
 
 | Reset ID | Port | Polarity / assertion | Sync or async | Scope | Deassertion | Reset value |
 |---|---|---|---|---|---|---|
-| RST-CORE | i_rst_n_core | Active-low | Asynchronous assertion; synchronous release provided by the SoC reset controller (REF-003 RST-02, DEP-002) | All flip-flops | Synchronous to i_clk_core | Both FSMs in ENUM_ST_IDLE; reg_a_valid, reg_d_ready, reg_pready, reg_pslverr, reg_prdata, reg_a_rd, reg_a_address, reg_a_data = 0 |
+| RST-CORE | i_rst_n_core | Active-low | Asynchronous assertion; synchronous release provided by the SoC reset controller (REF-003 RST-02, DEP-002) | All flip-flops | Synchronous to i_clk_core | Both FSMs in ENUM_ST_IDLE; reg_a_valid, reg_d_ready, reg_pready, reg_pslverr, reg_prdata, reg_a_rd, reg_a_addr, reg_a_data = 0 |
 
-Every flip-flop has the asynchronous reset (DEC-013): both FSM state registers, reg_a_valid, reg_d_ready, reg_pready, reg_pslverr and reg_prdata, and also the payload registers reg_a_rd, reg_a_address and reg_a_data. All are reset to 0, so every flop-driven output is defined after reset: o_tlul_a_opcode = 3'b000, o_tlul_a_address = 0 and o_tlul_a_data = 0 while o_tlul_a_valid = 0. reg_d_ready is cleared by reset and its D input is 1, so o_tlul_d_ready becomes 1 at the first clock edge after reset release (DEC-010). A transfer in progress when the reset asserts is abandoned; the SoC resets the APB Requester and the TL-UL device together with the bridge (DEP-002).
+Every flip-flop has the asynchronous reset (DEC-013): both FSM state registers, reg_a_valid, reg_d_ready, reg_pready, reg_pslverr and reg_prdata, and also the payload registers reg_a_rd, reg_a_addr and reg_a_data. All are reset to 0, so every flop-driven output is defined after reset: o_tlul_a_opcode = 3'b000, o_tlul_a_address = 0 and o_tlul_a_data = 0 while o_tlul_a_valid = 0. reg_d_ready is cleared by reset and its D input is 1, so o_tlul_d_ready becomes 1 at the first clock edge after reset release (DEC-010). A transfer in progress when the reset asserts is abandoned; the SoC resets the APB Requester and the TL-UL device together with the bridge (DEP-002).
 
 ### 7.4 Power intent (if applicable)
 
@@ -346,6 +346,8 @@ parameter logic [31:0] PARA_ADDR_W = 32'd32,
 |---|---|---|---|---|
 | CFG-BASE | Defaults | FEAT-001 to FEAT-005 | m_apb_tlul_bridge with two children | Elaborates and lints clean; synthesizes without memories |
 | CFG-NARROW | PARA_ADDR_W = 16, PARA_SRC_W = 1, PARA_SRC_ID = 1 | Same | Same | Same targets |
+
+The module m_tlul_if also holds three constants that are not parameters and cannot be overridden: LPARA_A_SIZE = 2 (request size code, 4 bytes), LPARA_A_MASK = 4'b1111 (all byte lanes) and LPARA_D_ACK_DATA = 1 (d_opcode of AccessAckData). They only give names to the constant fields of section 6.2.
 
 An illegal parameter value shall be reported at elaboration of the verification source set and shall not be silently clamped. The port list depends on a parameter only through widths.
 
@@ -380,7 +382,7 @@ There are two small FSMs, one in each module. Names follow REF-003 ENM-04 and EN
 
 | Mode/state | Entry condition | Behavior | Exit condition | Outputs / side effects |
 |---|---|---|---|---|
-| ENUM_ST_IDLE | Reset release, or response taken | No request outstanding | w_req_launch = 1: ENUM_ST_REQ | At that edge reg_a_valid, reg_a_rd, reg_a_address, reg_a_data load |
+| ENUM_ST_IDLE | Reset release, or response taken | No request outstanding | w_req_launch = 1: ENUM_ST_REQ | At that edge reg_a_valid, reg_a_rd, reg_a_addr, reg_a_data load |
 | ENUM_ST_REQ | Request launched | o_tlul_a_valid = 1; channel A stable | i_tlul_a_ready = 1 with a valid response in the same cycle: ENUM_ST_IDLE; i_tlul_a_ready = 1 without response: ENUM_ST_WAIT | reg_a_valid cleared when the request is accepted |
 | ENUM_ST_WAIT | Request accepted | Waits for the response | Valid response: ENUM_ST_IDLE | w_resp_valid = 1 in the exit cycle |
 
@@ -396,7 +398,7 @@ Combinational equations (all inputs go to flip-flop D pins or to the next-state 
 | w_legal | i_apb_paddr[1:0] = 2'b00 and (i_apb_pwrite = 0 or i_apb_pstrb = 4'b1111) |
 | w_req_launch | w_setup and w_legal |
 | w_local_err | w_setup and not w_legal |
-| w_resp_valid | i_tlul_d_valid and reg_d_ready and ((TL-UL state = ENUM_ST_REQ and i_tlul_a_ready) or TL-UL state = ENUM_ST_WAIT) |
+| w_resp_valid (named w_resp_hit inside m_tlul_if) | i_tlul_d_valid and reg_d_ready and ((TL-UL state = ENUM_ST_REQ and i_tlul_a_ready) or TL-UL state = ENUM_ST_WAIT) |
 | w_resp_err | i_tlul_d_error or (i_tlul_d_opcode differs from (reg_a_rd ? 3'b001 : 3'b000)) or (i_tlul_d_source differs from PARA_SRC_ID) |
 | w_resp_rdata | (reg_a_rd and not w_resp_err) ? i_tlul_d_data : 32'h0 |
 
@@ -409,6 +411,20 @@ Combinational equations (all inputs go to flip-flop D pins or to the next-state 
 
 ### 10.3 Cycle-level behavior
 
+**Waveform plan (rule R-024).** The list below was proposed from sections 6.3 and 10.2 and confirmed by the designer on 2026-10-21 (option "proposed list"). It covers every operation of 10.2, the success and the error case of both interfaces, and the special cases.
+
+| Waveform ID | Function / operation | Scenario (success / error / corner) | Signals shown | Figure | Confirmed by user |
+|---|---|---|---|---|---|
+| WF-001 | OP-001 full-strobe write | success | APB write, channels A and D, both FSMs, PREADY | figures/apb_write_ok.svg (Figure 6-1) | 2026-10-21 |
+| WF-002 | OP-002 read | success | APB read, Get, read data on PRDATA | figures/apb_read_ok.svg (Figure 6-2) | 2026-10-21 |
+| WF-003 | OP-003 illegal request, local error | error | PSTRB, PREADY and PSLVERR in the first Access cycle, no channel A request | figures/apb_local_err.svg (Figure 12-2) | 2026-10-21 |
+| WF-004 | OP-004 TL-UL error response | error | d_error, PSLVERR, PRDATA = 0 | figures/apb_write_resp_err.svg (Figure 12-1) | 2026-10-21 |
+| WF-005 | OP-001 and OP-002 with channel A back pressure | corner | a_ready low, channel A stable, extended Access phase | figures/tlul_backpressure.svg (Figure 6-3) | 2026-10-21 |
+| WF-006 | OP-001, OP-002 and OP-003 back to back with PSEL held high | corner | Setup detection by level, Setup-to-Setup interval | figures/apb_back_to_back.svg (Figure 6-4) | 2026-10-21 |
+| WF-007 | OP-001 with the response in the acceptance cycle | corner | d_valid with a_ready, 2 Access cycles | figures/apb_write_same_cycle.svg (Figure 10-1) | 2026-10-21 |
+| WF-008 | Reset and the first cycles after release | corner | rst_n, d_ready 0 then 1, outputs 0 | figures/reset_sequence.svg (Figure 10-2) | 2026-10-21 |
+| WF-009 | Orphan response discarded | corner | d_valid with no accepted request, no APB effect | figures/tlul_orphan_response.svg (Figure 10-3) | 2026-10-21 |
+
 Active edge: rising edge of i_clk_core. Inputs are sampled at the edge that ends a cycle; flip-flop outputs change after that edge. The table follows Figure 6-1 (write, device accepts in A1 and responds in A2).
 
 | Cycle / event | Input condition | State/action | Output condition |
@@ -420,6 +436,18 @@ Active edge: rising edge of i_clk_core. Inputs are sampled at the edge that ends
 | Next cycle | i_apb_psel = 0, or the next Setup phase | APB FSM to ENUM_ST_IDLE | reg_pready and reg_pslverr cleared |
 
 Variants: a response in A1 (the cycle of acceptance) gives o_apb_pready = 1 in A2, a 2-cycle Access phase (REQ-PERF-002). A local error loads reg_pready at the end of S, so o_apb_pready = 1 in A1, a 1-cycle Access phase (REQ-PERF-003, Figure 12-2). A device that holds a_ready low or answers late extends the Access phase by the same number of cycles. For back-to-back transfers the Setup cycle of the next transfer is the cycle after the PREADY cycle, with i_apb_psel still 1 and i_apb_penable = 0; the APB FSM is in ENUM_ST_IDLE in that cycle and captures the request at its end (Figure 6-4).
+
+![Response in the acceptance cycle](figures/apb_write_same_cycle.svg)
+
+*Figure 10-1. The device answers in the cycle in which it accepts the request: 2 Access cycles (source: `figures/apb_write_same_cycle.json`).*
+
+![Reset sequence](figures/reset_sequence.svg)
+
+*Figure 10-2. Reset and release: all flop outputs are 0 in reset; o_tlul_d_ready becomes 1 at the first clock edge after release (source: `figures/reset_sequence.json`).*
+
+![Orphan responses](figures/tlul_orphan_response.svg)
+
+*Figure 10-3. d_valid at T1 (idle), T3 (before acceptance) and T7 (after the response) is discarded; the real response is at T5 (source: `figures/tlul_orphan_response.json`).*
 
 ### 10.4 Arbitration, buffering, and throughput
 
@@ -677,7 +705,7 @@ The SDC delivered with the IP is the executable form of the tables below. The So
 | DEC-010 | Decision | reg_d_ready is a flop reset to 0 with D = 1: o_tlul_d_ready is 0 in reset and 1 from the first edge after release | Satisfies answers 1A (0 after reset) and 2A (constant 1); a request cannot be outstanding in the first cycle | Confirmed by the designer, 2026-10-18 |
 | DEC-011 | Decision | The data width is fixed at 32 bits; no data-width parameter | APB4 and TL-UL profile of this project | Confirmed by the designer (answer 4A) |
 | DEC-012 | Decision | Clock `i_clk_core` and reset `i_rst_n_core` (REF-003 PRT-02 suggests `apb`; one clock serves both buses so a neutral domain name is used) | Naming only | Announced, not contested |
-| DEC-013 | Decision | All flip-flops, including the payload registers reg_a_rd, reg_a_address and reg_a_data, are reset to 0 | Every flop-driven output is defined after reset; costs about 66 resettable flops instead of plain flops | Confirmed by the designer, 2026-10-18 |
+| DEC-013 | Decision | All flip-flops, including the payload registers reg_a_rd, reg_a_addr and reg_a_data, are reset to 0 | Every flop-driven output is defined after reset; costs about 66 resettable flops instead of plain flops | Confirmed by the designer, 2026-10-18 |
 | DEC-014 | Decision | The Setup phase is recognized by the levels i_apb_psel = 1 and i_apb_penable = 0, never by an edge of i_apb_psel, so back-to-back transfers with i_apb_psel held high are supported with no added idle cycle | Section 5.3; REQ-FUNC-008 | Requested and confirmed by the designer, 2026-10-18 |
 | DEP-001 | Dependency | A TL-UL fabric or device that follows REF-002 and REF-005 | Interface behavior | Integration |
 | DEP-002 | Dependency | A reset controller that releases the reset synchronously to i_clk_core and resets the APB Requester and the TL-UL device together with the bridge. REF-002 notes that TileLink 1.7.1 asks hosts to hold valid low for 100 cycles in reset; the bridge drives valid low while reset is asserted, the length is set by the SoC | REQ-RESET-001, REQ-RESET-002 | Integration |

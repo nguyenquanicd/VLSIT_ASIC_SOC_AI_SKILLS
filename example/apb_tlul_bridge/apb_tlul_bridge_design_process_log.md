@@ -169,7 +169,7 @@ Final deliverables are in `Output\apb_tlul_bridge\` / Sản phẩm cuối nằm 
 | 2 | Drop ports `d_param`, `d_size`, `d_sink`, `d_user` / Bỏ các port này | "May create the ports but not use them" / "Có thể tạo port nhưng không dùng" | DEC-006: all TL-UL ports kept, no logic reads them / giữ đủ port TL-UL, không logic nào đọc |
 | 3 | Add `PARA_A_USER_W` | "Approved, but since it is unused make the default width the lowest" / "Duyệt, nhưng không dùng nên mặc định bit width thấp nhất" | Default 1; `PARA_D_SINK_W` and `PARA_D_USER_W` added with default 1 / mặc định 1; thêm `PARA_D_SINK_W`, `PARA_D_USER_W` mặc định 1 |
 | 4 | Sticky error flag / Cờ lỗi sticky | "Right, no sticky flag in the RTL" / "Đúng, trong RTL không có cờ giữ" | DEC-009: only a counter in the verification environment / chỉ có bộ đếm ở môi trường verification |
-| 5 | Payload flops without reset / Flop payload không reset | "Add reset, set value 0" / "Thêm reset và gài trị 0" | DEC-013: every flop has asynchronous reset to 0, including `reg_a_rd`, `reg_a_address`, `reg_a_data` / mọi flop reset bất đồng bộ về 0 |
+| 5 | Payload flops without reset / Flop payload không reset | "Add reset, set value 0" / "Thêm reset và gài trị 0" | DEC-013: every flop has asynchronous reset to 0, including `reg_a_rd`, `reg_a_addr`, `reg_a_data` / mọi flop reset bất đồng bộ về 0 |
 
 ### A11. Adding back-to-back transfers / Bổ sung transfer liên tiếp (back-to-back)
 
@@ -291,3 +291,15 @@ Final deliverables are in `Output\apb_tlul_bridge\` / Sản phẩm cuối nằm 
 | 4 | **Reset:** every flop resets asynchronously to 0; `d_ready` is 0 in reset and becomes 1 at the first edge after release. The SoC must release reset synchronously and reset the APB master and the TL-UL device together (DEP-002). | **Reset:** mọi flop reset bất đồng bộ về 0; `d_ready` bằng 0 trong reset rồi lên 1 ở cạnh đầu tiên sau khi nhả reset. SoC phải nhả reset đồng bộ và reset APB master cùng thiết bị TL-UL (DEP-002). |
 | 5 | **Remaining open items:** TBD-001 (`a_user` layout), TBD-002 (frequency, area, power targets), OI-001 (integrity), OI-003 (TileLink 1.7.1 spec not downloaded), OI-004 (clock frequency range). | **Open items còn lại:** TBD-001 (layout `a_user`), TBD-002 (mục tiêu tần số, diện tích, công suất), OI-001 (integrity), OI-003 (chưa tải đặc tả TileLink 1.7.1), OI-004 (dải tần số clock). |
 | 6 | **Remaining lint messages:** 5 unused inputs need a waiver; the 8 NAM-08 warnings are port names fixed by the protocol. | **Cảnh báo lint còn lại:** 5 input không dùng cần waiver; 8 cảnh báo NAM-08 là tên port do giao thức quy định. |
+
+---
+
+## Part D. Update for the new skill rules (2026-10-21) / Phần D. Cập nhật theo rule mới của skill (2026-10-21)
+
+**EN:** The skill `vlsit-asic-ip-microspec` gained two rules, so the spec was updated and re-checked with `vlsit_spec_tool.py check` (PASS).
+- **Signal description table (R-025).** The port table of section 6.2 now has a "Meaning (function)" column, the clock domain, and a new **Signal type** column for all 32 ports. Only `o_apb_pready` is a pulse (1 cycle per transfer); the other control signals are levels; data signals name the qualifier that makes them valid; the constants are static; the five unused inputs are marked "ignored".
+- **Waveform plan (R-024).** Nine waveforms were proposed from sections 6.3 and 10.2 and **confirmed by you on 2026-10-21 ("proposed list")**: the six existing ones (write, read, local error, TL-UL error response, channel A back pressure, back-to-back with `PSEL` held) plus three new ones: response in the acceptance cycle (2 Access cycles), reset and the first cycles after release (`d_ready` 0 then 1), and an orphan response discarded. The plan table is at the start of section 10.3 (WF-001 to WF-009) and the three new images are Figure 10-1 to 10-3 (`figures\apb_write_same_cycle`, `reset_sequence`, `tlul_orphan_response`).
+
+**VI:** Skill `vlsit-asic-ip-microspec` có thêm hai rule, nên spec được cập nhật và kiểm lại bằng `vlsit_spec_tool.py check` (PASS).
+- **Bảng mô tả tín hiệu (R-025).** Bảng port ở mục 6.2 giờ có cột "Meaning (function)", clock domain, và cột mới **Signal type** cho cả 32 port. Chỉ `o_apb_pready` là pulse (1 chu kỳ mỗi transfer); các tín hiệu điều khiển khác là level; tín hiệu data ghi rõ điều kiện hợp lệ; các hằng là static; năm input không dùng ghi "ignored".
+- **Kế hoạch waveform (R-024).** Chín waveform được đề xuất từ mục 6.3 và 10.2 và **bạn đã xác nhận ngày 2026-10-21 ("danh sách đề xuất")**: sáu waveform sẵn có (ghi, đọc, lỗi cục bộ, response lỗi TL-UL, back pressure kênh A, back-to-back với `PSEL` giữ cao) cộng ba waveform mới: response cùng chu kỳ nhận (2 chu kỳ Access), reset và các chu kỳ đầu sau khi nhả (`d_ready` 0 rồi 1), và orphan response bị bỏ qua. Bảng kế hoạch nằm đầu mục 10.3 (WF-001 đến WF-009), ba hình mới là Figure 10-1 đến 10-3 (`figures\apb_write_same_cycle`, `reset_sequence`, `tlul_orphan_response`).
