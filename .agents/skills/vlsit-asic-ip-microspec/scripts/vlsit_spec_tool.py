@@ -5,7 +5,8 @@ Actions :
   env                              report Python, openpyxl, PyMuPDF and LaTeX availability (read-only)
   init NAME --out FILE [--id ID]   copy the bundled template, fill the title, ip_name and document_id, and add
                                    the "Signal type" column to 6.2 and the waveform plan table to 10.3
-  check FILE [--json]              verify structure and content (see below); exit 1 when errors exist
+  check FILE [--json] [--naming default|user]
+                                   verify structure and content (see below); exit 1 when errors exist
   mark-not-required FILE SECTION --reason TEXT [--date YYYY-MM-DD]
                                    replace the body of section "7" or "7.4" with the Not required line
   sections FILE                    list sections with their status: filled, not-required, N/A, TBD, placeholder
@@ -15,7 +16,10 @@ Checks  : all 22 sections present in order with the template titles; leftover te
           every REQ used elsewhere is defined; each TBD is listed in section 20; the port table of 6.2 has
           a function, a clock domain and a signal type (level, pulse, clock, reset, data, static) for every
           port (R-025); the waveform plan of 10.3 covers every operation of 10.2 and each figure and its
-          source file exist beside the specification (R-024).
+          source file exist beside the specification (R-024); section 2 records the naming rule, and with
+          --naming default (the default) the port names of 6.2 follow the default naming rule of the skill
+          vlsit-rtl-generator (direction prefix, i_clk_<domain>, i_rst_n_<domain>, 30 characters, NAM-08
+          abbreviations); with --naming user the rule supplied by the user is checked by hand (R-026).
 Exit    : 0 success, 1 findings or error, 3 prerequisite missing.
 Standard library only; text is read and written as UTF-8.
 Examples:
@@ -113,11 +117,17 @@ def action_init(a):
 
 
 def add_extensions(text):
-    """Add the 'Signal type' column to the 6.2 port table and the waveform plan table to 10.3 (R-024, R-025).
+    """Add the 'Signal type' column to the 6.2 port table, the waveform plan table to 10.3 (R-024, R-025) and the
+    line that records the naming rule to section 2 (R-026).
 
     The bundled template stays an exact copy of the VLSIT template; the additions are made on the new file.
     """
     text = text.replace(PORT_HEAD, PORT_HEAD_NEW).replace(PORT_SEP, PORT_SEP_NEW).replace(PORT_ROW, PORT_ROW_NEW)
+    naming = "### 2.3 Compliance declaration\n"
+    if naming in text and "Naming rule:" not in text:
+        line = ("**Naming rule:** <the user's naming rule, or the default naming rule of vlsit-rtl-generator "
+                "(VLSIT_RTL_Design_Rule.md v2, section 2)>, path <path>, version <version> (rule R-026).\n\n")
+        text = text.replace(naming, line + naming, 1)
     marker = "### 10.3 Cycle-level behavior\n"
     if marker in text and "Waveform ID" not in text:
         text = text.replace(marker, marker + "\n" + WAVE_PLAN, 1)
@@ -139,6 +149,66 @@ def subsection(text, number):
         return ""
     end = next((j for j in range(start + 1, len(lines)) if re.match(r"###? ", lines[j])), len(lines))
     return "\n".join(lines[start + 1:end])
+
+
+# Default naming rule (VLSIT_RTL_Design_Rule.md v2, section 2, the default of the skill vlsit-rtl-generator).
+# NAM-08: a spelled-out word of this table inside a name must be written as its abbreviation.
+SPELLED = {"address": "addr", "next": "nxt", "counter": "cnt", "enable": "en", "clock": "clk", "request": "req",
+           "response": "resp", "select": "sel", "status": "sts", "write": "wr", "read": "rd", "transmit": "tx",
+           "receive": "rx", "buffer": "buf", "pointer": "ptr", "index": "idx", "length": "len", "source": "src",
+           "destination": "dst", "error": "err", "frequency": "freq", "divider": "div", "threshold": "thr",
+           "arbiter": "arb", "grant": "gnt", "priority": "prio", "multiplexer": "mux", "decoder": "dec",
+           "encoder": "enc", "maximum": "max", "minimum": "min", "number": "num", "parity": "par",
+           "interrupt": "int", "configuration": "config", "configure": "config", "reset": "rst",
+           "acknowledge": "ack", "command": "cmd", "control": "ctrl"}
+PROTOCOL_TAGS = ("apb", "axi", "axil", "ahb", "tl", "tlul", "spi", "i2c", "uart", "jtag")
+
+
+def check_port_names(sec6, errors):
+    """R-026 with the default naming rule: direction prefix, i_clk_<domain>, i_rst_n_<domain>, at most 30
+    characters, lowercase snake_case, NAM-08 abbreviations. Names fixed by a protocol (NAM-02) are exempt
+    from the abbreviation check."""
+    body = subsection(sec6, "6.2")
+    if not body or NR_RE.search(body):
+        return
+    head, rows = table_rows(body)
+    if head is None:
+        return
+    pi = next((i for i, h in enumerate(head) if h.lower().startswith("port")), None)
+    di = next((i for i, h in enumerate(head) if h.lower().startswith("direction")), None)
+    ti = next((i for i, h in enumerate(head) if h.lower().startswith("signal type")), None)
+    if pi is None:
+        return
+    for r in rows:
+        if len(r) != len(head):
+            continue
+        port = r[pi].strip("`* ")
+        if not port or port.lower().startswith(("not applicable", "n/a", "<")):
+            continue
+        direction = r[di].lower() if di is not None else ""
+        sig = r[ti].lower() if ti is not None else ""
+        msg = "section 6.2: port %s: " % port
+        if len(port) > 30:
+            errors.append(msg + "name has %d characters; the limit is 30 (NAM-07, rule R-026)" % len(port))
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", port):
+            errors.append(msg + "name is not lowercase snake_case (rule R-026)")
+            continue
+        if direction.startswith("input") and not port.startswith("i_"):
+            errors.append(msg + "an input name starts with i_ (rule R-026)")
+        elif direction.startswith("output") and not port.startswith("o_"):
+            errors.append(msg + "an output name starts with o_ (rule R-026)")
+        elif direction.startswith("inout") and not port.startswith("io_"):
+            errors.append(msg + "a bidirectional name starts with io_ (rule R-026)")
+        if sig.startswith("clock") and not re.fullmatch(r"[io]_clk_[a-z0-9_]+", port):
+            errors.append(msg + "a clock input is named i_clk_<domain> (rule R-026)")
+        if sig.startswith("reset") and direction.startswith("input") and not re.fullmatch(r"i_rst_n_[a-z0-9_]+", port):
+            errors.append(msg + "a reset input is named i_rst_n_<domain> (rule R-026)")
+        parts = port.split("_")
+        if len(parts) > 1 and parts[1] in PROTOCOL_TAGS:
+            continue
+        for word in parts[1:]:
+            if word in SPELLED:
+                errors.append(msg + "'%s' is spelled out; write '%s' (NAM-08, rule R-026)" % (word, SPELLED[word]))
 
 
 def check_signal_table(sec6, errors):
@@ -226,7 +296,7 @@ def section_status(body):
     return "filled"
 
 
-def findings_for(text, base=None):
+def findings_for(text, base=None, naming="default"):
     errors, lines = [], text.splitlines()
     secs = split_sections(text)
     want = template_titles()
@@ -271,6 +341,11 @@ def findings_for(text, base=None):
     for req in sorted(used - set(defined)):
         errors.append("%s is used but not defined in section 3" % req)
     check_signal_table(sec.get(6, ""), errors)
+    if naming == "default":
+        check_port_names(sec.get(6, ""), errors)
+    if not re.search(r"naming rule", sec.get(2, ""), re.I):
+        errors.append("section 2 does not record the naming rule that the specification follows: the user's rule "
+                      "or the default of vlsit-rtl-generator (rule R-026)")
     check_wave_plan(sec.get(10, ""), base, errors)
     tbd_secs = [n for n, _, s, e in secs if n != 20 and re.search(r"\bTBD\b", strip_code("\n".join(lines[s + 1:e])))]
     if tbd_secs and "TBD" not in s20:
@@ -280,12 +355,14 @@ def findings_for(text, base=None):
 
 def action_check(a):
     text = read(a.file)
-    errors = findings_for(text, Path(a.file).resolve().parent)
+    errors = findings_for(text, Path(a.file).resolve().parent, a.naming)
     if a.json:
         print(json.dumps({"errors": errors}, indent=2))
     else:
         for e in errors:
             print("ERROR: " + e)
+        if a.naming == "user":
+            print("naming: the user's rule is checked by hand (rule R-026); the script checks only the default rule")
         print("%s: %d error(s), %d section(s)" % ("PASS" if not errors else "FAIL", len(errors), len(split_sections(text))))
     return 1 if errors else 0
 
@@ -334,6 +411,9 @@ def main():
     c = sub.add_parser("check")
     c.add_argument("file")
     c.add_argument("--json", action="store_true")
+    c.add_argument("--naming", choices=("default", "user"), default="default",
+                   help="default = check port names against the default naming rule of vlsit-rtl-generator; "
+                        "user = the user supplied another rule, check it by hand")
     s = sub.add_parser("sections")
     s.add_argument("file")
     m = sub.add_parser("mark-not-required")

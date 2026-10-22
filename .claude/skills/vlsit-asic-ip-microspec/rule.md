@@ -97,6 +97,11 @@ MUST describe every port of section 6.2 with its function, its clock domain (or 
 - Why: integrators and verification engineers must know which input is a pulse that can be missed and which is a level, and in which clock domain it is sampled, before they connect the IP.
 - Check: `scripts/vlsit_spec_tool.py check` reports a port without a function, a clock domain or a valid signal type; manual - pulse widths and clock domains agree with sections 7 and 10.
 
+### R-026 Naming rule from the user
+MUST ask the user which naming rule the specification follows (a rule file or document of the user) before naming any module, port, signal, parameter, state or instance in it, and apply that rule to every name in the specification; when the user supplies none, MUST use the default naming rule of the skill `vlsit-rtl-generator`, that is section 2 of `VLSIT_RTL_Design_Rule.md` (v2, the copy in `reference/templates/`, and the `spec_template` file that skill reads by default), and record in section 2 of the specification which rule is used, with its path and version. A name that the user's rule or the default rule forbids MUST NOT be used even when the user typed it: write the name in the form the rule requires and tell the user the form and the clause.
+- Why: the specification is the source of the RTL, and a name that breaks the naming rule here is renamed in every later file and in every waveform, so the rule must be fixed before the first name is written.
+- Check: manual - the question and the answer are in the chat and section 2 names the rule; `scripts/vlsit_spec_tool.py check` (with `--naming user` when the user supplied a rule) reports a missing record and, with the default rule, a port name that breaks the direction prefix, `i_clk_<domain>`, `i_rst_n_<domain>`, the 30-character limit or the NAM-08 abbreviations; manual - the names that are not ports follow the same rule.
+
 ## Diagrams and waveforms
 
 ### R-017 Block diagram and key waveforms

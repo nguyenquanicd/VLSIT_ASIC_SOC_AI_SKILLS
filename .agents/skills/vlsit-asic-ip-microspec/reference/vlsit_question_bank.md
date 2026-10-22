@@ -38,6 +38,10 @@ C. Other: write your own idea.
 10. Which DFT methods apply? (Scan always; MBIST and LBIST only with memories or logic BIST.)
 11. Who owns timing constraints? (A: IP delivers an SDC; B: integrator writes all constraints.)
 
+## Naming rule (ask first, rule R-026)
+
+0. Which naming rule must the names in the specification follow? (A: the default naming rule of the skill `vlsit-rtl-generator`, section 2 of `VLSIT_RTL_Design_Rule.md` v2, recommended because the RTL generator checks the same rule; B: your own rule file or document, give the path; C: other. Example under A: a software reset input is `i_rst_n_sw`, not `i_sw_reset_n`, because the rule abbreviates "reset" to "rst" and names an active-low reset input `i_rst_n_<domain>`.)
+
 ## Signals and waveforms
 
 12. Which waveforms must the specification show at minimum? (A: the proposed list with one waveform for every operation, the success and the error case of every interface and the special cases, recommended; B: only one success and one error per interface, smaller but key functions are not shown; C: the proposed list plus extra corner cases; D: other. Example for a FIFO: write, read, full, empty, simultaneous write and read, reset.)

@@ -97,6 +97,8 @@ The bridge lets an APB4 manager (for example a peripheral subsystem or a debug p
 6. The exact protocol revisions, roles, and optional-signal configuration are recorded in section 2.3 and section 6. No signal outside the selected profile is included.
 7. Conflicts are resolved through an explicit product decision recorded in section 20.
 
+**Naming rule:** the default naming rule of the skill vlsit-rtl-generator (VLSIT_RTL_Design_Rule.md v2, section 2), path spec_template/VLSIT_RTL_Design_Rule.md, version v2 (rule R-026).
+
 ### 2.3 Compliance declaration
 
 | Standard | Revision / profile | Role implemented | Options | Deviations |

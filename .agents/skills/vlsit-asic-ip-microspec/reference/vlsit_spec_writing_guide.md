@@ -45,7 +45,9 @@ The Clock domain cell names the domain (for example `CLK-CORE`) or `async` with 
 
 The table sits at the start of section 10.3, with the columns Waveform ID, Function / operation, Scenario, Signals shown, Figure and Confirmed by user. Build it from the operations of 10.2 and the interface cases of 6.3, add the special cases of the IP, show it to the user, and draw only what the user confirms. Typical entries: one success waveform per operation, one error waveform per error mechanism, reset, backpressure, back-to-back transfers, full and empty boundaries, timeout. A declined waveform stays in the table with a dated Not required line in the Figure cell, so `vlsit_spec_tool.py check` can see that the operation was considered.
 
-## Names (from VLSIT_RTL_Design_Rule.md)
+## Names (rule R-026)
+
+Ask the user for the naming rule first and record it in section 2 (the line `Naming rule:` that `init` adds). If the user gives none, use the default naming rule of the skill `vlsit-rtl-generator`, section 2 of `VLSIT_RTL_Design_Rule.md` v2, summarized here. If the user's rule or the default forbids a name that the user typed, write the allowed form and tell the user.
 
 Module `m_<function>`; ports `i_`/`o_` with protocol tag `<direction>_<protocol>_<signal>` (for example `i_apb_psel`); clock `i_clk_<domain>`; reset `i_rst_n_<domain>`; parameters `PARA_<NAME>`; FSM `reg_fsm_<function>_current_state` with states `ENUM_ST_<FUNCTION>`; names at most 30 characters.
 
