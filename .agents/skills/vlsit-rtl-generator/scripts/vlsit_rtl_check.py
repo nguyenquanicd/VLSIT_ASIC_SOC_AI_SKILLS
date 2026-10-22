@@ -108,6 +108,11 @@ COVERAGE = OrderedDict([
     ("P23", ("lint", "combinational loops")), ("P28", ("manual", "logic around synchronizers")),
     ("PRT-01", ("manual", "protocol port names")), ("SCP-02", ("manual", "synthesis environment record")),
     ("CHK-11", ("manual", "tapeout checklist of section 11")),
+    ("NAM-09", ("script", "cell and macro instances are named u_dont_touch_<function>")),
+    ("FIL-05", ("script", "port list aligned in columns: direction, type, width, name")),
+    ("FIL-06", ("script", "ports declared in functional groups with a comment per group")),
+    ("FIL-04", ("script", "if / else branch statements on their own line, no alignment after the condition")),
+    ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
 ])
 
 
@@ -334,14 +339,137 @@ def check_if_chains(code, name, f):
 
 # ------------------------------------------------------------------ one file
 
+SIM_MACRO = "VLSIT_SYNTHESIS"
+SIM_REASON = ("simulation-only branch of `%s` is excluded from the RTL rules (spec DEC-021 and REQ-RTL-002, rule R-027): "
+              "it is never synthesized, so the design rules were NOT checked in these lines; it is covered by simulation only" % SIM_MACRO)
+DIRECTIVE = re.compile(r"^\s*`(ifdef|ifndef|elsif|else|endif)\b[ \t]*(\w*)")
+
+
+def mask_sim_branches(raw, f, name):
+    """Blank the lines of the only accepted exception (R-027): the simulation-only branch selected by the macro
+    VLSIT_SYNTHESIS, that is the body of `ifndef VLSIT_SYNTHESIS (up to `else or `endif) or the `else body of
+    `ifdef VLSIT_SYNTHESIS. Every other macro condition is left to the normal checks. Returns (masked text, regions)."""
+    lines = raw.split("\n")
+    stack = []            # frames: [macro, kind, branch (0 first, 1 after else), is_target]
+    regions = []          # (first line, last line) of masked bodies
+    masked = [False] * len(lines)
+    open_start = None
+    for number, text in enumerate(lines, 1):
+        m = DIRECTIVE.match(text)
+        if not m:
+            if open_start is not None:
+                masked[number - 1] = True
+            continue
+        word, macro = m.group(1), m.group(2)
+        if word in ("ifdef", "ifndef"):
+            stack.append([macro, word, 0, macro == SIM_MACRO])
+        elif word == "elsif":
+            if stack and stack[-1][3]:
+                f.add("ERROR", "R-027", name, number, "`elsif is not allowed in a `%s condition; use one `else" % SIM_MACRO)
+        elif word == "else":
+            if stack:
+                if stack[-1][2] == 1 and stack[-1][3]:
+                    f.add("ERROR", "R-027", name, number, "second `else in a `%s condition" % SIM_MACRO)
+                stack[-1][2] = 1
+        else:
+            if not stack:
+                f.add("ERROR", "R-027", name, number, "`endif without a matching `ifdef/`ifndef")
+            else:
+                stack.pop()
+        in_sim = any(fr[3] and ((fr[1] == "ifndef" and fr[2] == 0) or (fr[1] == "ifdef" and fr[2] == 1)) for fr in stack)
+        if in_sim and open_start is None:
+            open_start = number + 1
+        elif not in_sim and open_start is not None:
+            if number - 1 >= open_start:
+                regions.append((open_start, number - 1))
+            open_start = None
+    if stack:
+        f.add("ERROR", "R-027", name, len(lines), "unbalanced `ifdef/`ifndef: %d condition(s) not closed by `endif" % len(stack))
+    out = [("" if masked[i] else lines[i]) for i in range(len(lines))]
+    return "\n".join(out), regions
+
+
+PORT_LINE = re.compile(r"^(\s*)(input|output|inout)(\s+)(wire|logic)(\s+)(\[[^\]]*\])?(\s*)([A-Za-z_]\w*)\s*(,?)\s*$")
+
+
+def check_port_layout(raw, code, name, f):
+    """FIL-05: the ports of the module are aligned in four columns (direction, type, width, name), as tight
+    as the longest entry of each column allows. FIL-06: ports are declared in functional groups, each group
+    starts with a comment line and groups are separated by one blank line."""
+    lines = code.split("\n")
+    rawl = raw.split("\n")
+    start = None
+    for i, l in enumerate(lines):
+        if re.match(r"^\)\s*\(\s*$", l) or re.match(r"^module\s+\w+\s*\(\s*$", l):
+            start = i
+            break
+    if start is None:
+        return
+    end = next((i for i in range(start + 1, len(lines)) if re.match(r"^\);", lines[i])), None)
+    if end is None:
+        return
+    ports = []
+    for i in range(start + 1, end):
+        if not lines[i].strip():
+            continue
+        m = PORT_LINE.match(lines[i])
+        if not m:
+            f.add("ERROR", "FIL-05", name, i + 1, "port line not in the form 'direction type [width] name' (FIL-05)")
+            return
+        ports.append((i, m.group(2), m.group(4), m.group(6) or "", m.group(8), m.group(9)))
+    if not ports:
+        return
+    ld = max(len(x[1]) for x in ports)
+    lt = max(len(x[2]) for x in ports)
+    lw = max(len(x[3]) for x in ports)
+    for i, d, t, w, n, comma in ports:
+        expected = "  " + d.ljust(ld) + " " + t.ljust(lt) + " " + ((w.ljust(lw) + " ") if lw else "") + n + comma
+        actual = lines[i].rstrip()
+        if actual != expected:
+            f.add("ERROR", "FIL-05", name, i + 1, "port '%s' is not aligned: keyword, type, width and name start in the same columns for every port, "
+                  "each column as narrow as its longest entry (FIL-05)" % n)
+            break
+    first = next((k for k in range(start + 1, end) if rawl[k].strip()), None)
+    if first is not None and not rawl[first].strip().startswith("//"):
+        f.add("ERROR", "FIL-06", name, first + 1, "the port list starts without a group comment line; declare the ports in functional groups, each with a comment (FIL-06)")
+    for k in range(start + 2, end):
+        if not rawl[k - 1].strip() and rawl[k].strip() and not rawl[k].strip().startswith("//"):
+            f.add("ERROR", "FIL-06", name, k + 1, "a group of ports starts without a comment line (FIL-06)")
+            break
+    for k in range(start + 2, end):
+        if rawl[k].strip().startswith("//") and rawl[k - 1].strip() and not rawl[k - 1].strip().startswith("//"):
+            f.add("ERROR", "FIL-06", name, k + 1, "separate the port groups with one blank line (FIL-06)")
+            break
+
+
 def check_file(path, f):
     raw = Path(path).read_text(encoding="utf-8-sig")
     name = Path(path).name
+    raw, sim_regions = mask_sim_branches(raw, f, name)
+    f.mark("R-027")
+    for first, last in sim_regions:
+        f.add("WARN", "R-027", name, first, "lines %d-%d: %s" % (first, last, SIM_REASON))
     code, comments = strip_code(raw)
     raw_lines = raw.split("\n")
 
     # --- FIL-03 / P29 tabs
-    f.mark("FIL-03", "P29")
+    f.mark("FIL-03", "P29", "FIL-04")
+    # --- FIL-04: the statement of an if / else branch goes on its own line, not after the condition
+    for m in re.finditer(r"\bif\s*\(", code):
+        close = match_paren(code, m.end() - 1)
+        if close < 0:
+            continue
+        eol = code.find("\n", close)
+        rest = code[close + 1:(len(code) if eol < 0 else eol)].strip()
+        if rest and not rest.startswith("begin"):
+            f.add("ERROR", "FIL-04", name, line_of(code, m.start()), "statement on the line of the if condition; put the branch statement on its own line, indented two more spaces (FIL-04)")
+    for m in re.finditer(r"(?<!`)\belse\b(?!\s*if\b)", code):
+        eol = code.find("\n", m.end())
+        rest = code[m.end():(len(code) if eol < 0 else eol)].strip()
+        if rest and not rest.startswith("begin"):
+            f.add("ERROR", "FIL-04", name, line_of(code, m.start()), "statement on the line of else; put the branch statement on its own line, indented two more spaces (FIL-04)")
+    check_port_layout(raw, code, name, f)
+    f.mark("FIL-05", "FIL-06")
     tabs = [i + 1 for i, l in enumerate(raw_lines) if "\t" in l]
     if tabs:
         f.add("ERROR", "P29", name, tabs[0], "tab character in %d line(s) (first at line %d); use spaces only (FIL-03)" % (len(tabs), tabs[0]))
@@ -666,7 +794,7 @@ def check_file(path, f):
         f.add("WARN", "P17", name, header_line, "inout port outside a pad/IO wrapper module")
 
     # --- instances: named connections, naming, HIE-02
-    f.mark("HIE-03", "HIE-02")
+    f.mark("HIE-03", "HIE-02", "NAM-09")
     instances = 0
     for m in re.finditer(r"(?m)^\s*(\w+)\s*(#\s*\()?", body):
         pass
@@ -674,7 +802,7 @@ def check_file(path, f):
         mod, inst = m.group(1), m.group(3)
         if mod in KEYWORDS or mod in ("if", "for", "while", "case", "casez", "always_ff", "always_comb", "assign", "function", "typedef", "else", "begin"):
             continue
-        if not (mod.startswith("m_") or re.match(r"^[a-z]\w*$", mod) and inst.startswith("u_")):
+        if not (mod.startswith("m_") or re.match(r"^[a-z]\w*$", mod) and inst.startswith("u_") or re.match(r"^[A-Z]", mod)):
             continue
         open_idx = body.find("(", m.end() - 1)
         close_idx = match_paren(body, open_idx)
@@ -682,7 +810,11 @@ def check_file(path, f):
         ln = line_of(code, body_offset + m.start())
         instances += 1
         defined.append(("instance", inst, ln))
-        if not inst.startswith("u_"):
+        if not mod.startswith("m_"):
+            # NAM-09: the instance of a library cell or macro (a module that is not an m_ module)
+            if not re.fullmatch(r"u_dont_touch_[a-z0-9_]+", inst):
+                f.add("ERROR", "NAM-09", name, ln, "instance '%s' of cell '%s' must be named u_dont_touch_<function>" % (inst, mod))
+        elif not inst.startswith("u_"):
             f.add("ERROR", "NAM-TBL", name, ln, "instance '%s' must be named u_<function>" % inst)
         if conn.strip() and not re.search(r"\.\s*\w+\s*\(", conn):
             f.add("ERROR", "P13", name, ln, "positional connections on instance '%s'; connect by name (HIE-03)" % inst)

@@ -11,11 +11,16 @@
 `timescale 1ns/1ps
 
 module m_moore_fsm_example (
-  input wire i_clk_core,
-  input wire i_rst_n_core,
-  input wire i_start,
-  input wire i_ready,
-  input wire i_last,
+  // Clock and reset
+  input  wire  i_clk_core,
+  input  wire  i_rst_n_core,
+
+  // Transfer request
+  input  wire  i_start,
+  input  wire  i_ready,
+  input  wire  i_last,
+
+  // Status and control
   output logic o_busy,
   output logic o_load_en,
   output logic o_send_valid,

@@ -243,12 +243,23 @@ def action_filelist(args):
 # -------------------------------------------------------------------- lint
 
 def read_filelist(path):
+    """Return the file names of a filelist. A line `+define+NAME` is an option, not a file: it is kept out of
+    the file list and returned by read_defines (used to define the flow macro VLSIT_SYNTHESIS for lint)."""
     files = []
     for line in Path(path).read_text(encoding="utf-8-sig").splitlines():
         line = line.split("//")[0].strip()
-        if line:
+        if line and not line.startswith("+define+"):
             files.append(line)
     return files
+
+
+def read_defines(path):
+    out = []
+    for line in Path(path).read_text(encoding="utf-8-sig").splitlines():
+        line = line.split("//")[0].strip()
+        if line.startswith("+define+"):
+            out.extend(d for d in line[len("+define+"):].split("+") if d)
+    return out
 
 
 def numbered(path):
@@ -268,6 +279,7 @@ def action_lint(args):
         print("ERROR: filelist not found: %s" % flist)
         return 2
     files = read_filelist(flist)
+    defines = read_defines(flist)
     cwd = flist.resolve().parent
     missing = [f for f in files if not (cwd / f).is_file()]
     if missing:
@@ -287,14 +299,14 @@ def action_lint(args):
         return 3
     name, exe, lint = chosen
     if name == "verilator":
-        command = [exe, "--lint-only", "-Wall", "--top-module", args.top] + files
+        command = [exe, "--lint-only", "-Wall", "--top-module", args.top] + ["+define+" + d for d in defines] + files
     elif name == "slang":
-        command = [exe, "--top", args.top, "-Wextra"] + files
+        command = [exe, "--top", args.top, "-Wextra"] + [x for d in defines for x in ("-D", d)] + files
     elif name == "yosys":
-        reads = "; ".join("read_verilog -sv %s" % f for f in files)
+        reads = "; ".join("read_verilog -sv %s %s" % (" ".join("-D" + d for d in defines), f) for f in files)
         command = [exe, "-q", "-p", "%s; hierarchy -check -top %s" % (reads, args.top)]
     else:
-        command = [exe, "-g2012", "-t", "null", "-s", args.top] + files
+        command = [exe, "-g2012", "-t", "null", "-s", args.top] + ["-D" + d for d in defines] + files
     try:
         run = subprocess.run(command, cwd=str(cwd), env=tool_env(), capture_output=True, text=True, errors="replace", timeout=args.timeout)
     except subprocess.TimeoutExpired:

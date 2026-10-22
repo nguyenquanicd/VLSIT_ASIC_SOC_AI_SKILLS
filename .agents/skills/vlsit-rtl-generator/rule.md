@@ -58,7 +58,7 @@ MUST write modified and generated RTL as new files in the output folder and leav
 - Check: manual - the original files have the same content as before the run.
 
 ### R-010 Design RTL only
-MUST keep testbenches, assertions and any other verification code out of the design file set, and apply the design rules of the rule file to design RTL only.
+MUST keep testbenches, assertions and any other verification code out of the design file set, except the one exception of R-027, and apply the design rules of the rule file to design RTL only.
 - Why: the rule file covers synthesizable RTL only, and verification belongs to a separate source set.
 - Check: vlsit_rtl_check.py reports no P14 or P19 finding on the design folder; manual - no verification file is in the design folder or in `filelist.f`.
 
@@ -66,6 +66,26 @@ MUST keep testbenches, assertions and any other verification code out of the des
 MUST write a reason in the module header for every deviation from a SHOULD rule of the rule file.
 - Why: the rule file allows a deviation only when its reason is written down for the reviewer.
 - Check: manual - each deviation named in the report has its reason in the header of the file.
+
+### R-028 Cell instance names
+MUST name every instance of a technology library cell or memory macro (an instance of a module that is not an `m_<function>` design module) `u_dont_touch_<function>`, in lowercase with `<function>` naming what the cell does and the whole name at most 30 characters, and MUST instantiate such cells only in the dedicated wrapper modules.
+- Why: the implementation flow applies `dont_touch` to these cells by the name pattern, and one fixed prefix keeps the pattern simple and the cells easy to find in a netlist (rule file NAM-09, CLK-02, HIE-07).
+- Check: `vlsit_rtl_check.py check` reports no NAM-09 finding; manual - the instances of design modules keep the form `u_<function>`.
+
+### R-029 Branch layout
+MUST write the statement of an `if`, `else if` or `else` branch that has no `begin` on its own line, indented two spaces more than the `if` or `else`, and MUST NOT put it after the condition or after `else` on the same line, nor align the statements of different branches to a common column; with `begin`, the `begin` stays at the end of the `if` or `else` line.
+- Why: one statement per line with a fixed indent keeps the code aligned, makes each branch easy to read and to compare in a diff, and avoids the ragged columns that appear when single-line branches are aligned by hand (rule file FIL-04).
+- Check: `vlsit_rtl_check.py check` reports no FIL-04 finding.
+
+### R-030 Port list alignment
+MUST write the ports of a module one per line in four aligned columns, direction keyword, type, width, and name, each column starting at the same position for every port and as narrow as its longest entry plus one space, with a blank width field for a port without a width.
+- Why: aligned columns let the reader compare the direction, the type and the width of all ports at a glance, and keep the ports of the module readable when the widths differ (rule file FIL-05).
+- Check: `vlsit_rtl_check.py check` reports no FIL-05 finding.
+
+### R-031 Port groups by function
+MUST declare the ports in functional groups, with the inputs and the outputs of one function together, a comment line that names each group, one blank line between groups, and the clock and reset group first, and MUST NOT list all inputs before all outputs.
+- Why: the ports of one interface, protocol or memory port are read together, so grouping by function shows the structure of the module; this replaces the earlier grouping by direction (rule file FIL-06, HIE-03).
+- Check: `vlsit_rtl_check.py check` reports no FIL-06 finding; manual - each group holds the ports of one function.
 
 ### R-019 Case for three or more branches
 MUST write a selection that has three or more conditional branches (an `if` followed by two or more `else if`) as a `case` or `casez` statement, never as an `if` / `else if` chain. Choose the statement with COM-03 and COM-04 of the rule file: a selection on the value of one signal is a plain `case`; a priority selection among independent conditions is a `casez` on the concatenated condition bits with `?` for the bits of lower priority, and its `default` assigns a defined value unless COM-04 allows `'x`. A chain with one or two conditions (with or without a final `else`), the reset test that opens a sequential process, and an elaboration-time `if` in a generate block are not counted.
@@ -108,6 +128,11 @@ MUST continue with the rule check, report lint as not run, and offer the designe
 MUST end with a report by rule ID that names the rules failed, justified, clean by script, covered by lint and inspected by hand, and says what was not run.
 - Why: the designer can then see exactly which rules stand behind the delivery and which do not.
 - Check: manual - the report lists the manual rules from `vlsit_rtl_check.py coverage` with the result of each inspection.
+
+### R-027 Simulation branch of VLSIT_SYNTHESIS (only exception)
+MUST accept simulation-only code inside a design file only in the one form that the specification fixes: the body of `` `ifndef VLSIT_SYNTHESIS `` (up to its `` `else `` or `` `endif ``), or the `` `else `` body of `` `ifdef VLSIT_SYNTHESIS ``, with one `` `else `` at most and no `` `elsif ``. The synthesizable branch and every other line of the file stay under all rules. `vlsit_rtl_check.py check` skips the rule check of the simulation branch only, and prints one WARN with rule ID R-027, the line range and the reason for each such branch; the report MUST repeat each of these WARN lines with the reason. A condition on any other macro name gets no exception.
+- Why: the specification (DEC-021, REQ-RTL-002) selects the metastability model, the SRAM macro model and the cell model by the macro inside the same module, and these models are simulation code (initial, delays, random numbers) that is never synthesized; the exception keeps the macro structure of the specification while the rest of the design stays rule-checked, and the WARN keeps the unchecked lines visible.
+- Check: `vlsit_rtl_check.py check` prints one `WARN R-027` per simulation branch with the reason and no ERROR for the lines inside it; an `` `ifndef `` or `` `ifdef `` of another macro containing `initial`, `#` or a plain `always` still gives an ERROR; manual - the report lists the R-027 WARN lines with the reason.
 
 ## Simulation testbench
 

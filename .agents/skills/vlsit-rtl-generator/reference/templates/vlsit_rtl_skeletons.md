@@ -22,9 +22,12 @@ module m_<function> #(
   parameter logic [31:0] PARA_<NAME> = <default>,
   localparam logic [31:0] LPARA_<NAME> = <expression of the parameters>
 ) (
-  input wire i_clk_<domain>,
-  input wire i_rst_n_<domain>,
-  input wire [PARA_<NAME>-1:0] i_<name>,
+  // Clock and reset
+  input  wire                    i_clk_<domain>,
+  input  wire                    i_rst_n_<domain>,
+
+  // <Function of the group>
+  input  wire  [PARA_<NAME>-1:0] i_<name>,
   output logic [PARA_<NAME>-1:0] o_<name>
 );
 
@@ -36,8 +39,10 @@ module m_<function> #(
 
   // <what is registered, reset policy of this state>
   always_ff @(posedge i_clk_<domain>, negedge i_rst_n_<domain>) begin : p_ff_<function>
-    if (!i_rst_n_<domain>) reg_<name> <= '0;
-    else                   reg_<name> <= w_<name>_nxt;
+    if (!i_rst_n_<domain>)
+      reg_<name> <= '0;
+    else
+      reg_<name> <= w_<name>_nxt;
   end
 
 endmodule
