@@ -45,6 +45,11 @@ MUST take the project name and the user name for the file header from the design
 - Why: the header names the human author and the project, and a made-up value would be false documentation in every file.
 - Check: manual - the Project and Author lines of the headers match the designer's answer.
 
+### R-037 Offer the library before generating an equivalent function
+MUST run `vlsit_reuse_scan.py scan` on the specification against the reusable library `common_rtl` before writing RTL for any function of it, judge from the ports, parameters and header of each candidate whether it implements an equivalent function, and ask the designer for each equivalent module or IP, in the question format of R-006, whether to reuse it by instantiation instead of generating new RTL. The question MUST explain the advantages of reuse: the library code already passed the rule check, lint and, where its folder says so, simulation, so it needs no new review; names, reset style and clock-domain-crossing structure stay uniform across designs; and the AI model spends its effort, and the designer's review time, on the functions that do not exist yet, which makes those functions more likely to be right. Reuse is the recommended option. MUST NOT generate a new module for such a function unless the designer says so; when the designer chooses reuse, MUST instantiate the library module (add its file to `filelist.f`, never copy or edit it); when the library is not found, MUST ask the designer for its path.
+- Why: a function that the library already provides and that was checked once is safer than a new copy written and checked again, and every module that is reused leaves more of the generation effort and of the review for the new functions, where an error is still possible.
+- Check: manual - the output of `vlsit_reuse_scan.py scan` and the designer's answer for each equivalent candidate are in the run before the first RTL line of that function; `filelist.f` lists the reused library files and the report names each reuse decision.
+
 ## Writing and changing RTL
 
 ### R-008 Approved change plan

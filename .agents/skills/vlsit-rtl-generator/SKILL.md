@@ -59,6 +59,16 @@ Then write the module list with its port tables in the chat and ask for a yes be
 
 Follow [reference/vlsit_modify_existing_rtl.md](reference/vlsit_modify_existing_rtl.md): baseline check, snapshot of the originals, a change plan, and the designer's approval before the first edit (R-008). When a sibling skill named `vlsit-rtl-spec-change-implementer` is installed, use its plan and gate.
 
+### 4c. Offer the reusable library (generate and modify mode)
+
+Before writing any module, look for functions that the reusable library `common_rtl` already provides. Read [reference/vlsit_reuse_guide.md](reference/vlsit_reuse_guide.md), then run:
+
+```powershell
+<python> "<skill folder>\scripts\vlsit_reuse_scan.py" scan "<spec.md>" --lib "<path of common_rtl>"
+```
+
+The script ranks candidate modules by keywords; you judge whether each is really equivalent (function, ports, parameters, behavior). For each equivalent function ask the designer, in the question format of R-006, whether to reuse the library module by instantiation instead of generating new RTL, and explain the advantages (checked code needs no new review, uniform structure, and the model concentrates on the functions that do not exist yet) (R-037). Reuse is the recommended answer; generate a new module for that function only when the designer says so. Ask for the path of `common_rtl` when the script cannot find it.
+
 ### 5. Write the RTL
 
 Write the modules leaf first and the top last, one module per file, into the output folder (R-009, R-018). Before each module read the matching example in [reference/rtl_example/](reference/rtl_example/) and write the module in its structure and style (R-020): an FSM follows `m_moore_fsm_example.sv` when its outputs depend on the state only and `m_mealy_fsm_example.sv` when they also depend on the inputs. Start each file from [reference/templates/vlsit_rtl_skeletons.md](reference/templates/vlsit_rtl_skeletons.md) and follow the rule file. After each module run the rule check and correct it before the next one:
@@ -105,6 +115,7 @@ Read a file only when the step needs it.
 | [reference/vlsit_modify_existing_rtl.md](reference/vlsit_modify_existing_rtl.md) | Step 3 and 4b: the mode and the procedure for existing RTL |
 | [reference/templates/vlsit_rtl_skeletons.md](reference/templates/vlsit_rtl_skeletons.md) | Step 5: header, leaf module, FSM and top skeletons |
 | [reference/vlsit_lint_and_install.md](reference/vlsit_lint_and_install.md) | Step 6: running lint, reading warnings, install options |
+| [reference/vlsit_reuse_guide.md](reference/vlsit_reuse_guide.md) | Step 4c: how to judge a library candidate, the wording of the reuse question with its advantages, what to do after the answer |
 | [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of the checks, assertions, strength check, failure analysis, layout, waveform evidence folder, simulation of both branches of a crossing |
 | `reference/rtl_example/m_moore_fsm_example.sv` | Step 5: example of a Moore FSM (current-state process, next-state process, state-only output process) |
 | `reference/rtl_example/m_mealy_fsm_example.sv` | Step 5: example of a Mealy FSM (outputs depend on the state and the inputs) |
@@ -119,11 +130,12 @@ Run each script as `<python> "<skill folder>/scripts/<script>.py" <action>` (use
 |---|---|
 | `scripts/vlsit_find_python.ps1` (Windows) and `scripts/vlsit_find_python.sh` (Linux, macOS) | Step 2, and again after Python was installed |
 | `scripts/vlsit_spec_gaps.py` (`gaps`, `facts`) | Step 4a: find what the specification leaves open, print its tables |
+| `scripts/vlsit_reuse_scan.py` (`list`, `scan`) | Step 4c: catalog of the library `common_rtl` and the candidates for the functions of a specification |
 | `scripts/vlsit_rtl_check.py` (`check`, `coverage`) | Steps 5, 7: check the mechanical rules; list what stays manual |
 | `scripts/vlsit_lint_rtl.py` (`tools`, `filelist`, `lint`) | Step 6: find lint tools, write `filelist.f`, run lint |
 | `scripts/vlsit_sim_evidence.py` (`plan`, `check`, `cdc`) | Step 8b: list the waveform plan, check the waveform evidence folder and the logs of both simulation branches of a crossing |
 
-Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool; `vlsit_sim_evidence.py` 0 pass, 1 findings, 2 bad input.
+Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool; `vlsit_sim_evidence.py` 0 pass, 1 findings, 2 bad input; `vlsit_reuse_scan.py` 0 done, 2 library or specification not found.
 
 ## Output
 
