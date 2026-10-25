@@ -1,4 +1,4 @@
-# VLSIT RTL Hierarchy Diagram — Codex CLI
+# VLSIT RTL Hierarchy Diagram — Claude Code
 
 ## Purpose / Mục đích
 
@@ -37,20 +37,21 @@ Bắt buộc cung cấp đường dẫn thư mục RTL cụ thể. Kết quả m
 
 ## Use / Cách gọi
 
-    $vlsit-rtl-hierarchy-diagram Analyze the RTL in <RTL_SOURCE_DIRECTORY> and create the hierarchy diagram.
+    /vlsit-rtl-hierarchy-diagram Analyze the RTL in <RTL_SOURCE_DIRECTORY> and create the hierarchy diagram.
 
 Instructions: [SKILL.md](SKILL.md)
 
 ## Installation options / Các cách cài đặt
 
-1. **Use this repository / Dùng repository này:** Open this repository in Codex; its .agents/skills folder is project-scoped and can be shared with the team. / Mở repository này trong Codex; skill trong .agents/skills áp dụng cho project và có thể chia sẻ với nhóm.
-2. **Manual project copy / Chép thủ công vào project:** Copy this entire folder to the target project at .agents/skills/vlsit-rtl-hierarchy-diagram. / Chép toàn bộ thư mục này vào .agents/skills/vlsit-rtl-hierarchy-diagram trong project đích.
-3. **Personal installation / Cài cho tài khoản cá nhân:** Copy the folder to the user skill location scanned by your Codex version. Current docs list $HOME/.agents/skills/vlsit-rtl-hierarchy-diagram; Codex Skill Installer may use $CODEX_HOME/skills. / Chép thư mục vào vị trí skill cá nhân mà phiên bản Codex nhận diện. Tài liệu hiện tại ghi $HOME/.agents/skills/vlsit-rtl-hierarchy-diagram; Codex Skill Installer có thể dùng $CODEX_HOME/skills.
-4. **GitHub installer / Cài từ GitHub:** For a GitHub-hosted copy, use $skill-installer and supply the repository and .agents/skills/vlsit-rtl-hierarchy-diagram path. For local-only files, use manual copy. / Nếu skill được lưu trên GitHub, dùng $skill-installer và cung cấp repository cùng đường dẫn .agents/skills/vlsit-rtl-hierarchy-diagram. Với file chỉ có trên máy, hãy chép thủ công.
+1. **Use this repository / Dùng repository này:** Open this repository in Claude Code; its .claude/skills folder is project-scoped and can be shared with the team. / Mở repository này trong Claude Code; skill trong .claude/skills áp dụng cho project và có thể chia sẻ với nhóm.
+2. **Manual project copy / Chép thủ công vào project:** Copy this entire folder to the target project at .claude/skills/vlsit-rtl-hierarchy-diagram. / Chép toàn bộ thư mục này vào .claude/skills/vlsit-rtl-hierarchy-diagram trong project đích.
+3. **Personal installation / Cài cho tài khoản cá nhân:** Copy the folder to $HOME/.claude/skills/vlsit-rtl-hierarchy-diagram to make it available across local projects. / Chép thư mục vào $HOME/.claude/skills/vlsit-rtl-hierarchy-diagram để dùng trong các project cục bộ.
+4. **One-session loading / Nạp cho một phiên:** Start Claude Code with claude --add-dir "<path to this repository>" when working outside this repository. / Khi làm việc ngoài repository này, khởi chạy Claude Code với claude --add-dir "<đường dẫn tới repository>".
+5. **Plugin installation / Cài plugin:** This skill can be installed as a plugin only after it is packaged with a Claude Code plugin manifest and marketplace or loaded plugin directory. This repository is not packaged as a plugin yet. / Chỉ có thể cài skill dạng plugin sau khi đóng gói kèm manifest Claude Code và marketplace hoặc thư mục plugin. Repository này chưa được đóng gói thành plugin.
 
-Invoke with $vlsit-rtl-hierarchy-diagram or describe a matching request. Codex may also select the skill automatically. See the repository README for Windows copy commands and plugin packaging options.
+Invoke with /vlsit-rtl-hierarchy-diagram or describe a matching request. Claude Code may also select the skill automatically. Use /skills to confirm it loaded. See the repository README for Windows examples and plugin details.
 
-Gọi bằng $vlsit-rtl-hierarchy-diagram hoặc mô tả yêu cầu phù hợp để Codex tự chọn. Xem README repository để có lệnh chép trên Windows và lựa chọn đóng gói plugin.
+Gọi bằng /vlsit-rtl-hierarchy-diagram hoặc mô tả yêu cầu phù hợp để Claude Code tự chọn. Dùng /skills để xác nhận skill đã được nạp. Xem README repository để biết ví dụ Windows và thông tin plugin.
 
 ## Language convention / Quy định ngôn ngữ
 
