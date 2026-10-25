@@ -1,14 +1,13 @@
 # Diagrams and waveforms
 
-Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-017 to R-020, R-024).
+Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-017 to R-020, R-024, R-027 to R-029).
 
-## Block diagram
+## Block diagram (draw.io, rules R-018 to R-020, R-027 to R-029)
 
-1. Describe the diagram in JSON (`vlsit_block_diagram.py template` prints a starter): blocks with `id`, `label` (use `\n` for a second line), a grid position `col`/`row` or `x`/`y` in cm, and a `kind` (block, memory, io, clock); optional `groups` (a dashed frame with the clock or reset domain); `links` with `from`, `to`, `label`, `style` (data, ctrl, clock), `dir` and explicit `from_side`/`to_side` (north, south, east, west).
-2. `vlsit_block_diagram.py check` must print READY. If it does not, ask the user (rule R-018): install tectonic (one executable of about 21 MB, no administrator rights), install MiKTeX, or use draw.io.
-3. `vlsit_block_diagram.py tex figures/vlsit_block_diagram.json --out figures/vlsit_block_diagram.tex`, then `vlsit_block_diagram.py build figures/vlsit_block_diagram.tex`, then `vlsit_pdf_render.py figures/vlsit_block_diagram.pdf --svg figures/vlsit_block_diagram.svg --png figures/vlsit_block_diagram.png`.
-4. Look at the PNG: labels must not overlap arrows or blocks; move blocks or sides in the JSON and rebuild.
-5. Keep the JSON and the `.tex` beside the image; delete the PDF if the repository should hold only text and images.
+1. Draft the diagram spec from section 14.2: `vlsit_spec_diagram.py from-spec SPEC.md --top <top module> --out figures/<ip>_diagram_spec.json` (or `template` for a starter). Add the connectors, externals (boundary interfaces with mnemonics), nets (clock and reset trees) and interface rows; the schema is `reference/drawio/vlsit_diagram_spec.md`, the drawing rules `reference/drawio/vlsit_diagram_rules.md`, a worked example `reference/drawio/example/`.
+2. `vlsit_spec_diagram.py check figures/<ip>_diagram_spec.json`, then `vlsit_spec_diagram.py build figures/<ip>_diagram_spec.json --out-dir figures --png`. It draws the `.drawio`, validates the library, runs the geometry check and writes the `.svg`. Fix every finding (move an entry to another side, widen a block, change gaps with `--gap-h`, `--gap-v`, `--seed`; `vlsit_layout_search.py` ranks variants).
+3. Look at the PNG, then `vlsit_spec_diagram.py insert SPEC.md --figure figures/<ip>_block_diagram.svg --source figures/<ip>_block_diagram.drawio --caption "..."`.
+4. LaTeX fallback (only when the user asks for it): `vlsit_block_diagram.py template/check/tex/build`, then `vlsit_pdf_render.py`.
 
 ## draw.io (only after the user declined LaTeX and agreed)
 

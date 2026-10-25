@@ -88,7 +88,7 @@ Write the reason in the module header for every deviation from a SHOULD rule (R-
 
 ### 8b. Simulation testbench (only when the designer asks)
 
-Do not write a testbench unless the designer asks for one (R-022). Read [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) first. Derive every stimulus, expected value and check from the specification and from the standards of the protocols, with the requirement ID or clause named, and read the RTL only for port names, widths and parameters (R-023). Put at least 20 assertions on each standard protocol and the assertions that relate the interfaces, count their hits, and make the run fail when an assertion fails or never fires (R-024, R-025). Save the testbench in its own folder beside the RTL, not in the design folder. When a check or an assertion fails and you cannot tell whether the RTL, the test or the specification is at fault, stop, give the designer the analysis of the specification, the RTL and the test described in the guide, and wait for the decision before changing either (R-026).
+Do not write a testbench unless the designer asks for one (R-022). Read [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) first. Derive every stimulus, expected value and check from the specification and from the standards of the protocols, with the requirement ID or clause named, and read the RTL only for port names, widths and parameters (R-023). Put at least 20 assertions on each standard protocol and the assertions that relate the interfaces, count their hits, and make the run fail when an assertion fails or never fires (R-024, R-025). Save the testbench in its own folder beside the RTL, not in the design folder. When a check or an assertion fails and you cannot tell whether the RTL, the test or the specification is at fault, stop, give the designer the analysis of the specification, the RTL and the test described in the guide, and wait for the decision before changing either (R-026). Save the waveforms that the simulation produced for the waveform plan of the specification in the evidence folder `waveforms_sim` (VCD, WaveJSON, SVG with the stem of the specification figure, and the index `waveform_compare.md`), and check it with `vlsit_sim_evidence.py check` (R-033). When the design has a clock-domain crossing, run the whole testbench in the synthesis branch (`VLSIT_SYNTHESIS` defined) and in the simulation branch with the metastability model and at least three seeds, with the `SIM-BRANCH:` line in each log, and check the logs with `vlsit_sim_evidence.py cdc` (R-034).
 
 ### 9. Verify against the rules and report
 
@@ -105,7 +105,7 @@ Read a file only when the step needs it.
 | [reference/vlsit_modify_existing_rtl.md](reference/vlsit_modify_existing_rtl.md) | Step 3 and 4b: the mode and the procedure for existing RTL |
 | [reference/templates/vlsit_rtl_skeletons.md](reference/templates/vlsit_rtl_skeletons.md) | Step 5: header, leaf module, FSM and top skeletons |
 | [reference/vlsit_lint_and_install.md](reference/vlsit_lint_and_install.md) | Step 6: running lint, reading warnings, install options |
-| [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of the checks, assertions, strength check, failure analysis, layout |
+| [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of the checks, assertions, strength check, failure analysis, layout, waveform evidence folder, simulation of both branches of a crossing |
 | `reference/rtl_example/m_moore_fsm_example.sv` | Step 5: example of a Moore FSM (current-state process, next-state process, state-only output process) |
 | `reference/rtl_example/m_mealy_fsm_example.sv` | Step 5: example of a Mealy FSM (outputs depend on the state and the inputs) |
 
@@ -121,9 +121,10 @@ Run each script as `<python> "<skill folder>/scripts/<script>.py" <action>` (use
 | `scripts/vlsit_spec_gaps.py` (`gaps`, `facts`) | Step 4a: find what the specification leaves open, print its tables |
 | `scripts/vlsit_rtl_check.py` (`check`, `coverage`) | Steps 5, 7: check the mechanical rules; list what stays manual |
 | `scripts/vlsit_lint_rtl.py` (`tools`, `filelist`, `lint`) | Step 6: find lint tools, write `filelist.f`, run lint |
+| `scripts/vlsit_sim_evidence.py` (`plan`, `check`, `cdc`) | Step 8b: list the waveform plan, check the waveform evidence folder and the logs of both simulation branches of a crossing |
 
-Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool.
+Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool; `vlsit_sim_evidence.py` 0 pass, 1 findings, 2 bad input.
 
 ## Output
 
-All deliverables are saved in the output folder the user names (R-018): the `.sv` files, `filelist.f`, the lint logs, the rule-check report if one was asked for, and, when asked, the testbench folder with its simulation logs and assertion table. The final message gives the folder, the file list, the top module, the rule-ID report and the commands that reproduce the checks.
+All deliverables are saved in the output folder the user names (R-018): the `.sv` files, `filelist.f`, the lint logs, the rule-check report if one was asked for, and, when asked, the testbench folder with its simulation logs and assertion table, the evidence folder `waveforms_sim`, and for a design with a crossing the logs of the synthesis branch and of the metastability runs. The final message gives the folder, the file list, the top module, the rule-ID report and the commands that reproduce the checks.

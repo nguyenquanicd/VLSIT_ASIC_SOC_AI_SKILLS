@@ -8,3 +8,7 @@ __pycache__/
 # Licensed standard converted to Markdown (Arm APB, redistribution forbidden, rule R-008)
 .agents/skills/vlsit-asic-ip-microspec/reference/md_doc/vlsit_apb_amba_apb_ihi0024d.md
 .claude/skills/vlsit-asic-ip-microspec/reference/md_doc/vlsit_apb_amba_apb_ihi0024d.md
+
+# Licensed standard converted to Markdown (Arm AXI IHI 0022H.c, redistribution forbidden, rule R-008)
+.agents/skills/vlsit-asic-ip-microspec/reference/md_doc/vlsit_axi_amba_axi_ihi0022h_c.md
+.claude/skills/vlsit-asic-ip-microspec/reference/md_doc/vlsit_axi_amba_axi_ihi0022h_c.md

@@ -29,6 +29,8 @@ Every check, expected value and assertion carries the requirement ID or the prot
 
 Keep the testbench and the assertions in their own folder beside the design files, for example `verification/` next to `rtl/`, never in the design file set or in `filelist.f` (R-010, R-022). The rule check of the skill (`vlsit_rtl_check.py`) and the lint run on the design folder only, because the design rules do not apply to verification code. A Makefile that runs the rule check, the lint and the simulation, and a folder for their logs and reports (for example `sanity/`), make the run repeatable.
 
+The folder also holds the evidence folder `waveforms_sim` (section 7) and the logs of both simulation branches of a crossing (section 8); for example `verification/waveforms_sim/` and `verification/logs/`.
+
 ## 3. Protocol assertions (R-024, R-025)
 
 Write at least 20 assertions on the rules of each standard protocol the design has on a port, plus the assertions that relate two interfaces when the design converts between them (completion reflects response, illegal request gives no downstream request, a legal request becomes the matching downstream request). Typical groups:
@@ -93,6 +95,50 @@ When the cause is clear from this (for example the RTL breaks a named requiremen
 
 The designer decides; then make exactly that change.
 
-## 6. Report
+## 6. Waveform evidence of the specification plan (R-033)
 
-State which standards and which requirements the testbench was derived from, the number of assertions and the table of their hits, the stimulus cases, the seeds, the number of injected bugs caught, every failure with its decision, and what was not verified (formal proof, coverage, a protocol feature that the stimulus models do not drive).
+The specification lists its key waveforms in the plan of section 10.3 (WF-001, WF-002, ...), each with a figure and a WaveJSON source. The testbench reproduces the same scenarios, and the waveforms that the simulation produces are kept in one folder so that the designer can put the simulated and the specified waveform side by side.
+
+1. **Scenario per waveform.** For each row of the plan write a directed test (or a window of a directed test) that makes the scenario of the row, with the stimulus of the specification, not read from the RTL. Name the test with the waveform ID.
+2. **Dump.** Dump the signals of the figure (the ports named in the figure, and, for the evidence only, internal signals that the figure shows, taken by hierarchical name) to a VCD file whose stem is the stem of the specification figure: figure `waveforms/apbcdc_wf001_write_no_wait.svg` gives `waveforms_sim/apbcdc_wf001_write_no_wait.vcd`. Use one dump per scenario (`$dumpfile` set by the test, or one run per scenario) so that the file holds only that scenario.
+3. **Render.** Convert the window of the figure to WaveJSON and to SVG with the same stem (`.json`, `.svg`), for example with the skill `vlsit-wavedrom-waveform` (VCD window to WaveJSON) and `vlsit_waveform_svg.py` of the skill `vlsit-asic-ip-microspec`. Use the same clock rows, the same signal names and the same slot grid as the specification figure, so the rows line up.
+4. **Index.** Write `waveforms_sim/waveform_compare.md` with one row per plan waveform:
+
+| Waveform ID | Specification figure | Simulated waveform | Result | Note |
+|---|---|---|---|---|
+| WF-001 | waveforms/apbcdc_wf001_write_no_wait.svg | waveforms_sim/apbcdc_wf001_write_no_wait.svg | MATCH | Same edges and values |
+| WF-004 | waveforms/apbcdc_wf004_read_error.svg | waveforms_sim/apbcdc_wf004_read_error.svg | DIFFERENT | PSLVERR rises one cycle later than the figure; analysis under R-026, decision of the designer: figure to be corrected |
+
+   The result is MATCH (the cycles, the edges and the values agree with the figure), DIFFERENT (with the reason and the decision) or NOT-SIMULATED (with the reason). A waveform of the specification that the designer declined in the plan is not listed.
+5. **Check.** `vlsit_sim_evidence.py check <spec.md> waveforms_sim` prints one ERROR for each plan waveform without dump, WaveJSON or index row, and one WARN for each port signal of the specification figure that the simulated waveform lacks. A DIFFERENT row is a finding for section 5 of this guide: the cause is the RTL, the test or the specification, and only the designer decides.
+
+The waveforms of the specification may themselves come from a prototype; the evidence of the delivered RTL replaces that statement only when the comparison says MATCH.
+
+## 7. Both branches of a design with a clock-domain crossing (R-034)
+
+A design with a crossing has a synchronizer wrapper that holds two branches (rule R-027): the branch with `VLSIT_SYNTHESIS` instantiates the library cells and is the netlist that is built; the other branch is a simulation model of the same chain with a random extra latency of a few cycles (the metastability model), controlled by plusargs for the seed and for enabling the model. The testbench shall pass in both.
+
+1. **Detect.** `vlsit_sim_evidence.py plan <spec.md>` says whether section 7.2 of the specification lists crossings. A synchronizer wrapper in the RTL also makes the rule apply.
+2. **Synthesis branch.** Compile the design, the wrapper, the cell models and the testbench with the flow macro defined (for example `iverilog -DVLSIT_SYNTHESIS`, or `+define+VLSIT_SYNTHESIS`). The latency is deterministic; this run is the one whose waveforms are compared with the specification (section 6 of this guide).
+3. **Simulation branch.** Compile without the macro and run the same testbench with at least three seeds (the plusargs named in the specification, for example `+APBCDC_MSYNC_SEED=<n>`), the model enabled. The latency changes from run to run, so a check that depends on a fixed latency shall accept the range that the specification states (for example the latency bound of a requirement), not one value.
+4. **Log line.** The testbench prints at the start of every run the line that tells the branch, for example:
+
+```systemverilog
+initial begin
+`ifdef VLSIT_SYNTHESIS
+  $display("SIM-BRANCH: synthesis");
+`else
+  if (!$value$plusargs("APBCDC_MSYNC_SEED=%d", seed)) seed = 1;
+  $display("SIM-BRANCH: metastable seed=%0d", seed);
+`endif
+end
+```
+
+   and, as before (R-025), the last line `assertion failures: 0, assertions never exercised: 0`. Keep each log in the logs folder under a name that carries the branch and the seed.
+5. **Check.** `vlsit_sim_evidence.py cdc <logs folder>` fails when there is no log of the synthesis branch, when fewer than three different seeds pass in the simulation branch, or when a log lacks the pass line. `vlsit_sim_evidence.py check <spec.md> waveforms_sim --logs <logs folder>` does both checks.
+6. **Missing model.** If the wrapper has no simulation branch with random latency, do not skip the branch: report it as a gap and ask the designer (R-005) whether the wrapper shall get the model.
+7. **Metastable-run waveforms.** The evidence folder of section 6 holds the synthesis-branch waveforms. A dump of a metastable run is welcome as a second set (for example with the suffix `_seed3`) but is not compared with the figure, because the latency differs by design.
+
+## 8. Report
+
+State which standards and which requirements the testbench was derived from, the number of assertions and the table of their hits, the stimulus cases, the seeds, the result of `vlsit_sim_evidence.py` for the waveform evidence and, for a crossing, the runs of both branches, the number of injected bugs caught, every failure with its decision, and what was not verified (formal proof, coverage, a protocol feature that the stimulus models do not drive).

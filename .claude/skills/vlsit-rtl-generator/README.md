@@ -18,5 +18,6 @@ Tạo RTL SystemVerilog tổng hợp được từ specification theo mẫu ASIC
 | `vlsit_spec_gaps.py` | `gaps`: list open items of the specification; `facts`: print its tables. / Liệt kê điểm còn trống; in các bảng. |
 | `vlsit_rtl_check.py` | `check`: mechanical rules by ID; `coverage`: what is checked by script, lint or by hand. / Kiểm rule máy đọc được theo ID. |
 | `vlsit_lint_rtl.py` | `tools`, `filelist`, `lint`. / Tìm công cụ, tạo filelist, chạy lint. |
+| `vlsit_sim_evidence.py` | `plan`, `check`, `cdc`: waveform evidence folder of the testbench against the specification plan (R-033) and the logs of both simulation branches of a clock-domain crossing (R-034). / Kiểm thư mục waveform mô phỏng so với plan trong spec và log hai nhánh mô phỏng của design có CDC. |
 
 Invoke / Gọi: /vlsit-rtl-generator

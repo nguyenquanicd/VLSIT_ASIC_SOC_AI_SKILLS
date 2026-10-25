@@ -113,6 +113,7 @@ COVERAGE = OrderedDict([
     ("FIL-06", ("script", "ports declared in functional groups with a comment per group")),
     ("FIL-04", ("script", "if / else branch statements on their own line, no alignment after the condition")),
     ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
+    ("R-032", ("script", "cell model VLSIT_CELL_<function>: library pin names accepted, reported as WARN")),
 ])
 
 
@@ -342,6 +343,9 @@ def check_if_chains(code, name, f):
 SIM_MACRO = "VLSIT_SYNTHESIS"
 SIM_REASON = ("simulation-only branch of `%s` is excluded from the RTL rules (spec DEC-021 and REQ-RTL-002, rule R-027): "
               "it is never synthesized, so the design rules were NOT checked in these lines; it is covered by simulation only" % SIM_MACRO)
+CELL_PREFIX = "VLSIT_CELL_"
+CELL_REASON = ("module `%s` is a cell model (rule R-032): its module and pin names keep the usual style of a library cell, so the "
+               "port and signal naming of the rule file was NOT checked; a real design uses the cell of the synthesis library")
 DIRECTIVE = re.compile(r"^\s*`(ifdef|ifndef|elsif|else|endif)\b[ \t]*(\w*)")
 
 
@@ -506,6 +510,14 @@ def check_file(path, f):
     if not modules:
         return
     mod_name, mod_pos = modules[0]
+    is_cell = mod_name.startswith(CELL_PREFIX)
+    f.mark("R-032")
+    if is_cell:
+        f.add("WARN", "R-032", name, line_of(code, mod_pos), CELL_REASON % mod_name)
+        if not re.match(r"^VLSIT_CELL_[A-Z][A-Z0-9_]*$", mod_name):
+            f.add("ERROR", "R-032", name, line_of(code, mod_pos), "cell module name must be VLSIT_CELL_<FUNCTION> in uppercase")
+        if not re.search(r"(?i)synthesizable", raw.split("*/")[0]) or not re.search(r"(?i)synthesis library", raw.split("*/")[0]):
+            f.add("ERROR", "R-032", name, 1, "cell header must say that the model is synthesizable and that the cell of the synthesis library is used in a real design")
     if Path(path).stem != mod_name:
         f.add("ERROR", "HIE-01", name, line_of(code, mod_pos), "file name '%s' must equal the module name '%s'" % (name, mod_name))
 
@@ -554,7 +566,9 @@ def check_file(path, f):
         if direction == "input":
             if typ != "wire":
                 f.add("ERROR", "TYP-02", name, ln, "input port '%s' must be declared 'input wire' (found '%s')" % (pname, typ or "no type"))
-            if not pname.startswith("i_"):
+            if is_cell:
+                pass
+            elif not pname.startswith("i_"):
                 f.add("ERROR", "NAM-TBL", name, ln, "input port '%s' must start with i_" % pname)
             elif re.search(r"(^|_)clk(_|$)", pname) and not pname.startswith(("i_clk_", "i_dft_")):
                 f.add("ERROR", "NAM-TBL", name, ln, "clock input '%s' must be named i_clk_<domain>" % pname)
@@ -563,12 +577,12 @@ def check_file(path, f):
         elif direction == "output":
             if typ != "logic":
                 f.add("ERROR", "TYP-02", name, ln, "output port '%s' must be declared 'output logic' (found '%s')" % (pname, typ or "no type"))
-            if not pname.startswith("o_"):
+            if not is_cell and not pname.startswith("o_"):
                 f.add("ERROR", "NAM-TBL", name, ln, "output port '%s' must start with o_" % pname)
         elif direction == "inout":
             if typ != "wire":
                 f.add("ERROR", "TYP-02", name, ln, "inout port '%s' must be declared 'inout wire'" % pname)
-            if not pname.startswith("io_"):
+            if not is_cell and not pname.startswith("io_"):
                 f.add("ERROR", "NAM-TBL", name, ln, "inout port '%s' must start with io_" % pname)
 
     # --- parameters (PAR-01, PAR-02)
@@ -583,7 +597,7 @@ def check_file(path, f):
         if kind == "parameter":
             if not decl_ok:
                 f.add("ERROR", "PAR-01", name, ln, "parameter '%s' must be declared 'parameter logic [31:0] PARA_<NAME>'" % pname)
-            if not re.match(r"^PARA_[A-Z0-9_]+$", pname):
+            if not is_cell and not re.match(r"^PARA_[A-Z0-9_]+$", pname):
                 f.add("ERROR", "NAM-TBL", name, ln, "parameter '%s' must be PARA_<UPPERCASE>" % pname)
             above = []
             k = ln - 1
@@ -677,6 +691,8 @@ def check_file(path, f):
     for m in re.finditer(r"\balways(?!_ff\b|_comb\b|_latch\b)\b", code):
         f.add("ERROR", "P6", name, line_of(code, m.start()), "plain 'always'; use always_comb or always_ff")
     for m in re.finditer(r"\balways_latch\b", code):
+        if is_cell:
+            continue
         f.add("ERROR", "P7", name, line_of(code, m.start()), "always_latch / latch")
     for kind in ("always_ff", "always_comb"):
         for m in re.finditer(r"\b%s\b" % kind, code):
@@ -701,7 +717,7 @@ def check_file(path, f):
             if len(set(clocks)) > 1:
                 f.add("ERROR", "SEQ-01", name, ln0, "always_ff has more than one clock (%s)" % ", ".join(sorted(set(clocks))))
             for s in clocks:
-                if not s.startswith(("i_clk_", "i_dft_")) and not s.startswith("w_"):
+                if not is_cell and not s.startswith(("i_clk_", "i_dft_")) and not s.startswith("w_"):
                     f.add("WARN", "SEQ-01", name, ln0, "always_ff clock '%s' is not named i_clk_<domain>" % s)
         else:
             f.add("ERROR", "SEQ-01", name, ln0, "always_ff has no event control")
@@ -719,12 +735,12 @@ def check_file(path, f):
             n = a.group(1)
             if n in KEYWORDS or n.startswith("idx"):
                 continue
-            if not n.startswith(("w_", "o_")):
+            if not is_cell and not n.startswith(("w_", "o_")):
                 f.add("ERROR", "NAM-TBL", name, line_of(code, body_offset + m.start() + a.start()), "combinational signal '%s' must be named w_<name> (or be an o_ port)" % n)
                 break
     for m in re.finditer(r"\bassign\s+(\w+)", code):
         defined.append(("net", m.group(1), line_of(code, m.start())))
-        if not m.group(1).startswith(("w_", "o_")):
+        if not is_cell and not m.group(1).startswith(("w_", "o_")):
             f.add("ERROR", "NAM-TBL", name, line_of(code, m.start()), "assigned signal '%s' must be named w_<name> (or be an o_ port)" % m.group(1))
 
     # --- functions

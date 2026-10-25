@@ -240,6 +240,23 @@ def check_signal_table(sec6, errors):
                           "data or static (rule R-025)" % (port, r[idx["signal type"]][:30]))
 
 
+def check_block_diagram(sec5, base, errors):
+    """R-017, R-028: section 5.2 links an existing image and its source (.drawio, .tex or .json) beside it."""
+    body = subsection(sec5, "5.2")
+    if NR_RE.search(body):
+        return
+    m = re.search(r"!\[[^\]]*\]\(([^)\s]+\.(?:svg|png))\)", body)
+    if not m:
+        errors.append("section 5.2: no block diagram image (rule R-017)")
+        return
+    if base is not None:
+        path = Path(base) / m.group(1)
+        if not path.is_file():
+            errors.append("section 5.2: image %s not found" % m.group(1))
+        elif not any(path.with_suffix(s).is_file() for s in (".drawio", ".tex", ".json")):
+            errors.append("section 5.2: no .drawio, .tex or .json source beside %s (rules R-017, R-028)" % m.group(1))
+
+
 def check_wave_plan(sec10, base, errors):
     """R-024: the waveform plan covers every operation, and each figure and its source file exist."""
     sec103 = subsection(sec10, "10.3")
@@ -347,6 +364,7 @@ def findings_for(text, base=None, naming="default"):
         errors.append("section 2 does not record the naming rule that the specification follows: the user's rule "
                       "or the default of vlsit-rtl-generator (rule R-026)")
     check_wave_plan(sec.get(10, ""), base, errors)
+    check_block_diagram(sec.get(5, ""), base, errors)
     tbd_secs = [n for n, _, s, e in secs if n != 20 and re.search(r"\bTBD\b", strip_code("\n".join(lines[s + 1:e])))]
     if tbd_secs and "TBD" not in s20:
         errors.append("TBD used in section(s) %s but section 20 records none" % tbd_secs)

@@ -78,7 +78,7 @@ If the IP has software-visible registers, describe them in JSON and fill the wor
 ### 10. Waveform plan, block diagram and waveforms
 
 1. **Agree the waveform plan first (rule R-024).** From sections 6.3 and 10.2 build a list with an ID (WF-001, ...), the function or operation, the scenario (success, error or corner case) and the signals shown. It must cover every operation of 10.2, the success and the error case of every interface, and the special cases of this IP (reset, backpressure, back-to-back, boundary, timeout). Show the list to the user and ask which waveforms are the minimum, with the question format of R-003: for example A, the proposed list (recommended); B, only one success and one error per interface; C, the proposed list plus extra corner cases; D, the user's own list. Record the answer in the table of section 10.3 with the date; a waveform the user declines gets a dated Not required line in its Figure cell. Draw nothing before the answer.
-2. Describe the blocks and links in JSON and generate the diagram as LaTeX (rule R-018).
+2. Draw the block diagram with draw.io (rules R-018 to R-020, R-027 to R-029): fill a diagram spec JSON from sections 5, 6 and 14.2 (`vlsit_spec_diagram.py template` or `from-spec`), run `vlsit_spec_diagram.py check`, `build` (draw.io, library validation, geometry check, SVG) and `insert` (section 5.2); the rules are in [reference/drawio/vlsit_diagram_rules.md](reference/drawio/vlsit_diagram_rules.md). LaTeX (`vlsit_block_diagram.py`) is the fallback.
 3. Describe each waveform of the plan as WaveJSON and render it to SVG (rule R-017); link the image in the Figure cell of the plan. Formats and commands are in [reference/vlsit_diagrams_and_waveforms.md](reference/vlsit_diagrams_and_waveforms.md). If no LaTeX compiler exists, ask the user whether to install one; if the user declines, ask whether to use draw.io (rules R-019, R-020; the library and reference diagram are in [reference/drawio/](reference/drawio/README.md)).
 
 ### 11. Check and review
@@ -124,7 +124,8 @@ Run each script as `<python> "<skill folder>\scripts\<script>.py" <action>`.
 | `scripts/vlsit_pdf_render.py` | Step 10: turn a compiled PDF diagram into SVG or PNG (needs PyMuPDF) |
 | `scripts/vlsit_ip_search.py` | Step 6: `search` GitHub or Gitee, `evaluate` one page |
 | `scripts/vlsit_csr_tool.py` | Step 9: `validate`, `fill`, `dump` the CSR workbook (needs openpyxl) |
-| `scripts/vlsit_block_diagram.py` | Step 10: `check`, `tex`, `build`, `drawio` |
+| `scripts/vlsit_spec_diagram.py` | Step 10: `template`, `from-spec`, `check`, `build`, `insert` (draw.io block diagram, with `vlsit_drawio_frame_diagram.py`, `vlsit_drawio_geometry_check.py`, `vlsit_drawio_to_svg.py`, `vlsit_layout_search.py`) |
+| `scripts/vlsit_block_diagram.py` | Step 10 fallback: `check`, `tex`, `build`, `drawio` |
 | `scripts/vlsit_waveform_svg.py` | Step 10: render WaveJSON to SVG |
 | `scripts/vlsit_library_symbols.py` | Step 10 with draw.io: `validate` a .drawio file against the VLSIT library |
 

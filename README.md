@@ -59,7 +59,7 @@ The Makefile header lists the tools it needs (GNU make, Icarus Verilog, Verilato
 | Python 3 | all skill scripts / mọi script của skill | Yes / Có |
 | Verilator or slang | RTL lint (without it the skill says "lint not run") / lint RTL | No / Không |
 | Icarus Verilog + GNU make | simulation of the example / mô phỏng ví dụ | No / Không |
-| `openpyxl`, `PyMuPDF`, `tectonic` (LaTeX) | CSR workbook, PDF conversion, block diagrams of the specification skill / workbook CSR, chuyển PDF, sơ đồ khối | Only for that feature; asked first / Chỉ cho tính năng đó, hỏi trước |
+| `openpyxl`, `PyMuPDF`, `tectonic` (LaTeX) | CSR workbook, PDF conversion, block diagrams of the specification skill (LaTeX is only the fallback; draw.io is the default) / workbook CSR, chuyển PDF, sơ đồ khối | Only for that feature; asked first / Chỉ cho tính năng đó, hỏi trước |
 
 Standards under copyright (for example the Arm APB specification) are not shipped. The specification skill names the file, the source and the licence and asks your approval before it downloads one. / Tiêu chuẩn có bản quyền (ví dụ đặc tả APB của Arm) không đi kèm. Skill đặc tả báo tên file, nguồn, giấy phép và xin phép trước khi tải.
 
