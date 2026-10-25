@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_drawio_geometry_check.py
+# Function : review the geometry of a generated multi-page draw.io file without rendering it
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Geometric review of a generated multi-page .drawio file (no rendering needed).
 
 Purpose : checks the drawing rules that vlsit_library_symbols.py does not cover: connector through a block,

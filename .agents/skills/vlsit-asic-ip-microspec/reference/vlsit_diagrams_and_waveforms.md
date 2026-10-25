@@ -27,3 +27,14 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-017 to
 4. Link the SVG from the interface section and from the Figure cell of the plan, and cite the JSON source; `vlsit_spec_tool.py check` verifies that the image and its `.json` or `.tex` source exist.
 
 WaveJSON notes: one character per clock cycle; `p` clock, `0`/`1` levels, `x` unknown, `z` high impedance, `=` bus value taking the next entry of `data`, `.` repeats the previous cycle, `|` marks a time gap; a group is an array whose first item is its name. The skill `vlsit-wavedrom-waveform` (if installed) builds an interactive viewer for the same JSON.
+
+## draw.io reference files
+
+Read these when `vlsit_spec_diagram.py` or the draw.io path of `vlsit_block_diagram.py` is used (they are reference only; `rule.md` wins):
+
+| File | Read it when |
+|---|---|
+| [drawio/vlsit_interface_groups.md](drawio/vlsit_interface_groups.md) | Naming the interface groups of a block (catalog of names, typical signals, how to identify each group) |
+| [drawio/vlsit_library_usage.md](drawio/vlsit_library_usage.md) | Choosing and cloning symbols of the bundled VLSIT library; checksum and template list |
+| [drawio/vlsit_sizing_guide.md](drawio/vlsit_sizing_guide.md) | Sizing shapes and text boxes for 18 pt text |
+| [drawio/example/vlsit_axi_bridge_diagram_spec.json](drawio/example/vlsit_axi_bridge_diagram_spec.json) | A finished diagram description; its output is [vlsit_axi_bridge_block_diagram.drawio](drawio/example/vlsit_axi_bridge_block_diagram.drawio) and the render [vlsit_axi_bridge_block_diagram.svg](drawio/example/vlsit_axi_bridge_block_diagram.svg) |

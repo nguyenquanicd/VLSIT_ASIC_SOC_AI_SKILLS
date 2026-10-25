@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_drawio_frame_diagram.py
+# Function : generate the frame-style block diagram (draw.io, library symbols only) from a JSON specification
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Generate the frame-style block diagram (draw.io, library symbols only) from a JSON spec.
 
 Copy of the generator of the skill vlsit-rtl-hierarchy-diagram with three optional spec fields added for the

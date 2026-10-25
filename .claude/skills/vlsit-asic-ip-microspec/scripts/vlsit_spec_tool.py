@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_spec_tool.py
+# Function : create, check and edit an ASIC IP design specification written in the VLSIT template
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Create, check and edit an ASIC IP design specification written in the VLSIT template.
 
 Actions :
@@ -141,6 +147,29 @@ def table_rows(block):
     return (rows[0], rows[1:]) if rows else (None, [])
 
 
+def all_tables(block):
+    """Every Markdown table of block, as (header cells, [row cells]); tables are separated by lines that are not table rows."""
+    groups, cur = [], []
+    for l in block.splitlines():
+        if l.strip().startswith("|"):
+            cur.append(l)
+        elif cur:
+            groups.append("\n".join(cur))
+            cur = []
+    if cur:
+        groups.append("\n".join(cur))
+    return [table_rows(g) for g in groups]
+
+
+def port_tables(block):
+    """The tables of block that have a 'Port' column: section 6.2 may hold one table for the top and one per module."""
+    out = []
+    for head, rows in all_tables(block):
+        if head and any(h.lower().startswith("port") for h in head):
+            out.append((head, rows))
+    return out
+
+
 def subsection(text, number):
     """Text of '### number ...' up to the next heading of level 2 or 3, or ''."""
     lines = text.splitlines()
@@ -171,9 +200,11 @@ def check_port_names(sec6, errors):
     body = subsection(sec6, "6.2")
     if not body or NR_RE.search(body):
         return
-    head, rows = table_rows(body)
-    if head is None:
-        return
+    for head, rows in port_tables(body):
+        _check_port_names_table(head, rows, errors)
+
+
+def _check_port_names_table(head, rows, errors):
     pi = next((i for i, h in enumerate(head) if h.lower().startswith("port")), None)
     di = next((i for i, h in enumerate(head) if h.lower().startswith("direction")), None)
     ti = next((i for i, h in enumerate(head) if h.lower().startswith("signal type")), None)
@@ -216,10 +247,15 @@ def check_signal_table(sec6, errors):
     body = subsection(sec6, "6.2")
     if not body or NR_RE.search(body):
         return
-    head, rows = table_rows(body)
-    if head is None:
+    tables = port_tables(body)
+    if not tables:
         errors.append("section 6.2: no port table (rule R-025)")
         return
+    for head, rows in tables:
+        _check_signal_table(head, rows, errors)
+
+
+def _check_signal_table(head, rows, errors):
     idx = {name: next((i for i, h in enumerate(head) if h.lower().startswith(name)), None)
            for name in ("port", "meaning", "clock domain", "signal type")}
     for name, i in idx.items():

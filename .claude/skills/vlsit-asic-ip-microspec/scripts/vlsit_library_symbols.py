@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_library_symbols.py
+# Function : inspect, clone and validate symbols of the bundled VLSIT draw.io library
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Inspect, clone, and validate symbols from the bundled VLSIT draw.io library."""
 
 import argparse

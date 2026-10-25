@@ -58,7 +58,9 @@ what the result means) in SKILL.md.
   `hashlib`, `re`, `pathlib`, `shutil`, `subprocess`, `argparse`, `difflib`,
   `sqlite3`, `tempfile`, `datetime`. Reach for a package only when none of these can
   do the job, then ask the user, name the package and its version in
-  `compatibility`, and pass `--allow-package <name>` to `validate`.
+  `compatibility`, and record the approval: either pass `--allow-package <name>` to `validate`, or list the package in
+  `scripts/vlsit_approved_packages.txt` of the skill (one package per line, `#` starts a comment that says who
+  approved it and when), which `validate` reads, so that the approval stays with the skill.
 - **Explicit UTF-8.** Python on Windows opens text files in the local code page, so
   Vietnamese text is corrupted silently. Always write `open(path, encoding="utf-8")`,
   `path.read_text(encoding="utf-8")` and `path.write_text(text, encoding="utf-8")`.

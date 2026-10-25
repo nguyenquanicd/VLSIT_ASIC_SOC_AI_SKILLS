@@ -1,0 +1,5 @@
+# Third-party packages that the user approved for this skill (rule R-022 of vlsit-create-skill, R-022 of this skill).
+# One package per line; the text after '#' records who approved it and why. `vlsit_skillkit.py validate` reads this file.
+openpyxl   # approved by the user: fills the CSR workbook (vlsit_csr_tool.py)
+pymupdf    # approved by the user: PDF conversion and rendering (vlsit_pdf_to_md.py, vlsit_pdf_render.py, vlsit_drawio_to_svg.py); AGPL, see rule R-023
+fitz       # old import name of PyMuPDF, used as a fallback import in the same scripts

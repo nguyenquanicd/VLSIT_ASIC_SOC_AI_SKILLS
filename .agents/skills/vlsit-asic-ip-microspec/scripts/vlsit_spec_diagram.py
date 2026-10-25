@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_spec_diagram.py
+# Function : draw the block diagram of section 5.2 of a specification as draw.io, check, render and insert it
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Draw the block diagram of section 5.2 of a specification as draw.io, check it, render an SVG and insert it.
 
 Purpose : one command chain for the draw.io block diagram (rules R-018 to R-020, R-027 to R-029). The diagram is a

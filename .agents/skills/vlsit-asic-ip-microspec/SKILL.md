@@ -128,6 +128,7 @@ Run each script as `<python> "<skill folder>\scripts\<script>.py" <action>`.
 | `scripts/vlsit_block_diagram.py` | Step 10 fallback: `check`, `tex`, `build`, `drawio` |
 | `scripts/vlsit_waveform_svg.py` | Step 10: render WaveJSON to SVG |
 | `scripts/vlsit_library_symbols.py` | Step 10 with draw.io: `validate` a .drawio file against the VLSIT library |
+| `scripts/vlsit_approved_packages.txt` | Not run: the record of the third-party packages the user approved (openpyxl, PyMuPDF; rule R-022); `vlsit_skillkit.py validate` reads it |
 
 ## Output
 

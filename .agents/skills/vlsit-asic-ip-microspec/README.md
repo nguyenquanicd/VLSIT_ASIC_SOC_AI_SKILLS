@@ -1,4 +1,4 @@
-# vlsit-asic-ip-microspec (Codex copy)
+# vlsit-asic-ip-microspec (Claude copy)
 
 Discusses and writes an ASIC IP design (micro-architecture) specification in the VLSIT template. It asks questions with options and examples, grounds protocol statements in converted standards (`reference/md_doc`), studies only silicon- or FPGA-proven reference IP (GitHub, Gitee), fills the CSR workbook, and draws the block diagram (draw.io with the VLSIT library, checked and exported to SVG by `vlsit_spec_diagram.py`; LaTeX/TikZ is the fallback) a port table with the function, clock domain and signal type (level or pulse) of every signal, and the key function and interface waveforms that you confirm first. A worked APB-to-TL-UL bridge is in `example/apb_tlul_bridge/`.
 
@@ -10,4 +10,4 @@ Các file format spec nằm trong `reference/templates/` và thư viện draw.io
 
 Đặc tả thiết kế ASIC IP theo template VLSIT: hỏi đáp có options và ví dụ, tiêu chuẩn protocol đã chuyển sang Markdown, IP tham khảo đã có tapeout hoặc FPGA, workbook CSR, bảng mô tả tín hiệu (chức năng, clock domain, pulse hay level), sơ đồ block bằng draw.io với thư viện VLSIT (LaTeX là phương án dự phòng) và các waveform function và interface quan trọng đã được bạn xác nhận trước. Ví dụ hoàn chỉnh nằm ở `example/apb_tlul_bridge/`. Tiêu chuẩn có giấy phép cấm phân phối lại chỉ giữ dạng Markdown và không được commit.
 
-Invoke / Gọi: $vlsit-asic-ip-microspec
+Invoke / Gọi: /vlsit-asic-ip-microspec

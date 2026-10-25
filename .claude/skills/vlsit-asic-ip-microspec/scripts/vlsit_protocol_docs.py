@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_protocol_docs.py
+# Function : look up, search and fetch the protocol documents of reference/md_doc and reference/org_doc
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Look up and fetch protocol documents of reference/md_doc and reference/org_doc.
 
 Purpose : lets the assistant read one section of a standard instead of a whole file (saves tokens), search

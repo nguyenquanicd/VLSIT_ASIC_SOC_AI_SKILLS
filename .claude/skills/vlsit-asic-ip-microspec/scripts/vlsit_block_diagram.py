@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_block_diagram.py
+# Function : generate a block diagram as LaTeX (TikZ) or draw.io from one JSON description
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Generate a block diagram as LaTeX (TikZ) or draw.io from one JSON description.
 
 Purpose : fast, repeatable block diagrams for section 5.2 of the specification. The JSON is the source of

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_waveform_svg.py
+# Function : render a WaveJSON timing diagram to a static SVG file
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Render a WaveJSON timing diagram to a static SVG file (no browser, no network).
 
 Purpose : puts key interface waveforms into the specification as image files that every Markdown viewer

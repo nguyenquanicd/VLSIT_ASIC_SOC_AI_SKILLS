@@ -390,6 +390,21 @@ def check_header(report, path, rel):
 
 # ------------------------------------------------------------------ validate
 
+def read_approved_packages(path):
+    """Names listed in scripts/vlsit_approved_packages.txt: one package per line, the first word of the line, '#' starts a
+    comment (write there who approved the package and when). It records the user's approval of rule R-022 inside the skill."""
+    names = []
+    try:
+        lines = read_text(path).splitlines()
+    except OSError:
+        return names
+    for line in lines:
+        word = line.split("#", 1)[0].strip().split()
+        if word:
+            names.append(word[0])
+    return names
+
+
 def run_validate(skill_path, prefix, allow):
     report = Report()
     path = Path(skill_path)
@@ -401,6 +416,7 @@ def run_validate(skill_path, prefix, allow):
     rule_file = skill_dir / "rule.md"
     reference_dir = skill_dir / "reference"
     scripts_dir = skill_dir / "scripts"
+    allow = list(allow) + read_approved_packages(scripts_dir / "vlsit_approved_packages.txt")
 
     # R-001 four parts
     if not skill_file.is_file():

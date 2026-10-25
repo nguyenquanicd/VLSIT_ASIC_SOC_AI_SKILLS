@@ -3,6 +3,12 @@
 # This file imports PyMuPDF (AGPL-3.0, https://pymupdf.readthedocs.io/). Because of that import, this file is
 # licensed under the GNU Affero General Public License v3.0 only; the other scripts of this skill do not import
 # PyMuPDF and keep the repository licence (Apache-2.0). Corresponding source: this file, in this repository.
+# ---------------------------------------------------------------------------
+# File     : vlsit_pdf_to_md.py
+# Function : convert a PDF standard to a verbatim Markdown file and verify it
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Convert a PDF standard to a verbatim Markdown file with a protocol header (uses PyMuPDF).
 
 Purpose : builds the files of reference/md_doc/ from PDF documents. Headings are detected from font size and

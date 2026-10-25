@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_drawio_to_svg.py
+# Function : render an uncompressed draw.io file made by vlsit_drawio_frame_diagram.py to SVG
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Render an uncompressed .drawio file made by vlsit_drawio_frame_diagram.py to SVG (and optionally PNG).
 
 Purpose : the specification is a Markdown file, which cannot embed a .drawio file. This script draws the same

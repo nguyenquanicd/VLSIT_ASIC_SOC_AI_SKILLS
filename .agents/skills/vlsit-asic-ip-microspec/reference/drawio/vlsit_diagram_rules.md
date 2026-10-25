@@ -8,4 +8,4 @@ Guidance for rules R-018 to R-020. Source rules: RHD-020..059, 079, 086..089, 09
 - Boundary interfaces are straight stubs to a label or pad; clock and reset form one distribution tree (RHD-100..102).
 - Two native tables under the diagram: Block Functions & Interfaces and Interface Table, every signal listed (RHD-046, 089). Function text has no signal names.
 - Deviation for the specification flow: a single column of five or more independent channel blocks is accepted when every block has its boundary interfaces on two opposite sides (RHD-087 would forbid it); state it in the report.
-- Example: `reference/drawio/example/axi_bridge_diagram_spec.json` and its output (`vlsit_spec_diagram.py build`).
+- Example: `reference/drawio/example/vlsit_axi_bridge_diagram_spec.json` and its output (`vlsit_spec_diagram.py build`).

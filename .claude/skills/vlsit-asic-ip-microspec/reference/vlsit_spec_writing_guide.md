@@ -41,6 +41,8 @@ Columns: Port, Direction, Width, Meaning (function), Clock domain, Signal type, 
 
 The Clock domain cell names the domain (for example `CLK-CORE`) or `async` with the synchronizer that receives the signal.
 
+Section 6.2 may hold the table of the top level and, below it, one table per internal module (each with its own header row), or it may point to a later section that does. `vlsit_spec_tool.py check` reads every table of 6.2 that has a `Port` column, each with its own header, so a second table is not mistaken for rows of the first. A table that lists signal types (a legend) has no `Port` column and is ignored.
+
 ## Waveform plan (rule R-024)
 
 The table sits at the start of section 10.3, with the columns Waveform ID, Function / operation, Scenario, Signals shown, Figure and Confirmed by user. Build it from the operations of 10.2 and the interface cases of 6.3, add the special cases of the IP, show it to the user, and draw only what the user confirms. Typical entries: one success waveform per operation, one error waveform per error mechanism, reset, backpressure, back-to-back transfers, full and empty boundaries, timeout. A declined waveform stays in the table with a dated Not required line in the Figure cell, so `vlsit_spec_tool.py check` can see that the operation was considered.

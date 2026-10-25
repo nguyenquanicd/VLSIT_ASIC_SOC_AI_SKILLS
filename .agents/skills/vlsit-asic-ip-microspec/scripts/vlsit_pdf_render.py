@@ -2,6 +2,12 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # This file imports PyMuPDF (AGPL-3.0). Because of that import it is licensed under the GNU Affero General
 # Public License v3.0 only; the other scripts of this skill that do not import PyMuPDF keep Apache-2.0.
+# ---------------------------------------------------------------------------
+# File     : vlsit_pdf_render.py
+# Function : render a PDF page, such as a compiled diagram, to SVG or PNG
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# ---------------------------------------------------------------------------
 """Turn the first page of a PDF (for example a compiled LaTeX block diagram) into an SVG or PNG image.
 
 Purpose : the specification is Markdown, which shows images but not PDF pages; this converts the output of
