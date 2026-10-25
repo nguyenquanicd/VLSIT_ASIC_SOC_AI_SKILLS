@@ -115,6 +115,8 @@ COVERAGE = OrderedDict([
     ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
     ("R-032", ("script", "cell model VLSIT_CELL_<function>: library pin names accepted, reported as WARN")),
     ("R-035", ("script", "no redundant declaration: no one-bit range such as [0:0], no unused internal signal, localparam or type")),
+    ("R-036", ("script", "the always_ff that assigns an FSM current state holds that register only")), ("ENM-06", ("script", "FSM current-state register in its own always_ff (rule file): same check as R-036")),
+    ("TYP-06", ("script", "no redundant declaration (rule file): same check as R-035")), ("P30", ("script", "one-bit ranges and unused internal declarations (rule file): same check as R-035")),
 ])
 
 
@@ -349,7 +351,7 @@ DECL_TYPEDEF = re.compile(r"\}\s*([A-Za-z_]\w*_type_def)\s*;")
 def check_redundant(code, name, f):
     """R-035: no one-bit range such as [0:0] (declare a one-bit signal without a range, select a bit with [i]) and no
     internal signal, localparam or type that nothing uses. Ports and parameters belong to the interface and are exempt."""
-    f.mark("R-035")
+    f.mark("R-035", "TYP-06", "P30")
     for m in ONE_BIT_RANGE.finditer(code):
         if m.group(1) == m.group(2):
             f.add("ERROR", "R-035", name, line_of(code, m.start()),
@@ -369,6 +371,50 @@ def check_redundant(code, name, f):
         if len(re.findall(r"\b%s\b" % re.escape(ident), code)) == 1:
             f.add("ERROR", "R-035", name, line_of(code, pos),
                   "'%s' is declared but nothing uses it: remove the declaration (R-035)" % ident)
+
+
+FSM_CURRENT = re.compile(r"^reg_fsm_\w+_current_state$")
+
+
+def ff_assigned_names(body):
+    """Names on the left of the nonblocking assignments of an always_ff body (a '<=' inside parentheses is a
+    comparison of an expression, not an assignment)."""
+    names = set()
+    depth = 0
+    for i, ch in enumerate(body):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        elif ch == "<" and body[i:i + 2] == "<=" and depth == 0:
+            m = re.search(r"([A-Za-z_]\w*)(?:\s*\[[^\]]*\])*\s*$", body[:i])
+            if m:
+                names.add(m.group(1))
+    return names
+
+
+def check_fsm_ff(code, name, f):
+    """R-036: the always_ff that assigns the current-state register of an FSM holds that register only: no other
+    signal is assigned in the same always_ff."""
+    f.mark("R-036", "ENM-06")
+    for m in re.finditer(r"\balways_ff\b", code):
+        i = m.end()
+        if code[i:].lstrip().startswith("@"):
+            p = code.find("(", i)
+            q = match_paren(code, p) if p >= 0 else -1
+            i = q + 1 if q >= 0 else i
+        body = code[i:stmt_end(code, i)]
+        names = ff_assigned_names(body)
+        states = sorted(n for n in names if FSM_CURRENT.match(n))
+        others = sorted(n for n in names if not FSM_CURRENT.match(n))
+        if states and others:
+            f.add("ERROR", "R-036", name, line_of(code, m.start()),
+                  "always_ff assigns the FSM current state '%s' together with %s: give the current-state register its own "
+                  "always_ff (R-036, ENM-06)" % (states[0], ", ".join("'%s'" % n for n in others[:3])))
+        elif len(states) > 1:
+            f.add("ERROR", "R-036", name, line_of(code, m.start()),
+                  "one always_ff assigns the current state of two FSMs (%s): one always_ff per FSM (R-036, ENM-06)"
+                  % ", ".join(states))
 
 
 # ------------------------------------------------------------------ one file
@@ -810,6 +856,7 @@ def check_file(path, f):
     check_if_chains(code, name, f)
     check_comb_defaults(code, name, f)
     check_redundant(code, name, f)
+    check_fsm_ff(code, name, f)
 
     # --- prohibited constructs
     simple = [

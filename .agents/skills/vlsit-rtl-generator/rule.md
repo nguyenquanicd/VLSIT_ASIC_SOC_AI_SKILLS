@@ -94,8 +94,13 @@ MUST name a module that models a basic technology cell `VLSIT_CELL_<FUNCTION>` i
 
 ### R-035 No redundant declarations
 MUST declare a one-bit port, signal or enum base type without a range (`logic w_x`, `input wire i_x`, `typedef enum logic {...}`), never with a one-bit range such as `[0:0]`, and MUST select one bit with `[i]`, never with `[i:i]`; and MUST NOT declare an internal signal, localparam or type that nothing in the module uses. Ports and parameters are part of the interface and are exempt. A one-bit signal can be connected to a vector port whose width is 1 (for example `.o_data (w_x)` to `[W-1:0]` with W = 1), so no `[0:0]` wrapper is needed for it.
-- Why: a range that spans one bit and a declaration that nothing uses add noise, hide the real interface and cause lint warnings that a reviewer must read; the plain form says the same in fewer words (rule file TYP-01, ENM-01).
+- Why: a range that spans one bit and a declaration that nothing uses add noise, hide the real interface and cause lint warnings that a reviewer must read; the plain form says the same in fewer words (rule file TYP-06, P30, which this rule enforces).
 - Check: `vlsit_rtl_check.py check` reports no R-035 finding; manual - a signal that is assigned but never read is a lint finding handled under R-013.
+
+### R-036 FSM current state in its own always_ff
+MUST assign the current-state register of an FSM (`reg_fsm_<function>_current_state`) in an `always_ff` that holds that register only: its reset value and its update from the next state, and no other signal, so that every other flip-flop of the module (output registers, counters, flags, handshake bits) is in another `always_ff`; each FSM has its own such block.
+- Why: the current-state register is the one element that the synthesis frontend reads to extract and recode the FSM, and a block that mixes it with other registers hides the state update among unrelated assignments, blocks FSM extraction on some frontends and makes the three-process structure of the examples unreadable (rule file ENM-06, SEQ-01, SEQ-02).
+- Check: `vlsit_rtl_check.py check` reports no R-036 finding.
 
 ### R-019 Case for three or more branches
 MUST write a selection that has three or more conditional branches (an `if` followed by two or more `else if`) as a `case` or `casez` statement, never as an `if` / `else if` chain. Choose the statement with COM-03 and COM-04 of the rule file: a selection on the value of one signal is a plain `case`; a priority selection among independent conditions is a `casez` on the concatenated condition bits with `?` for the bits of lower priority, and its `default` assigns a defined value unless COM-04 allows `'x`. A chain with one or two conditions (with or without a final `else`), the reset test that opens a sequential process, and an elaboration-time `if` in a generate block are not counted.
