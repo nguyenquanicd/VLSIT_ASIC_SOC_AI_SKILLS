@@ -114,6 +114,7 @@ COVERAGE = OrderedDict([
     ("FIL-04", ("script", "if / else branch statements on their own line, no alignment after the condition")),
     ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
     ("R-032", ("script", "cell model VLSIT_CELL_<function>: library pin names accepted, reported as WARN")),
+    ("R-035", ("script", "no redundant declaration: no one-bit range such as [0:0], no unused internal signal, localparam or type")),
 ])
 
 
@@ -336,6 +337,38 @@ def check_if_chains(code, name, f):
         if count >= 3:
             f.add("ERROR", "R-019", name, line_of(code, start),
                   "if / else-if chain with %d conditions: write it as case or casez (R-019)" % count)
+
+
+ONE_BIT_RANGE = re.compile(r"\[\s*(\d+)\s*:\s*(\d+)\s*\]")
+DECL_SIGNAL = re.compile(r"(?m)^[ \t]*(?:logic|wire|[A-Za-z_]\w*_type_def)\b[ \t]*(?:\[[^\]\n]*\][ \t]*)?"
+                         r"([A-Za-z_]\w*(?:[ \t]*\[[^\]\n]*\])*(?:[ \t]*,[ \t]*[A-Za-z_]\w*(?:[ \t]*\[[^\]\n]*\])*)*)[ \t]*;")
+DECL_LPARA = re.compile(r"\blocalparam\b[^=;]*?\b(LPARA_\w+)\s*=")
+DECL_TYPEDEF = re.compile(r"\}\s*([A-Za-z_]\w*_type_def)\s*;")
+
+
+def check_redundant(code, name, f):
+    """R-035: no one-bit range such as [0:0] (declare a one-bit signal without a range, select a bit with [i]) and no
+    internal signal, localparam or type that nothing uses. Ports and parameters belong to the interface and are exempt."""
+    f.mark("R-035")
+    for m in ONE_BIT_RANGE.finditer(code):
+        if m.group(1) == m.group(2):
+            f.add("ERROR", "R-035", name, line_of(code, m.start()),
+                  "one-bit range [%s:%s]: declare a one-bit signal without a range and select one bit with [%s] (R-035)"
+                  % (m.group(1), m.group(2), m.group(1)))
+    declared = []
+    for m in DECL_SIGNAL.finditer(code):
+        for part in m.group(1).split(","):
+            ident = re.match(r"\s*([A-Za-z_]\w*)", part)
+            if ident:
+                declared.append((ident.group(1), m.start()))
+    for m in DECL_LPARA.finditer(code):
+        declared.append((m.group(1), m.start()))
+    for m in DECL_TYPEDEF.finditer(code):
+        declared.append((m.group(1), m.start()))
+    for ident, pos in declared:
+        if len(re.findall(r"\b%s\b" % re.escape(ident), code)) == 1:
+            f.add("ERROR", "R-035", name, line_of(code, pos),
+                  "'%s' is declared but nothing uses it: remove the declaration (R-035)" % ident)
 
 
 # ------------------------------------------------------------------ one file
@@ -776,6 +809,7 @@ def check_file(path, f):
     # --- if / else-if chains (R-019)
     check_if_chains(code, name, f)
     check_comb_defaults(code, name, f)
+    check_redundant(code, name, f)
 
     # --- prohibited constructs
     simple = [

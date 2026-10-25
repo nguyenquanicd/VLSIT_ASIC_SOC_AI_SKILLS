@@ -29,7 +29,7 @@ module m_mealy_fsm_example (
 
   // FSM states: IDLE waits for i_start and SEND offers one item at a time until the last one is
   // accepted. Both encodings of the 1-bit state are used; default recovers to ENUM_ST_IDLE.
-  typedef enum logic [0:0] {
+  typedef enum logic {
     ENUM_ST_IDLE = 1'b0,
     ENUM_ST_SEND = 1'b1
   } ctrl_state_type_def;
