@@ -107,6 +107,11 @@ MUST assign the current-state register of an FSM (`reg_fsm_<function>_current_st
 - Why: the current-state register is the one element that the synthesis frontend reads to extract and recode the FSM, and a block that mixes it with other registers hides the state update among unrelated assignments, blocks FSM extraction on some frontends and makes the three-process structure of the examples unreadable (rule file ENM-06, SEQ-01, SEQ-02).
 - Check: `vlsit_rtl_check.py check` reports no R-036 finding.
 
+### R-038 No default_nettype directive
+MUST NOT write a `` `default_nettype `` directive, with any value (`none`, `wire` or other), in design RTL; every signal is declared with an explicit type (rule file TYP-02, TYP-04) and an undeclared identifier is found by lint and elaboration (rule file TYP-03, P5), not by a directive in the source.
+- Why: the directive is compile-unit state that stays in force for every file compiled after it (a file that sets `none` and does not restore the default changes the meaning of later files and of vendor code, and a file that restores it hides a missing setting elsewhere), and tools disagree on how it carries across files, while lint reports implicit nets reliably without touching the source.
+- Check: `vlsit_rtl_check.py check` reports no R-038 finding; the lint of R-014 reports implicit nets and undeclared identifiers.
+
 ### R-019 Case for three or more branches
 MUST write a selection that has three or more conditional branches (an `if` followed by two or more `else if`) as a `case` or `casez` statement, never as an `if` / `else if` chain. Choose the statement with COM-03 and COM-04 of the rule file: a selection on the value of one signal is a plain `case`; a priority selection among independent conditions is a `casez` on the concatenated condition bits with `?` for the bits of lower priority, and its `default` assigns a defined value unless COM-04 allows `'x`. A chain with one or two conditions (with or without a final `else`), the reset test that opens a sequential process, and an elaboration-time `if` in a generate block are not counted.
 - Why: a `case` shows every alternative side by side and lets the synthesis frontend build one decoder, while a long `if` chain builds an unintended priority chain and hides a missing branch.

@@ -35,7 +35,7 @@ Per-skill details: the `README.md` inside each skill folder. / Chi tiết từng
 
 | Step | What you do / Bạn làm | What you get / Bạn nhận |
 |---|---|---|
-| 1 | Run `vlsit-asic-ip-microspec` and describe the IP. Answer its questions. / Chạy skill và mô tả IP, trả lời câu hỏi. | A specification (22 sections, numbered requirements), a block diagram and key waveforms. / Spec 22 mục có requirement đánh số, sơ đồ khối và waveform. |
+| 1 | Run `vlsit-asic-ip-microspec` and describe the IP. Answer its questions. / Chạy skill và mô tả IP, trả lời câu hỏi. | A specification (22 sections, numbered requirements), a draw.io block diagram (VLSIT library, SVG in the spec) and key waveforms. / Spec 22 mục có requirement đánh số, sơ đồ khối draw.io (thư viện VLSIT, SVG trong spec) và waveform. |
 | 2 | Read the spec, settle the open items (section 20). / Đọc spec, chốt các mục còn mở (mục 20). | A spec without open points. / Spec không còn điểm mở. |
 | 3 | Run `vlsit-rtl-generator` with the spec file, the project and author name, and the output folder. / Chạy skill với file spec, tên project, tên tác giả, thư mục output. | `.sv` files, `filelist.f`, rule-check report and lint logs, reported by rule ID. / File `.sv`, `filelist.f`, báo cáo rule và log lint theo ID rule. |
 | 4 | Ask for a testbench: "write a testbench with protocol assertions". / Yêu cầu testbench có assertion giao thức. | A self-checking testbench with 20+ assertions per protocol, derived from the spec and the standards, never from the RTL. / Testbench tự kiểm có từ 20 assertion mỗi giao thức, suy ra từ spec và chuẩn, không từ RTL. |

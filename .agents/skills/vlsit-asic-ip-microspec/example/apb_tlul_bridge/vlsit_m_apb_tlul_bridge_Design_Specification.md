@@ -462,7 +462,7 @@ State is owned by m_apb_tlul_cap, m_apb_tlul_rsp and m_apb_tlul_fsm. There are n
 | Parameters/configuration | CFG-BASE and CFG-TMO |
 | Libraries/corners | Chosen by the integrator (TBD-002) |
 | Memory flow | Not applicable: no memories |
-| Lint rule configuration | The project lint set with `default_nettype none` checking |
+| Lint rule configuration | The project lint set, which reports undeclared identifiers (implicit nets); the RTL has no `default_nettype` directive |
 
 ## 15. Verification specification
 

@@ -285,7 +285,7 @@ class Generator:
         self.fxr = snap(colx[-1] + colw[-1] / 2 + self.margin)
         self.fyb = snap(rowy[-1] + self.bh / 2 + self.margin)
         self.fw, self.fh = self.fxr - self.fx, self.fyb - self.fy
-        p.w, p.h = self.fxr + 250, self.fyb + 2300
+        p.w, p.h = max(self.fxr + 250, 2300), self.fyb + 2300   # at least the width of the description tables (RHD-055)
         top = spec["top"]
         p.block("FRAME", self.fx + self.fw / 2, self.fy + self.fh / 2, self.fw, self.fh,
                 "", kind="frame")

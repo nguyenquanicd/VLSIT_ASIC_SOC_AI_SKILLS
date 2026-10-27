@@ -16,6 +16,7 @@ This directory contains reusable ASIC RTL blocks, example cell models, and desig
 | [`004_AsyncAPBBridge`](004_AsyncAPBBridge/AsyncAPBBridge_Design_Specification.md) | Asynchronous APB bridge specification and integration collateral. |
 | [`005_AHB2AXI_Bridge`](005_AHB2AXI_Bridge/README.md) | AHB-to-AXI bridge specification, protocol references, and design collateral. |
 | [`006_AXI2APB_Bridge`](006_AXI2APB_Bridge/README.md) | AXI4 Subordinate to APB4 Manager bridge specification and synthesizable RTL. |
+| [`007_APB2TLUL_Bridge`](007_APB2TLUL_Bridge/README.md) | APB4 Completer to TL-UL Manager bridge specification, synthesizable RTL, and self-checking verification. |
 
 `rtl/filelist.f` in each design folder is the source list for that design. The CRC modules are alternatives: select the required CRC module as the elaboration top. FIFO filelists also depend on the shared wrappers and cell models noted in their filelist comments.
 
@@ -82,6 +83,7 @@ Thư mục này chứa các khối RTL ASIC dùng chung, mô hình cell ví dụ
 | [`004_AsyncAPBBridge`](004_AsyncAPBBridge/AsyncAPBBridge_Design_Specification.md) | Đặc tả và tài liệu tích hợp bridge APB bất đồng bộ. |
 | [`005_AHB2AXI_Bridge`](005_AHB2AXI_Bridge/README.md) | Đặc tả, tài liệu chuẩn giao thức và tài liệu thiết kế bridge AHB sang AXI. |
 | [`006_AXI2APB_Bridge`](006_AXI2APB_Bridge/README.md) | Đặc tả và RTL tổng hợp được cho bridge AXI4 Subordinate sang APB4 Manager. |
+| [`007_APB2TLUL_Bridge`](007_APB2TLUL_Bridge/README.md) | Đặc tả, RTL tổng hợp được và verification tự kiểm cho bridge APB4 Completer sang TL-UL Manager. |
 
 `rtl/filelist.f` trong mỗi thư mục thiết kế là danh sách source của thiết kế đó. Các module CRC là phương án thay thế nhau: chọn module CRC cần dùng làm top khi elaborate. Filelist FIFO cũng cần các wrapper và cell model dùng chung được nêu trong comment của filelist.
 

@@ -115,6 +115,7 @@ COVERAGE = OrderedDict([
     ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
     ("R-032", ("script", "cell model VLSIT_CELL_<function>: library pin names accepted, reported as WARN")),
     ("R-035", ("script", "no redundant declaration: no one-bit range such as [0:0], no unused internal signal, localparam or type")),
+    ("R-038", ("script", "no `default_nettype directive in design RTL; undeclared identifiers are found by lint (TYP-03, P5)")),
     ("R-036", ("script", "the always_ff that assigns an FSM current state holds that register only")), ("ENM-06", ("script", "FSM current-state register in its own always_ff (rule file): same check as R-036")),
     ("TYP-06", ("script", "no redundant declaration (rule file): same check as R-035")), ("P30", ("script", "one-bit ranges and unused internal declarations (rule file): same check as R-035")),
 ])
@@ -857,6 +858,10 @@ def check_file(path, f):
     check_comb_defaults(code, name, f)
     check_redundant(code, name, f)
     check_fsm_ff(code, name, f)
+    f.mark("R-038")
+    for m in re.finditer(r"`default_nettype\b", code):
+        f.add("ERROR", "R-038", name, line_of(code, m.start()),
+              "`default_nettype directive in design RTL: remove it; lint reports undeclared identifiers (R-038, TYP-03)")
 
     # --- prohibited constructs
     simple = [

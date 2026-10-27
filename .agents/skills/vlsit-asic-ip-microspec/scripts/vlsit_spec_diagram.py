@@ -244,6 +244,11 @@ def action_build(a):
         if rc:
             print("FAIL: the generator failed")
             return 1
+        report = (Path(tmp) / "generator_report.txt").read_text(encoding="utf-8")
+        if "NOT PLACED" in report:
+            print(report.strip())
+            print("FAIL: the generator could not place a label or an external; change its side or position")
+            return 1
         drawio = out_dir / name
         drawio.write_bytes((Path(tmp) / name).read_bytes())
         (out_dir / (Path(name).stem + "_generator_report.txt")).write_text(

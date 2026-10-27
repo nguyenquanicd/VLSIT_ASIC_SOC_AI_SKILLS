@@ -1,0 +1,28 @@
+$ C:\Tools\oss-cad-suite\bin\verilator_bin.exe --lint-only -Wall --top-module m_apb_tlul_bridge m_apb_if.sv m_tlul_if.sv m_apb_tlul_bridge.sv
+(cwd C:\HQuan\102_MyGithub\VLSIT_CODEX_CLAUDE_SKILLS\example\apb_tlul_bridge\rtl)
+
+%Warning-UNUSEDSIGNAL: m_apb_tlul_bridge.sv:47:20: Signal is not used: 'i_apb_pprot'
+                                                 : ... note: In instance 'm_apb_tlul_bridge'
+   47 |   input wire [2:0] i_apb_pprot,
+      |                    ^~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.053
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: m_apb_tlul_bridge.sv:51:20: Signal is not used: 'i_tlul_d_param'
+                                                 : ... note: In instance 'm_apb_tlul_bridge'
+   51 |   input wire [2:0] i_tlul_d_param,
+      |                    ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: m_apb_tlul_bridge.sv:52:20: Signal is not used: 'i_tlul_d_size'
+                                                 : ... note: In instance 'm_apb_tlul_bridge'
+   52 |   input wire [1:0] i_tlul_d_size,
+      |                    ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: m_apb_tlul_bridge.sv:54:34: Signal is not used: 'i_tlul_d_sink'
+                                                 : ... note: In instance 'm_apb_tlul_bridge'
+   54 |   input wire [PARA_D_SINK_W-1:0] i_tlul_d_sink,
+      |                                  ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: m_apb_tlul_bridge.sv:56:34: Signal is not used: 'i_tlul_d_user'
+                                                 : ... note: In instance 'm_apb_tlul_bridge'
+   56 |   input wire [PARA_D_USER_W-1:0] i_tlul_d_user,
+      |                                  ^~~~~~~~~~~~~
+%Error: Exiting due to 5 warning(s)
+
+exit code 1

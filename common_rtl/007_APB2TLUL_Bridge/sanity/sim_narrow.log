@@ -1,0 +1,48 @@
+T1: latency combinations
+T2: strobes
+T3: misaligned addresses
+T4: response errors
+T5: orphan responses
+T6: back-to-back transfers
+T7: reset during a transfer
+T8: 400 random transfers, seed 1
+---- protocol assertions: 36 checks, hits = how often the antecedent was true
+  APB-01 PENABLE only with PSEL (IHI0024D 4.1)                                 hits    2192  fails 0
+  APB-02 Setup lasts one cycle, then Access (4.1)                              hits     570  fails 0
+  APB-03 Access holds until PREADY (3.1, 4.1)                                  hits    1622  fails 0
+  APB-04 address, control, data stable during a transfer (3.1, 4.1)            hits    2192  fails 0
+  APB-05 PSTRB all LOW on a read (3.2)                                         hits     334  fails 0
+  APB-06 request signals known when PSEL (Appendix A)                          hits    2762  fails 0
+  APB-07 PREADY known in Access, PSLVERR and PRDATA known at the end (A, 3.4)  hits    2192  fails 0
+  APB-08 PSLVERR only together with PREADY (3.4)                               hits     210  fails 0
+  APB-09 BRIDGE: PREADY only in the Access phase (REQ-IF-004)                  hits     569  fails 0
+  APB-10 PENABLE LOW after a completed transfer (4.1)                          hits     569  fails 0
+  APB-11 PENABLE LOW in the first cycle of PSEL (4.1)                          hits     346  fails 0
+  APB-12 BRIDGE: an Access phase ends within MAX_WAIT cycles                   hits    1623  fails 0
+  APB-13 BRIDGE: PREADY is high for one cycle only (REQ-IF-004)                hits     569  fails 0
+  APB-14 BRIDGE: PREADY and PSLVERR are LOW in reset (REQ-RESET-001)           hits       4  fails 0
+  TL-01 legalAOpcode: Get, PutFullData or PutPartialData                       hits    1011  fails 0
+  TL-02 legalAParam: a_param is 0                                              hits    1011  fails 0
+  TL-03 sizeMatchesMask: 2^a_size equals the number of mask bits               hits    1011  fails 0
+  TL-04 addrSizeAligned: a_address aligned to a_size                           hits    1011  fails 0
+  TL-05 contigMask: a_mask contiguous for Get and PutFullData                  hits    1011  fails 0
+  TL-06 aKnown: channel A fields are not X when a_valid                        hits    1011  fails 0
+  TL-07 handshake signals are not X after reset (a/d valid/ready)              hits    3148  fails 0
+  TL-08 channel A stable until a_ready (valid and every field)                 hits     571  fails 0
+  TL-09 pendingReqPerSrc: one outstanding request                              hits     440  fails 0
+  TL-10 respMustHaveReq: a response needs an accepted request                  hits     438  fails 0
+  TL-11 respOpcode: AccessAckData for Get, AccessAck otherwise                 hits     389  fails 0
+  TL-12 d_source returns the source of the request                             hits     389  fails 0
+  TL-13 respSzEqReqSz and legalDParam: d_size equals a_size, d_param is 0      hits     439  fails 0
+  TL-14 dKnown: channel D fields are not X when d_valid                        hits     454  fails 0
+  TL-15 BRIDGE: d_ready is high from the first cycle after reset               hits    3148  fails 0
+  TL-16 BRIDGE: a request starts only after an APB Setup phase                 hits     440  fails 0
+  TL-17 BRIDGE: a_source is the constant PARA_SRC_ID                           hits    1011  fails 0
+  TL-18 BRIDGE: size 4 bytes, full mask, Get or PutFullData, a_user 0          hits    1011  fails 0
+  TL-19 reset: a_valid and d_ready are LOW (TileLink 3.2.2, REQ-RESET-001)     hits       4  fails 0
+  CROSS-01 the APB completion reflects the TL-UL response (PSLVERR, PRDATA)    hits     439  fails 0
+  CROSS-02 an illegal APB request: no TL-UL request, PSLVERR in the next cycle hits     130  fails 0
+  CROSS-03 a legal APB request becomes the matching TL-UL request              hits     440  fails 0
+---- assertion failures: 0, assertions never exercised: 0
+TB PASS: apb_tlul_bridge, 440 TL-UL requests, 36 protocol assertions, ADDR_W=16 SRC_W=1 SRC_ID=1
+verification/tb_apb_tlul_bridge.sv:516: $finish called at 31546000 (1ps)

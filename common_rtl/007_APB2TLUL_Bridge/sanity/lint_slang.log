@@ -1,0 +1,10 @@
+$ C:\Tools\oss-cad-suite\bin\slang.exe --top m_apb_tlul_bridge -Wextra m_apb_if.sv m_tlul_if.sv m_apb_tlul_bridge.sv
+(cwd C:\HQuan\102_MyGithub\VLSIT_CODEX_CLAUDE_SKILLS\example\apb_tlul_bridge\rtl)
+
+Top level design units:
+    m_apb_tlul_bridge
+
+
+Build succeeded: 0 errors, 0 warnings
+
+exit code 0
