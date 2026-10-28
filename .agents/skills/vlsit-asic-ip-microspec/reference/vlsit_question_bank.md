@@ -42,6 +42,17 @@ C. Other: write your own idea.
 
 0. Which naming rule must the names in the specification follow? (A: the default naming rule of the skill `vlsit-rtl-generator`, section 2 of `VLSIT_RTL_Design_Rule.md` v2, recommended because the RTL generator checks the same rule; B: your own rule file or document, give the path; C: other. Example under A: a software reset input is `i_rst_n_sw`, not `i_sw_reset_n`, because the rule abbreviates "reset" to "rst" and names an active-low reset input `i_rst_n_<domain>`.)
 
+## Registers (rule R-030; read reference/vlsit_csr_generator.md first)
+
+17. Which settings must software write? (Example: enable, mode, threshold. Type `rw`: the design reads `o_<reg>_<field>`; reset value is the safe state.)
+18. Which actions does software start and hardware finish? (Example: `start` that hardware clears, `busy`/`done` that hardware sets. Type `rwi`: a software write wins over a hardware load in the same cycle, so a hardware load can be lost; say who clears the bit and when.)
+19. Which state must software read at any time? (Example: FSM state, FIFO level, version. Type `ro`: the design drives `i_<reg>_<field>` and software reads the value at the read. If the value must be coherent over several bits, the design holds a snapshot.)
+20. Which events must software see and clear? (Example: error, overflow, interrupt cause. Type `w1c`: hardware loads 1 to set the bit, software writes 1 to clear it; if the load and the clearing write fall in the same cycle the hardware load wins and the new event is kept, so ask only how the event source drives the load enable: one cycle per event, or held until the event is cleared at the source.)
+21. What is the reset value of each field, and what does software see before the IP is configured? (A: the safe, disabled state; B: other, say it.)
+22. Is the register clock the APB clock? (A: yes, `Asynchronous` = 0, sheet `CSR`, wait state fixed; B: no, `Asynchronous` = 1, sheet `ASYNC_CSR`, handshake with two synchronizer stages each way, wait states depend on the clocks, software waits for PREADY.)
+23. How are `i_protect_en` and `i_slverr_en` driven? (A: `i_slverr_en` tied to 1 and `i_protect_en` tied to 0 with the library tie cell; B: IP input ports, constant after reset; C: other. Do not toggle `i_slverr_en` after reset.)
+24. What happens on an access to an address that is not a register, a partial-strobe write or a non-word-aligned address? (A: generator default, OKAY with read 0 for an unmapped address and `PSLVERR` for the other two when `i_slverr_en` is 1, recommended; B: an error for an unmapped address, a decision in section 20 because the generator cannot do it.)
+
 ## Signals and waveforms
 
 12. Which waveforms must the specification show at minimum? (A: the proposed list with one waveform for every operation, the success and the error case of every interface and the special cases, recommended; B: only one success and one error per interface, smaller but key functions are not shown; C: the proposed list plus extra corner cases; D: other. Example for a FIFO: write, read, full, empty, simultaneous write and read, reset.)

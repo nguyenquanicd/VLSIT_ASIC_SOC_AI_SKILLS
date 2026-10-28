@@ -26,6 +26,10 @@ Checks  : all 22 sections present in order with the template titles; leftover te
           --naming default (the default) the port names of 6.2 follow the default naming rule of the skill
           vlsit-rtl-generator (direction prefix, i_clk_<domain>, i_rst_n_<domain>, 30 characters, NAM-08
           abbreviations); with --naming user the rule supplied by the user is checked by hand (R-026).
+          Vietnamese letters outside code blocks (R-005); empty "###" subsections and template instruction
+          lines left in sections other than 2, 14 and 22 (R-013); every TEST, SVA or COV ID used is defined in
+          section 15 and every REQ row of section 19 names one (R-015); when a CSR workbook sits beside the
+          specification, 11.1, 11.3 and 11.4 are filled (R-031). Not checked: 6.1 interfaces against 6.2 ports.
 Exit    : 0 success, 1 findings or error, 3 prerequisite missing.
 Standard library only; text is read and written as UTF-8.
 Examples:
@@ -329,11 +333,73 @@ def check_wave_plan(sec10, base, errors):
                 errors.append("section 10.3: %s: no .json or .tex source beside %s (rule R-017)" % (r[0], m.group(1)))
     if not planned:
         errors.append("section 10.3: the waveform plan has no filled row (rule R-024)")
-    ops = [l.strip().strip("|").split("|")[0].strip() for l in subsection(sec10, "10.2").splitlines()
+    ops = [re.match(r"\|\s*(OP-\d+)", l).group(1) for l in subsection(sec10, "10.2").splitlines()
            if re.match(r"\|\s*OP-\d+", l)]
     for op in ops:
         if not re.search(r"\b%s\b" % re.escape(op), covered):
             errors.append("section 10.3: operation %s is not in the waveform plan (rule R-024)" % op)
+
+
+VIET_RE = re.compile("[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]", re.I)
+VERIF_ID_RE = re.compile(r"(?<![\w-])(?:TEST|SVA|COV)-(?:[A-Z]+-)*\d+\b")
+
+
+def check_english(text, errors):
+    """R-005: the specification is written in English; report the first lines that hold Vietnamese letters."""
+    hits = [i + 1 for i, l in enumerate(strip_code(text).splitlines()) if VIET_RE.search(l)]
+    if hits:
+        errors.append("%d line(s) contain Vietnamese letters; the specification is written in English (rule R-005); "
+                      "first lines of the text outside code blocks: %s" % (len(hits), hits[:5]))
+
+
+def check_empty_subsections(text, errors):
+    """A '###' subsection without any text or table is an unfilled section (rule R-013)."""
+    for m in re.finditer(r"^### (\d+\.\d+)[^\n]*", strip_code(text), re.M):
+        body = subsection(strip_code(text), m.group(1))
+        if not re.sub(r"<!--.*?-->", "", body, flags=re.S).strip():
+            errors.append("section %s is empty (rule R-013)" % m.group(1))
+
+
+def check_template_text(text, errors):
+    """R-013: instruction sentences copied from the template must be replaced by the content of the IP."""
+    tpl = {l.strip() for l in strip_code(read(TEMPLATE)).splitlines()
+           if len(l.strip()) > 50 and l.strip()[0] not in "|#<!>" and "<" not in l
+           and not re.match(r"\s*(?:\d+\.|[-*])\s+\[", l)}
+    keep = {n: strip_code("\n".join(text.splitlines()[s:e])) for n, _, s, e in split_sections(text) if n not in (2, 14, 22)}
+    left = [l.strip()[:60] for body in keep.values() for l in body.splitlines()
+            if l.strip() in tpl and not re.match(r"\d+\.\s", l.strip())]
+    if left:
+        errors.append("%d template instruction line(s) left, for example: %s (rule R-013)" % (len(left), left[0]))
+
+
+def check_verification_ids(sec, errors):
+    """Every TEST, SVA or COV ID that is used is defined in section 15, and every REQ row of section 19 names one."""
+    s15, s19 = sec.get(15, ""), sec.get(19, "")
+    defined = set()
+    for line in strip_code(s15).splitlines():
+        if line.startswith("|"):
+            defined |= set(VERIF_ID_RE.findall(line.strip().strip("|").split("|")[0]))
+    used = set()
+    for n, body in sec.items():
+        if n != 15:
+            used |= set(VERIF_ID_RE.findall(strip_code(body)))
+    for vid in sorted(used - defined):
+        errors.append("%s is used but not defined in section 15 (rule R-015)" % vid)
+    for line in s19.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if line.startswith("|") and cells and REQ_RE.fullmatch(cells[0]) and not VERIF_ID_RE.search(line) \
+                and not re.search(r"inspection|review|analysis", line, re.I):
+            errors.append("section 19: %s names no TEST, SVA or COV ID (rule R-015)" % cells[0])
+
+
+def check_csr_sections(text, base, errors):
+    """R-031: when a CSR workbook sits beside the specification, 11.3 and 11.4 are filled."""
+    if base is None or not any("csr" in p.name.lower() for p in Path(base).glob("*.xlsx")):
+        return
+    for n in ("11.1", "11.3", "11.4"):
+        body = subsection(text, n)
+        if not body.strip() or NR_RE.search(body):
+            errors.append("section %s is empty or Not required although a CSR workbook exists (rule R-031)" % n)
 
 
 def section_status(body):
@@ -401,6 +467,11 @@ def findings_for(text, base=None, naming="default"):
                       "or the default of vlsit-rtl-generator (rule R-026)")
     check_wave_plan(sec.get(10, ""), base, errors)
     check_block_diagram(sec.get(5, ""), base, errors)
+    check_english(text, errors)
+    check_empty_subsections(text, errors)
+    check_template_text(text, errors)
+    check_verification_ids(sec, errors)
+    check_csr_sections(text, base, errors)
     tbd_secs = [n for n, _, s, e in secs if n != 20 and re.search(r"\bTBD\b", strip_code("\n".join(lines[s + 1:e])))]
     if tbd_secs and "TBD" not in s20:
         errors.append("TBD used in section(s) %s but section 20 records none" % tbd_secs)

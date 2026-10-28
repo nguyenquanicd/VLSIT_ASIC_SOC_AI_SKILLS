@@ -88,9 +88,19 @@ MUST give every mandatory requirement a unique REQ-<AREA>-<NNN> identifier with 
 - Check: `scripts/vlsit_spec_tool.py check` reports no duplicate, untraced or undefined requirement.
 
 ### R-016 Registers only in the workbook
-MUST define software-visible registers only in the VLSIT CSR workbook, filled by `scripts/vlsit_csr_tool.py` from a JSON description and validated before delivery, with no register, field, offset or reset value declared in the specification.
-- Why: the workbook is the single source for the generated register RTL, so a second copy would drift.
+MUST define software-visible registers only in the VLSIT CSR workbook, filled by `scripts/vlsit_csr_tool.py` from a JSON description and validated before delivery, with no register, field, offset, width, type or reset value declared in the specification; sections 11.2 to 11.4 name registers and fields only by their workbook names.
+- Why: the workbook is the single source for the register RTL that APB-CSR-Generator builds, so a second copy would drift.
 - Check: `scripts/vlsit_csr_tool.py validate` prints PASS; manual - section 11 holds no register table.
+
+### R-030 Registers planned from the design
+MUST derive the registers from the control and status needs of the IP by asking the user, for each function, which settings software writes, which actions software starts, which state software reads and which events software clears, give every field one of the generator types `rw`, `rwi`, `ro` or `w1c` with the reason, and ask for the reset value, the software sequence and whether the register clock differs from the APB clock; the questions are in the question bank (Registers).
+- Why: a register that nobody asked for wastes area and review, and a missing status or event leaves software blind; the generator types decide what the hardware can do, so the choice must be made with the user.
+- Check: manual - each field in the workbook traces to a user answer or a requirement, and section 11.2 holds a sequence that uses it.
+
+### R-031 Generator limits respected
+MUST write section 11 so that it states the behavior of the generated CSR module (reference/vlsit_csr_generator.md: APB wait states, `PSLVERR` cases, unmapped address, reserved bits, priority between a software write and a hardware load: software first for `rwi`, hardware first for `w1c`) in sections 11.3 and 11.4, MUST ask the user and record a decision in section 20 when the IP needs something that the generator cannot do (another bus or width, byte-strobe or sub-word access, write-only, set-only or read-to-clear fields, an error for an unmapped address), and MUST NOT promise a fixed wait-state count for an asynchronous sheet.
+- Why: software and verification depend on these behaviors, and a promise that the generated RTL cannot keep is found only in silicon.
+- Check: `scripts/vlsit_csr_tool.py validate` prints PASS and `ports` lists the module ports; manual - sections 11.1, 11.3 and 11.4 are filled, and every limit that applies has a decision in section 20.
 
 ### R-025 Signal description table
 MUST describe every port of section 6.2 with its function, its clock domain (or asynchronous) and its signal type, where the type starts with level, pulse (with its width in cycles), clock, reset, data (with the qualifier that makes it valid) or static, and ask the user when the type or the clock domain of a port is not known.

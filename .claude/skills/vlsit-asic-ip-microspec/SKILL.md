@@ -68,18 +68,21 @@ For section 6.2, describe every input and output with its function, its clock do
 
 ### 9. Registers
 
-If the IP has software-visible registers, describe them in JSON and fill the workbook; section 11 only points to it (rule R-016). Details in [reference/vlsit_csr_workbook.md](reference/vlsit_csr_workbook.md).
+If the IP has software-visible registers, the register RTL will be built by APB-CSR-Generator from the workbook (the RTL skill runs it), so plan the registers for what that generator can build. Read [reference/vlsit_csr_generator.md](reference/vlsit_csr_generator.md) first. Ask the questions of the question bank (Registers, rule R-030): for each function of the IP the settings (`rw`), the actions that software starts and hardware finishes (`rwi`), the live state (`ro`), the sticky events (`w1c`), the reset values, the software sequences and whether the register clock differs from the APB clock. Describe the answer in JSON, validate it, fill the workbook, and print the module ports for the specification; section 11 points to the workbook and states the connection and the APB behavior (rules R-016, R-031). Details in [reference/vlsit_csr_workbook.md](reference/vlsit_csr_workbook.md).
 
 ```powershell
 <python> "<skill folder>\scripts\vlsit_csr_tool.py" validate regs.json
 <python> "<skill folder>\scripts\vlsit_csr_tool.py" fill regs.json --out "<IP>_CSR.xlsx" --auto-reserved
+<python> "<skill folder>\scripts\vlsit_csr_tool.py" ports regs.json
 ```
+
+Use the module name of the project naming rule (rule R-026) in the JSON. Fill sections 11.1, 11.3 and 11.4 of the template from the `ports` output and the generator reference; ask the user for the source of `i_protect_en` and `i_slverr_en`, for the connection of each field to the design, and for the decision on every limit of the generator that the IP meets (rule R-031).
 
 ### 10. Waveform plan, block diagram and waveforms
 
 1. **Agree the waveform plan first (rule R-024).** From sections 6.3 and 10.2 build a list with an ID (WF-001, ...), the function or operation, the scenario (success, error or corner case) and the signals shown. It must cover every operation of 10.2, the success and the error case of every interface, and the special cases of this IP (reset, backpressure, back-to-back, boundary, timeout). Show the list to the user and ask which waveforms are the minimum, with the question format of R-003: for example A, the proposed list (recommended); B, only one success and one error per interface; C, the proposed list plus extra corner cases; D, the user's own list. Record the answer in the table of section 10.3 with the date; a waveform the user declines gets a dated Not required line in its Figure cell. Draw nothing before the answer.
 2. Draw the block diagram with draw.io (rules R-018 to R-020, R-027 to R-029): fill a diagram spec JSON from sections 5, 6 and 14.2 (`vlsit_spec_diagram.py template` or `from-spec`), run `vlsit_spec_diagram.py check`, `build` (draw.io, library validation, geometry check, SVG) and `insert` (section 5.2); the rules are in [reference/drawio/vlsit_diagram_rules.md](reference/drawio/vlsit_diagram_rules.md). LaTeX (`vlsit_block_diagram.py`) is the fallback.
-3. Describe each waveform of the plan as WaveJSON and render it to SVG (rule R-017); link the image in the Figure cell of the plan. Formats and commands are in [reference/vlsit_diagrams_and_waveforms.md](reference/vlsit_diagrams_and_waveforms.md). If no LaTeX compiler exists, ask the user whether to install one; if the user declines, ask whether to use draw.io (rules R-019, R-020; the library and reference diagram are in [reference/drawio/](reference/drawio/README.md)).
+3. Describe each waveform of the plan as WaveJSON and render it to SVG (rule R-017); link the image in the Figure cell of the plan. Formats and commands are in [reference/vlsit_diagrams_and_waveforms.md](reference/vlsit_diagrams_and_waveforms.md). Waveforms need no LaTeX; the block diagram of step 10.2 is draw.io by default (rules R-018 to R-020; the library and reference diagram are in [reference/drawio/](reference/drawio/README.md)).
 
 ### 11. Check and review
 
@@ -87,7 +90,7 @@ Run `vlsit_spec_tool.py check` (add `--naming user` when the user supplied their
 
 ### 12. Verify against the rules
 
-Check the result against every rule ID in [rule.md](rule.md): R-013, R-014, R-015, R-016, R-019, R-020, R-024, R-025 and R-026 by the script outputs, the others by inspection of the conversation and the files. Report which rules were verified and how, and say plainly what could not be verified.
+Check the result against every rule ID in [rule.md](rule.md): R-013, R-014, R-015, R-016, R-019, R-020, R-024, R-025, R-026 and R-031 (validate part) by the script outputs, the others by inspection of the conversation and the files. Report which rules were verified and how, and say plainly what could not be verified.
 
 ## Reference
 
@@ -101,6 +104,7 @@ Read a file only when the step needs it.
 | [reference/vlsit_ip_reference_criteria.md](reference/vlsit_ip_reference_criteria.md) | Step 6: evidence filter and research log format |
 | [reference/vlsit_spec_writing_guide.md](reference/vlsit_spec_writing_guide.md) | Steps 7 and 8: what each template section must contain |
 | [reference/vlsit_csr_workbook.md](reference/vlsit_csr_workbook.md) | Step 9: workbook layout and JSON format |
+| [reference/vlsit_csr_generator.md](reference/vlsit_csr_generator.md) | Step 9: what APB-CSR-Generator builds, its limits, field types, APB behavior, what section 11 must state |
 | [reference/vlsit_diagrams_and_waveforms.md](reference/vlsit_diagrams_and_waveforms.md) | Step 10: diagram and waveform formats |
 | [reference/drawio/README.md](reference/drawio/README.md) | Step 10 with draw.io: the library and the reference diagram |
 | [reference/templates/VLSIT_ASIC_IP_Design_Specification_Template.md](reference/templates/VLSIT_ASIC_IP_Design_Specification_Template.md) | Step 8: the template (copied by `vlsit_spec_tool.py init`) |
@@ -123,7 +127,7 @@ Run each script as `<python> "<skill folder>\scripts\<script>.py" <action>`.
 | `scripts/vlsit_pdf_to_md.py` | Step 5: convert PDF standards (needs PyMuPDF); `verify` the result |
 | `scripts/vlsit_pdf_render.py` | Step 10: turn a compiled PDF diagram into SVG or PNG (needs PyMuPDF) |
 | `scripts/vlsit_ip_search.py` | Step 6: `search` GitHub or Gitee, `evaluate` one page |
-| `scripts/vlsit_csr_tool.py` | Step 9: `validate`, `fill`, `dump` the CSR workbook (needs openpyxl) |
+| `scripts/vlsit_csr_tool.py` | Step 9: `validate`, `fill`, `dump` the CSR workbook and `ports` (the module ports that the generator builds) (needs openpyxl) |
 | `scripts/vlsit_spec_diagram.py` | Step 10: `template`, `from-spec`, `check`, `build`, `insert` (draw.io block diagram, with `vlsit_drawio_frame_diagram.py`, `vlsit_drawio_geometry_check.py`, `vlsit_drawio_to_svg.py`, `vlsit_layout_search.py`) |
 | `scripts/vlsit_block_diagram.py` | Step 10 fallback: `check`, `tex`, `build`, `drawio` |
 | `scripts/vlsit_waveform_svg.py` | Step 10: render WaveJSON to SVG |

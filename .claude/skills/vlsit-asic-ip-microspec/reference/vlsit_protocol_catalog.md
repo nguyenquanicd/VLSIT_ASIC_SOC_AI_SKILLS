@@ -8,7 +8,7 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-006 to
 |---|---|---|---|---|
 | AMBA APB | Arm IHI 0024 (the issue named by VLSIT_RTL_Design_Rule.md is D; check which APB versions the issue covers) | developer.arm.com, documentation page IHI 0024 | Arm licence; treat as no redistribution | Not present: scripted access to developer.arm.com returned HTTP 403. The user downloads the PDF; then `vlsit_pdf_to_md.py` converts it |
 | AMBA AHB | Arm IHI 0033 (AHB5 and AHB-Lite) | developer.arm.com | Same | Not present (same reason) |
-| AMBA AXI and ACE | Arm IHI 0022 (the issue named by VLSIT_RTL_Design_Rule.md is H) | developer.arm.com | Same | Not present (same reason) |
+| AMBA AXI and ACE | Arm IHI 0022 (the issue named by VLSIT_RTL_Design_Rule.md is H) | developer.arm.com | Same | Present: issue H.c (`vlsit_axi_amba_axi_ihi0022h_c.md`) and the AXI3-era v1.0, IHI 0022B (`vlsit_axi_amba_axi_ihi0022b_v1_0.md`, used for the AXI3 write data interleaving rules of chapter 8); both are licensed, redistribution forbidden, ignored by git (rule R-008) |
 | AMBA AXI4-Stream | Arm IHI 0051 | developer.arm.com | Same | Not present (same reason) |
 | I2C | NXP UM10204, Rev. 7.0 of 2021-10-01 | nxp.com (a direct download returned HTTP 404; the page may need a login) | NXP licence; treat as no redistribution | Not present |
 | SPI | No formal standard; use the datasheet of the target peripheral (state the modes CPOL and CPHA) | Vendor datasheet | Vendor licence | Not present |

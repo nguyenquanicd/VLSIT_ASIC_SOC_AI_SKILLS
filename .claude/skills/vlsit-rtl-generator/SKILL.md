@@ -1,7 +1,7 @@
 ---
 name: vlsit-rtl-generator
 description: Generate synthesizable SystemVerilog RTL from a design specification written in the VLSIT ASIC IP template, or modify existing RTL after the designer approves a change plan, under VLSIT_RTL_Design_Rule.md, then verify it with a rule checker and lint. Use when the user asks to write, generate, create or fix RTL from a specification, or to bring RTL into line with the VLSIT RTL rules.
-compatibility: Python 3.8 or later using the standard library only, on Windows or Linux, offline. Windows PowerShell 5.1 (Windows) or POSIX sh (Linux, macOS) is used only to locate or install Python. Lint needs Verilator or slang, found in PATH or in an OSS CAD Suite folder; without one the skill still runs the rule check and reports that lint was not run. Nothing is installed without the user's agreement.
+compatibility: Python 3.8 or later, standard library only, except the CSR step: openpyxl (approved by the user on 2026-10-28) and the APB-CSR-Generator repository. Windows or Linux, offline. Windows PowerShell 5.1 (Windows) or POSIX sh (Linux, macOS) is used only to locate or install Python. Lint needs Verilator or slang, found in PATH or in an OSS CAD Suite folder; without one the skill still runs the rule check and reports that lint was not run. Nothing is installed without the user's agreement.
 ---
 
 # VLSIT RTL generator
@@ -79,6 +79,18 @@ Write the modules leaf first and the top last, one module per file, into the out
 
 Write every selection of three or more branches as `case` or `casez`, never as an `if` / `else if` chain (R-019). Fix every ERROR (R-012). Keep a list of the WARN and INFO findings for the report (R-013). Keep testbenches and assertions out of the design files (R-010).
 
+### 5b. CSR block (only when section 11 of the specification has a workbook)
+
+Read [reference/vlsit_csr_generator.md](reference/vlsit_csr_generator.md) first. The register RTL is never written by hand (R-039). Find the generator, check the workbook and generate into the `csr` folder:
+
+```powershell
+<python> "<skill folder>\scripts\vlsit_csr_generate.py" locate
+<python> "<skill folder>\scripts\vlsit_csr_generate.py" generate "<workbook.xlsx>" --sheet CSR|ASYNC_CSR --out "<output folder>\csr" --project "<project>" --author "<user> (user)"
+<python> "<skill folder>\scripts\vlsit_csr_generate.py" verify "<output folder>\csr"
+```
+
+Use the sheet that section 11.1 names (`CSR` for one clock, `ASYNC_CSR` when the APB clock and the register clock differ). When `locate` fails, ask the designer for the generator folder (the submodule `APB-CSR-Generator` of `VLSIT_RTL_Generator_AI_Model`, or the repository `https://github.com/nguyenquanicd/APB-CSR-Generator`). The script checks the workbook against the limits of the generator, runs it in a work folder, compares the generated ports with the workbook, writes the adapter `m_csr_sync.sv` to the library synchronizer for an asynchronous sheet (R-041), the manifest `CSR_GENERATED.md` and `filelist_csr.f`. Then write the top module so that it instantiates the generated module as R-042 says: take the connections from section 6.2, 7 and 11.3 of the specification, ask about every one that is open, tie `i_protect_en` and `i_slverr_en` with the library `m_vlsit_tie` or connect them to the IP ports that the specification names, and put the library wrapper and its cells into the filelist (R-037). The generated files are checked like all RTL (R-040): the rule check and the lint run over the `csr` folder, and a finding is fixed in the workbook or the generator, never in the generated file.
+
 ### 6. Make the filelist and lint
 
 ```powershell
@@ -114,6 +126,7 @@ Read a file only when the step needs it.
 | [reference/vlsit_question_format.md](reference/vlsit_question_format.md) | Step 4a: wording of a question with options and examples |
 | [reference/vlsit_modify_existing_rtl.md](reference/vlsit_modify_existing_rtl.md) | Step 3 and 4b: the mode and the procedure for existing RTL |
 | [reference/templates/vlsit_rtl_skeletons.md](reference/templates/vlsit_rtl_skeletons.md) | Step 5: header, leaf module, FSM and top skeletons |
+| [reference/vlsit_csr_generator.md](reference/vlsit_csr_generator.md) | Step 5b: what the generator builds, its limits, the APB behavior and the integration points |
 | [reference/vlsit_lint_and_install.md](reference/vlsit_lint_and_install.md) | Step 6: running lint, reading warnings, install options |
 | [reference/vlsit_reuse_guide.md](reference/vlsit_reuse_guide.md) | Step 4c: how to judge a library candidate, the wording of the reuse question with its advantages, what to do after the answer |
 | [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of the checks, assertions, strength check, failure analysis, layout, waveform evidence folder, simulation of both branches of a crossing |
@@ -132,10 +145,11 @@ Run each script as `<python> "<skill folder>/scripts/<script>.py" <action>` (use
 | `scripts/vlsit_spec_gaps.py` (`gaps`, `facts`) | Step 4a: find what the specification leaves open, print its tables |
 | `scripts/vlsit_reuse_scan.py` (`list`, `scan`) | Step 4c: catalog of the library `common_rtl` and the candidates for the functions of a specification |
 | `scripts/vlsit_rtl_check.py` (`check`, `coverage`) | Steps 5, 7: check the mechanical rules; list what stays manual |
+| `scripts/vlsit_csr_generate.py` (`locate`, `generate`, `verify`, `ports`) | Step 5b: run APB-CSR-Generator on the CSR workbook, adapt its synchronizer, write the manifest, check the files are unedited |
 | `scripts/vlsit_lint_rtl.py` (`tools`, `filelist`, `lint`) | Step 6: find lint tools, write `filelist.f`, run lint |
 | `scripts/vlsit_sim_evidence.py` (`plan`, `check`, `cdc`) | Step 8b: list the waveform plan, check the waveform evidence folder and the logs of both simulation branches of a crossing |
 
-Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool; `vlsit_sim_evidence.py` 0 pass, 1 findings, 2 bad input; `vlsit_reuse_scan.py` 0 done, 2 library or specification not found.
+Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 pass, 1 errors, 2 bad input; `vlsit_lint_rtl.py` 0 pass, 1 lint errors, 2 bad input, 3 no lint tool; `vlsit_sim_evidence.py` 0 pass, 1 findings, 2 bad input; `vlsit_csr_generate.py` 0 done, 1 findings, 2 generator or file not found, 3 openpyxl missing; `vlsit_reuse_scan.py` 0 done, 2 library or specification not found.
 
 ## Output
 

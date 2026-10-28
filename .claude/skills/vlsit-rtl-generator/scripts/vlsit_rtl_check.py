@@ -114,6 +114,7 @@ COVERAGE = OrderedDict([
     ("FIL-04", ("script", "if / else branch statements on their own line, no alignment after the condition")),
     ("R-027", ("script", "only exception: simulation branch of VLSIT_SYNTHESIS, reported as WARN")),
     ("R-032", ("script", "cell model VLSIT_CELL_<function>: library pin names accepted, reported as WARN")),
+    ("R-040", ("script", "output of an APB-CSR-Generator older than 2.0 (header without Design Rule v2) is not rule-checked; reported as WARN")),
     ("R-035", ("script", "no redundant declaration: no one-bit range such as [0:0], no unused internal signal, localparam or type")),
     ("R-038", ("script", "no `default_nettype directive in design RTL; undeclared identifiers are found by lint (TYP-03, P5)")),
     ("R-036", ("script", "the always_ff that assigns an FSM current state holds that register only")), ("ENM-06", ("script", "FSM current-state register in its own always_ff (rule file): same check as R-036")),
@@ -526,9 +527,23 @@ def check_port_layout(raw, code, name, f):
             break
 
 
+GENERATED_MARK = "APB-CSR-Generator"
+GENERATED_REASON = ("generated CSR file of an APB-CSR-Generator older than 2.0 (rule R-040): its style does not follow the RTL rule file, so the rule "
+                    "check is skipped; generate it again with version 2.0 or later instead of editing it, the lint of rule R-014 still applies")
+
+
+def is_generated(path):
+    head = Path(path).read_text(encoding="utf-8-sig")[:1500]
+    return GENERATED_MARK in head and "Design Rule v2" not in head
+
+
 def check_file(path, f):
     raw = Path(path).read_text(encoding="utf-8-sig")
     name = Path(path).name
+    if is_generated(path):
+        f.mark("R-040")
+        f.add("WARN", "R-040", name, 1, GENERATED_REASON)
+        return
     raw, sim_regions = mask_sim_branches(raw, f, name)
     f.mark("R-027")
     for first, last in sim_regions:

@@ -25,8 +25,9 @@ The workbook `templates/VLSIT_CSR_Specification_Template.xlsx` has three sheets:
 
 ## Commands
 
-- `vlsit_csr_tool.py validate regs.json [--auto-reserved]`: offsets unique and 4-byte aligned below 0x10000, fields tile bits 31..0 without overlap or gap, types valid, reset values fit.
-- `vlsit_csr_tool.py fill regs.json --out FILE.xlsx [--auto-reserved]`: writes the sheet chosen by `async`; the other sheet keeps the template sample rows.
+- `vlsit_csr_tool.py validate regs.json [--auto-reserved]`: offsets unique and 4-byte aligned below 0x10000, names are lower-case identifiers (they become port names), a `reserved` field is type `ro`, fields tile bits 31..0 without overlap or gap, types valid, reset values fit; a warning for a generated port name above 30 characters (NAM-07).
+- `vlsit_csr_tool.py fill regs.json --out FILE.xlsx [--auto-reserved]`: writes the sheet chosen by `async` and removes the unused sample rows below it (a leftover empty row crashes the generator); the other sheet keeps the template sample rows, so the generator must be run on the sheet that was filled (`CSR` for `async` 0, `ASYNC_CSR` for 1).
 - `vlsit_csr_tool.py dump FILE.xlsx [--sheet CSR]`: prints the register map as Markdown (cheaper than reading cells).
+- `vlsit_csr_tool.py ports regs.json`: prints the APB ports and the per-field ports (`o_<reg>_<field>`, `i_<reg>_<field>`, `i_hw_wdata_<reg>_<field>`, `i_hw_we_<reg>_<field>`) with their clock domain, as the generator names them; use it for sections 6.2 and 11.3.
 
 A register behavior that the template cannot express (another bus, other widths, other access types) is recorded as a decision in section 20 of the specification; do not add a register table to the specification.

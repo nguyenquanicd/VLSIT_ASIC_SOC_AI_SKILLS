@@ -127,6 +127,28 @@ MUST change an example of `reference/rtl_example/` whenever it breaks a rule of 
 - Why: an example that breaks a rule teaches the wrong pattern to every module written from it.
 - Check: `vlsit_rtl_check.py check reference/rtl_example` prints RESULT: PASS and lint of each example prints RESULT: PASS with 0 errors; manual - each example was inspected against the manual rules of `vlsit_rtl_check.py coverage`.
 
+## CSR block
+
+### R-039 CSR block from the generator
+MUST build every register block (APB slave with control and status registers) from the CSR workbook named in section 11 of the specification by running `vlsit_csr_generate.py generate` with the APB-CSR-Generator (found by `vlsit_csr_generate.py locate`, or at the path the designer gives), MUST NOT write or edit that RTL by hand, and MUST generate it again after any change of the workbook; when the workbook, its sheet or the generator is missing, MUST ask the designer in the question format of R-006.
+- Why: the workbook is the single source of the register map (microspec rule R-016), so hand-written or edited register RTL would drift from the specification and from the software view.
+- Check: `vlsit_csr_generate.py verify <csr folder>` prints RESULT: PASS (files equal the hashes of `CSR_GENERATED.md`); manual - the manifest names the generator commit and the workbook hash that the report repeats.
+
+### R-040 Generated CSR files follow the rules and are never edited
+MUST keep the generated CSR files in their own folder (`csr` under the output folder) and check them like every other file: the rule check (R-012) and the lint (R-014) cover them, and a finding is corrected by changing the workbook or the generator and generating again, never by editing the generated file. The generator MUST be version 2.0 or later (its header says that the RTL follows the Design Rule v2); `vlsit_csr_generate.py generate` refuses an older one, and `vlsit_rtl_check.py check` reports a WARN R-040 and skips the rule check of a file from an older generator, which the report MUST repeat with its reason (R-011).
+- Why: since version 2.0 the generator writes RTL in the style of the rule file, so there is no reason to exempt it; an edit of the output breaks R-039, and a finding in it points to the workbook (for example a name that spells out a NAM-08 word) or to the generator.
+- Check: `vlsit_rtl_check.py check` and `vlsit_lint_rtl.py lint` over the whole output folder print PASS; manual - no WARN R-040 is left, or the report explains each one.
+
+### R-041 Library synchronizer in the CSR
+MUST NOT use the placeholder model `m_csr_sync` of the generator for an asynchronous sheet (`Asynchronous` = 1); the adapter `m_csr_sync` that `vlsit_csr_generate.py` writes forwards to the library wrapper `m_vlsit_apbcdc_cell_sync`, and MUST be listed in the filelist after the wrapper and its cells (R-037), in place of the generator's `models/m_csr_sync.sv`, and the testbench of such a design runs both branches (R-034).
+- Why: the placeholder is a plain two-flop model without a library cell; the library wrapper holds the technology synchronizer cell and the metastability model, so every design crosses a clock the same checked way.
+- Check: the filelist names `m_vlsit_apbcdc_cell_sync.sv` and the adapter and not the generator's `models` folder; manual - the report says which synchronizer stages were chosen.
+
+### R-042 CSR integration
+MUST instantiate the CSR module once, in the top module or in a wrapper that the specification names, with every port connected by name: the APB ports of the IP (section 6.2) to `i_apb_paddr`, `i_apb_pwdata`, `i_apb_pwrite`, `i_apb_penable`, `i_apb_psel`, `i_apb_pstrb`, `i_apb_pprot`, `o_apb_pready`, `o_apb_pslverr`, `o_apb_prdata`; `i_protect_en` and `i_slverr_en` to a port of the IP or to a constant from the library module `m_vlsit_tie` as section 11 says (never open, never toggled after reset); the field ports to the design signals of section 11.3 in the register clock domain; and `i_clk_apb`, `i_rst_n_apb`, `i_clk_reg`, `i_rst_n_reg` to the two clock domains of the specification. A design signal of another clock domain MUST pass its own synchronizer before it reaches a field port.
+- Why: the generated module has no knowledge of the IP; a port left open, a tie-off that moves, or an input from another clock domain gives a silent register error that the CSR lint cannot see.
+- Check: the lint of R-014 reports no unconnected or width-mismatched port on the CSR instance; manual - the report lists each CSR port, the signal it connects to and its clock domain.
+
 ## Verification
 
 ### R-012 Rule check

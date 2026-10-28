@@ -14,7 +14,7 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to
 | 8 Parameters | Parameter table, VLSIT comment lines, configurations, illegal values | Which values may change, and which are illegal? |
 | 9 Data representation | Widths, endianness, encodings, invalid behavior | Which encodings and overflow rules? |
 | 10 Functional behavior | States, operations, the waveform plan confirmed by the user (R-024), cycle tables, throughput, memories | What happens cycle by cycle, with backpressure? Which waveforms are the minimum? |
-| 11 Registers | Pointer to the CSR workbook and software sequences | Which registers? (fill the workbook) |
+| 11 Registers | Pointer to the CSR workbook, generator and clocks (11.1), software sequences (11.2), connection of the fields to the design (11.3), APB access behavior of the CSR (11.4) | Which settings, actions, state and events? (fill the workbook; question bank, Registers) |
 | 12 Errors | Error table, precedence, recovery, waveforms | What are the errors and how does the system recover? |
 | 13 PPA | Hard requirements and goals with conditions | Frequency, area, power targets and corners? |
 | 14 RTL contract | Coding baseline, hierarchy, synthesis assumptions | Hierarchy and synthesis setup? |
