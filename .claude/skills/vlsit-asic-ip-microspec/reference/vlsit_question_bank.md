@@ -53,6 +53,9 @@ C. Other: write your own idea.
 23. How are `i_protect_en` and `i_slverr_en` driven? (A: `i_slverr_en` tied to 1 and `i_protect_en` tied to 0 with the library tie cell; B: IP input ports, constant after reset; C: other. Do not toggle `i_slverr_en` after reset.)
 24. What happens on an access to an address that is not a register, a partial-strobe write or a non-word-aligned address? (A: generator default, OKAY with read 0 for an unmapped address and `PSLVERR` for the other two when `i_slverr_en` is 1, recommended; B: an error for an unmapped address, a decision in section 20 because the generator cannot do it.)
 
+25. Which keyword represents this design in register names (rule R-032)? (A: the short name of the design, 2 to 8 lower-case characters, example `axi2apb`, so registers are `axi2apb_ctrl`, `axi2apb_sts`, recommended; B: another keyword of the user; C: you decide.) The prefix also lengthens the generated port names `o_<register>_<field>`, which must stay within 30 characters, so a short prefix is better.
+26. For each field: when may software program it and when is it written or cleared? (Example: before enable only, any time, only while the IP is idle; written by software, cleared by hardware at completion.) The answer goes to line 2 "Usage: " of the field description (rule R-034), then the programmable values as hexadecimal value lines (rule R-037), the unit and the limits.
+
 ## Signals and waveforms
 
 12. Which waveforms must the specification show at minimum? (A: the proposed list with one waveform for every operation, the success and the error case of every interface and the special cases, recommended; B: only one success and one error per interface, smaller but key functions are not shown; C: the proposed list plus extra corner cases; D: other. Example for a FIFO: write, read, full, empty, simultaneous write and read, reset.)

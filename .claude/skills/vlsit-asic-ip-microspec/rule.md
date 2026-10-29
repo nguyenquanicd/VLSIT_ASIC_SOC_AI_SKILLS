@@ -102,6 +102,46 @@ MUST write section 11 so that it states the behavior of the generated CSR module
 - Why: software and verification depend on these behaviors, and a promise that the generated RTL cannot keep is found only in silicon.
 - Check: `scripts/vlsit_csr_tool.py validate` prints PASS and `ports` lists the module ports; manual - sections 11.1, 11.3 and 11.4 are filled, and every limit that applies has a decision in section 20.
 
+### R-032 Register and field names
+MUST ask the user for a keyword that represents the design (2 to 8 lower-case letters or digits, for example `axi2apb`), record it as `prefix` in the JSON description, and name every register `<prefix>_<function>` and every field with a short abbreviation, using only lower-case letters, digits and underscores; the register name abbreviates the main function of the whole register and has fewer than 30 characters, the field name states its function clearly and has at most 20 characters, and the resulting port names keep the 30-character limit of the naming rule (R-026).
+- Why: a prefix keeps register names unique when several IP share a software address map, and short names that carry the function keep the generated ports readable.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a missing or malformed prefix, a register without the prefix, a register name of 30 characters or more, a field name above 20 characters and a generated name above 30 characters; manual - the abbreviations are understandable and follow the naming rule.
+
+### R-033 Register description
+MUST write the description of every register as one line in the description cell, in the form "Full name of the register derived from its name. Main meaning of the register." (for example "Controller control register. Enables the controller and selects its basic operation.").
+- Why: the first line a reader sees must tell what the register is without a decode of the abbreviated name.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a description that has more than one line or lacks the full name and the meaning.
+
+### R-034 Field description
+MUST write the description of every field except `reserved` in one cell with these parts, in the layout of rule R-038: the full name of the field and a technical explanation that a reader who does not know the design can follow; "Usage: " the conditions of use (the fields it is used with, when software may program it, before or after enable, when it is written or cleared and by whom); the Values block of rule R-037; "Unit: " the unit; "Limits: " the limits, or "none". Write at the level of detail of the register documentation of ARM, Synopsys and Cadence, from the viewpoint of the software engineer who uses the register.
+- Why: the register map is the contract with software and verification, and a short or implicit description leaves the programming conditions to guesswork.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a missing part, a wrong label or a first line shorter than 40 characters; manual - the content of each part is technically complete and agrees with sections 10 and 11.2.
+
+### R-037 Values block of a field
+MUST write the programmable values of a field as a block: a line "Values:" alone, then one line for each value or range of values that starts with its hexadecimal number as software writes it (`0x0`, `0x1`, `0x2 to 0x5`) followed by its meaning and the mark "(reset value)" where it applies, every line ending with ";" except the last, which ends with "."; then a blank line and the "Unit: " line. A decimal number MUST NOT be the key of a value line.
+- Why: software and verification read and write registers in hexadecimal, and one value on one line is read faster than a list in a sentence.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a "Values:" line that is not alone, a value line without a hexadecimal key or with a wrong ending, and a missing blank line.
+
+### R-035 Workbook format
+MUST produce the CSR workbook with `scripts/vlsit_csr_tool.py fill` and not format it by hand: only black, white and purple colors (purple header rows with white text, light purple register rows, white field rows, thin black borders); font size 13 in every cell; every cell wraps its text and is aligned to the middle vertically; every row is just as high as its lines need, so that the bottom border lies close to the last line of text; header text stays on one line; the six columns REGISTER to RESET VALUE have the same width, fitted to the longest content, and the DESCRIPTION column is 5 times as wide.
+- Why: the register map is read by software and verification engineers, so every description must be fully visible and compact, and one generated format keeps all IP alike.
+- Check: manual - open the workbook produced by `fill`; `tests/vlsit_test_csr_tool.py` checks the widths, the font size, the alignment, the header wrapping and the colors.
+
+### R-038 Field description layout
+MUST lay out the description of a field with one blank line between the parts, in this order: the first line (full name and explanation), a blank line, the "Usage: " line, a blank line, the "Values:" block, a blank line, the "Unit: " line, a blank line, and the "Limits: " line as the last line.
+- Why: blank lines let a reader find each part of a long description at a glance.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a description whose parts or blank lines are not in this order.
+
+### R-039 Reserved field description
+MUST give every `reserved` field the description "This field is unused." on the first line and "Read-as-zero and write-ignored." on the second line, and MUST NOT write any other text; `fill` writes it for every reserved field, including those that `--auto-reserved` adds.
+- Why: a reserved bit is never programmable, and one fixed text tells software the safe behavior (read as zero, writes ignored).
+- Check: `scripts/vlsit_csr_tool.py validate` reports a reserved field with another description; manual - the workbook shows the fixed text.
+
+### R-040 Interrupt register set
+MUST give the interrupt enable, injection and masked-status registers exactly the same fields as the raw interrupt status register of the same IP, with the same field names and the same bit positions, so that bit N means the same event in every register; only the descriptions differ; the injection fields are type `rw` (not `rwi`), and the IP raises the raw event on the rising edge of the injection bit.
+- Why: software decodes the interrupt cause with one bit mask for all four registers, and different field names or positions cause wrong masks.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a register named `<prefix>_irq_en`, `_irq_inj` or `_irq_sts` whose fields differ from `<prefix>_irq_raw`, and an injection field that is not `rw`; manual - the four descriptions say what each register does with the event.
+
 ### R-025 Signal description table
 MUST describe every port of section 6.2 with its function, its clock domain (or asynchronous) and its signal type, where the type starts with level, pulse (with its width in cycles), clock, reset, data (with the qualifier that makes it valid) or static, and ask the user when the type or the clock domain of a port is not known.
 - Why: integrators and verification engineers must know which input is a pulse that can be missed and which is a level, and in which clock domain it is sampled, before they connect the IP.

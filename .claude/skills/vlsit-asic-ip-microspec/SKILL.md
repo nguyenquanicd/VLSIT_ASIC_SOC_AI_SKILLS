@@ -76,7 +76,7 @@ If the IP has software-visible registers, the register RTL will be built by APB-
 <python> "<skill folder>\scripts\vlsit_csr_tool.py" ports regs.json
 ```
 
-Use the module name of the project naming rule (rule R-026) in the JSON. Fill sections 11.1, 11.3 and 11.4 of the template from the `ports` output and the generator reference; ask the user for the source of `i_protect_en` and `i_slverr_en`, for the connection of each field to the design, and for the decision on every limit of the generator that the IP meets (rule R-031).
+Use the module name of the project naming rule (rule R-026) in the JSON. Ask the user for the design prefix of the register names (question bank 25) and write every register and field name and description as rules R-032 to R-034 and R-037 require: `<prefix>_<function>` register names, fields of at most 20 characters, a one-line register description and a field description with `Usage: `, a `Values:` block of hexadecimal value lines (rule R-037), `Unit: ` and `Limits: ` (question 26); `validate` checks these. Fill sections 11.1, 11.3 and 11.4 of the template from the `ports` output and the generator reference; ask the user for the source of `i_protect_en` and `i_slverr_en`, for the connection of each field to the design, and for the decision on every limit of the generator that the IP meets (rule R-031).
 
 ### 10. Waveform plan, block diagram and waveforms
 

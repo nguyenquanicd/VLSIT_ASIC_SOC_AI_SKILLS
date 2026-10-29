@@ -149,6 +149,11 @@ MUST instantiate the CSR module once, in the top module or in a wrapper that the
 - Why: the generated module has no knowledge of the IP; a port left open, a tie-off that moves, or an input from another clock domain gives a silent register error that the CSR lint cannot see.
 - Check: the lint of R-014 reports no unconnected or width-mismatched port on the CSR instance; manual - the report lists each CSR port, the signal it connects to and its clock domain.
 
+### R-043 Workbook follows the register conventions
+MUST let `vlsit_csr_generate.py generate` compare the workbook with the register conventions of the specification skill (microspec rules R-032 to R-040: module name `m_vlsit_csr_<function>`, one design prefix on every register name, register names under 30 characters, field names of at most 20 characters, the one-line register description, the field description layout with hexadecimal value lines, the fixed description of reserved fields, and the same fields in the enable, injection and status registers as in the raw interrupt register), MUST report every `WARN R-043` line in the report, and MUST use `--strict-names` when the specification was written under those rules; the workbook is changed only by the designer or after the designer agrees (R-002), never to silence a warning.
+- Why: the register names and descriptions go into the RTL ports and into the software documents, so a workbook that departs from the conventions makes the RTL and the specification disagree on names.
+- Check: `vlsit_csr_generate.py generate --strict-names` prints no WARN R-043 and no FAIL; manual - every warning that remains is in the report with the designer's answer.
+
 ## Verification
 
 ### R-012 Rule check

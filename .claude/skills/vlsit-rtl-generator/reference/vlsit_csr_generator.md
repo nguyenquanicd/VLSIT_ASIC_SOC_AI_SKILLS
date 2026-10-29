@@ -63,3 +63,12 @@ All register outputs `o_*` are flip-flop outputs in the register clock domain (`
 ## Planning the registers from the design
 
 Ask, for each function of the IP, in this order: (1) what software must configure (`rw`); (2) what software must start or stop and the hardware finishes (`rwi`); (3) what software must read as live state (`ro`); (4) what software must see as a sticky event, error or interrupt cause and clear (`w1c`); (5) the reset value of every field and whether software or hardware owns the reset state; (6) whether the register clock differs from the APB clock (`Asynchronous`); (7) the software sequences (initialisation, start, completion, error clearing, safe reconfiguration). Put a status that is a counter or a wide bus in a `ro` register that is sampled when software reads; ask whether it must be coherent (a snapshot or a latch is then a design function, not a CSR function).
+
+## Register conventions checked by `generate` (rule R-043)
+
+The specification skill (rules R-032 to R-040) writes the workbook with these conventions, and `vlsit_csr_generate.py generate` prints a `WARN R-043` line for each deviation (and stops with `--strict-names`):
+
+- module name `m_vlsit_csr_<function>`; a design with several register sets uses a different function name for each;
+- every register name is `<prefix>_<function>` with one design prefix of 2 to 8 characters and fewer than 30 characters; field names have at most 20 characters;
+- the register description is one line `Full name. Main meaning.`; the field description has the explanation, `Usage:`, a `Values:` block of hexadecimal value lines, `Unit:` and `Limits:`, with a blank line between the parts; a reserved field has the fixed text `This field is unused.` and `Read-as-zero and write-ignored.`;
+- `<prefix>_irq_en`, `_irq_inj` and `_irq_sts` have the same fields and bits as `<prefix>_irq_raw`; the injection fields are `rw` and the IP raises the raw event on the rising edge of the injection bit.

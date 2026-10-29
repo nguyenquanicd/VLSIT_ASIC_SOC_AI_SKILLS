@@ -139,15 +139,82 @@ def read_sheet(xlsx, sheet):
                 in_regs = True
             continue
         if vals[0] is not None:
-            cur = {"name": str(vals[0]), "offset": vals[1], "fields": [], "row": row}
+            cur = {"name": str(vals[0]), "offset": vals[1], "fields": [], "row": row, "desc": vals[6]}
             regs.append(cur)
         elif any(v is not None for v in vals):
             if cur is None:
                 raise ValueError("row %d: field row before any register" % row)
-            cur["fields"].append({"name": vals[2], "bits": vals[3], "type": vals[4], "reset": vals[5], "row": row})
+            cur["fields"].append({"name": vals[2], "bits": vals[3], "type": vals[4], "reset": vals[5], "row": row, "desc": vals[6]})
         elif cur is not None:
             raise ValueError("row %d: empty row inside the register table; the generator would read it as a field (delete the row)" % row)
     return cfg, regs
+
+
+RESERVED_DESC = "This field is unused.\nRead-as-zero and write-ignored."
+VALUE_RE = re.compile(r"0x[0-9A-Fa-f]+( to 0x[0-9A-Fa-f]+)? ")
+IRQ_RE = re.compile(r"(.+_irq)_(raw|en|inj|sts)")
+
+
+def field_description_findings(label, text):
+    """Layout of rules R-034, R-037 and R-038 of the specification skill for one field description."""
+    lines = str(text or "").split("\n")
+    if len(lines[0]) < 40:
+        return ["%s: the first line of the description is shorter than 40 characters" % label]
+    if len(lines) < 5 or lines[1] != "" or not lines[2].startswith("Usage: ") or lines[3] != "" or lines[4] != "Values:":
+        return ["%s: the description must be: explanation, blank, 'Usage: ', blank, 'Values:' (R-034, R-038)" % label]
+    rest = lines[5:]
+    if "" not in rest:
+        return ["%s: the Values block must end with a blank line and be followed by 'Unit: ', a blank line and 'Limits: '" % label]
+    cut = rest.index("")
+    values, tail = rest[:cut], rest[cut + 1:]
+    out = []
+    for k, v in enumerate(values):
+        if not VALUE_RE.match(v) or not v.endswith("." if k == len(values) - 1 else ";"):
+            out.append("%s: value line '%s' must start with a hexadecimal value and end with ';' (the last with '.') (R-037)" % (label, v[:30]))
+    if not values or len(tail) != 3 or not tail[0].startswith("Unit: ") or tail[1] != "" or not tail[2].startswith("Limits: "):
+        out.append("%s: the tail must be a blank line, 'Unit: ', a blank line and 'Limits: ' (R-038)" % label)
+    return out
+
+
+def convention_findings(cfg, regs):
+    """Register conventions of the specification skill (rules R-032 to R-040); returned as text, never fatal."""
+    out = []
+    module = str(cfg.get("Module Name", ""))
+    if not re.fullmatch(r"m_vlsit_csr_[a-z0-9][a-z0-9_]*", module):
+        out.append("module name %s must be m_vlsit_csr_<function> (R-036)" % module)
+    prefixes = {r["name"].split("_", 1)[0] for r in regs}
+    if len(prefixes) != 1:
+        out.append("register names do not share one design prefix: %s (R-032)" % sorted(prefixes))
+    prefix = next(iter(prefixes)) if len(prefixes) == 1 else None
+    if prefix is not None and not re.fullmatch(r"[a-z][a-z0-9]{1,7}", prefix):
+        out.append("the prefix %s must be 2 to 8 lower-case letters or digits (R-032)" % prefix)
+    by_name = {r["name"]: r for r in regs}
+    for r in regs:
+        n = r["name"]
+        if len(n) > 29:
+            out.append("register %s has %d characters; it must have fewer than 30 (R-032)" % (n, len(n)))
+        if not re.fullmatch(r"[^.]{3,80}\. \S.{14,}", str(r.get("desc") or "")):
+            out.append("register %s: the description must be one line 'Full name. Main meaning.' (R-033)" % n)
+        for f in r["fields"]:
+            fn, label = str(f["name"]), "%s.%s" % (n, f["name"])
+            if len(fn) > 20:
+                out.append("%s: field name has %d characters; the limit is 20 (R-032)" % (label, len(fn)))
+            if fn == "reserved":
+                if f.get("desc") != RESERVED_DESC:
+                    out.append("%s: the description of a reserved field must be the fixed text of R-039" % label)
+            else:
+                out += field_description_findings(label, f.get("desc"))
+        m = IRQ_RE.fullmatch(n)
+        if m and m.group(2) != "raw" and (m.group(1) + "_raw") in by_name:
+            raw = by_name[m.group(1) + "_raw"]
+            want = sorted((f["name"], str(f["bits"])) for f in raw["fields"] if f["name"] != "reserved")
+            got = sorted((f["name"], str(f["bits"])) for f in r["fields"] if f["name"] != "reserved")
+            if want != got:
+                out.append("%s must have the same fields and bits as %s_raw (R-040)" % (n, m.group(1)))
+            if m.group(2) == "inj":
+                out += ["%s.%s: an injection field must be type rw (R-040)" % (n, f["name"]) for f in r["fields"]
+                        if f["name"] != "reserved" and f["type"] != "rw"]
+    return out
 
 
 def check_map(cfg, regs, sheet):
@@ -353,6 +420,12 @@ def action_generate(args):
             print("ERROR: " + e)
         print("FAIL: fix the workbook before generating")
         return 1
+    notes = convention_findings(cfg, regs)
+    for note in notes:
+        print("WARN R-043: " + note)
+    if notes and args.strict_names:
+        print("FAIL: the workbook breaks the register conventions of the specification skill (--strict-names)")
+        return 1
     module = str(cfg["Module Name"])
     if module in SAMPLE_MODULES and not args.allow_sample:
         print("ERROR: Module Name %s is the name of the template sample; the sheet probably still holds the sample rows" % module)
@@ -462,6 +535,7 @@ def main():
     g.add_argument("--generator")
     g.add_argument("--force", action="store_true")
     g.add_argument("--allow-sample", action="store_true", help="accept the template sample module name")
+    g.add_argument("--strict-names", action="store_true", help="fail when the workbook breaks the register conventions (R-043)")
     v = sub.add_parser("verify")
     v.add_argument("dir")
     p = sub.add_parser("ports")
