@@ -77,7 +77,7 @@ Write the modules leaf first and the top last, one module per file, into the out
 <python> "<skill folder>\scripts\vlsit_rtl_check.py" check "<output folder>"
 ```
 
-Write every selection of three or more branches as `case` or `casez`, never as an `if` / `else if` chain (R-019). Fix every ERROR (R-012). Keep a list of the WARN and INFO findings for the report (R-013). Keep testbenches and assertions out of the design files (R-010).
+Write every selection of three or more branches as `case` or `casez`, never as an `if` / `else if` chain (R-019). Prefer direct RTL for simple one-use expressions; document every function and use it only when reuse or a clear abstraction justifies it (R-044). Name fixed protocol encodings with `LPARA_` localparams; reserve `PARA_` parameters for choices the specification makes configurable (R-045). Fix every ERROR (R-012). Keep a list of the WARN and INFO findings for the report (R-013). Keep testbenches and assertions out of the design files (R-010).
 
 ### 5b. CSR block (only when section 11 of the specification has a workbook)
 

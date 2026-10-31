@@ -61,6 +61,21 @@ class ContentChecks(unittest.TestCase):
         T.check_verification_ids({15: "| TEST-001 | x |\n", 19: "", 12: "see AXI-SVA-02 of the bridge"}, e)
         self.assertEqual(e, [])
 
+    def test_wave_plan_exempt_figure_needs_no_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "w.svg").write_text("<svg/>", encoding="utf-8")
+            sec10 = "\n".join([
+                "### 10.2 Operations", "| OP-001 | a |", "### 10.3 Cycle-level behavior",
+                "| Waveform ID | Function / operation | Scenario | Signals | Figure | Confirmed |",
+                "|---|---|---|---|---|---|",
+                "| WF-001 | OP-001 write | success | a | w.svg R-017 exempt | 2026-10-30 |", ""])
+            e = []
+            T.check_wave_plan(sec10, d, e)
+            self.assertEqual(e, [])
+            e = []
+            T.check_wave_plan(sec10.replace(" R-017 exempt", ""), d, e)
+            self.assertTrue(any("no .json or .tex source" in x for x in e))
+
     def test_csr_sections_need_workbook(self):
         text = "### 11.1 CSR source\nx\n### 11.3 Connection\n\n### 11.4 APB\ny\n"
         with tempfile.TemporaryDirectory() as d:

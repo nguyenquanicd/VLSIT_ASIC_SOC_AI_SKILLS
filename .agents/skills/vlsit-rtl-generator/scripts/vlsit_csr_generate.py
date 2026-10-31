@@ -11,7 +11,7 @@ Purpose : the register RTL is never written by hand; it comes from APB-CSR-Gener
           (https://github.com/nguyenquanicd/APB-CSR-Generator, script CSR_Generation.py), which in the VLSIT
           flow is the submodule APB-CSR-Generator of VLSIT_RTL_Generator_AI_Model. This script runs it in a
           work folder, checks the result against the workbook, replaces the generator's placeholder
-          synchronizer by an adapter to the library wrapper m_vlsit_apbcdc_cell_sync, and writes the manifest.
+          synchronizer by an adapter to the library wrapper m_vlsit_afifo_cell_sync, and writes the manifest.
 Actions :
   locate [--generator PATH]     print the path and commit of CSR_Generation.py (search order: --generator,
                                 environment variable VLSIT_CSR_GENERATOR, folders APB-CSR-Generator found
@@ -48,7 +48,7 @@ except ImportError:
 GEN_NAME = "CSR_Generation.py"
 GEN_DIR = "APB-CSR-Generator"
 MANIFEST = "CSR_GENERATED.md"
-LIB_WRAPPER = "m_vlsit_apbcdc_cell_sync"
+LIB_WRAPPER = "m_vlsit_afifo_cell_sync"
 TYPES = {"rw", "ro", "rwi", "w1c"}
 FIRST_ROW = 16
 SAMPLE_MODULES = {"m_vlsi_csr", "m_vlsi_async_csr"}
@@ -362,8 +362,8 @@ module m_csr_sync #(
 
   // Synchronizer cell: the library wrapper selects the 2-FF, 3-FF or 4-FF cell by the stage count.
   {lib} #(
-    .PARA_APBCDC_CELL_RST_VAL (32'd0),
-    .PARA_APBCDC_CELL_TYPE    (PARA_LEVELS)
+    .PARA_AFIFO_CELL_RST_VAL (32'd0),
+    .PARA_AFIFO_CELL_TYPE    (PARA_LEVELS)
   ) u_sync (
     .i_clk_dst   (i_clk_dst),
     .i_rst_n_dst (i_rst_n_dst),

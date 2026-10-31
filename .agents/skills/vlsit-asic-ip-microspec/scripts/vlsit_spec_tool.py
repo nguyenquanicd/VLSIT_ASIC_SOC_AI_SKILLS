@@ -22,7 +22,7 @@ Checks  : all 22 sections present in order with the template titles; leftover te
           every REQ used elsewhere is defined; each TBD is listed in section 20; the port table of 6.2 has
           a function, a clock domain and a signal type (level, pulse, clock, reset, data, static) for every
           port (R-025); the waveform plan of 10.3 covers every operation of 10.2 and each figure and its
-          source file exist beside the specification (R-024); section 2 records the naming rule, and with
+          source file exist beside the specification (R-024; a figure marked 'R-017 exempt' needs no source); section 2 records the naming rule, and with
           --naming default (the default) the port names of 6.2 follow the default naming rule of the skill
           vlsit-rtl-generator (direction prefix, i_clk_<domain>, i_rst_n_<domain>, 30 characters, NAM-08
           abbreviations); with --naming user the rule supplied by the user is checked by hand (R-026).
@@ -329,6 +329,8 @@ def check_wave_plan(sec10, base, errors):
             path = Path(base) / m.group(1)
             if not path.is_file():
                 errors.append("section 10.3: %s: figure %s not found" % (r[0], m.group(1)))
+            elif "R-017 exempt" in fig:
+                pass   # R-017: a figure from a simulation of a specification written before 2026-10-30
             elif not (path.with_suffix(".json").is_file() or path.with_suffix(".tex").is_file()):
                 errors.append("section 10.3: %s: no .json or .tex source beside %s (rule R-017)" % (r[0], m.group(1)))
     if not planned:

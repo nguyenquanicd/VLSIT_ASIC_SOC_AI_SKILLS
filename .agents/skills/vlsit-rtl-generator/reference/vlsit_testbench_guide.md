@@ -120,7 +120,7 @@ A design with a crossing has a synchronizer wrapper that holds two branches (rul
 
 1. **Detect.** `vlsit_sim_evidence.py plan <spec.md>` says whether section 7.2 of the specification lists crossings. A synchronizer wrapper in the RTL also makes the rule apply.
 2. **Synthesis branch.** Compile the design, the wrapper, the cell models and the testbench with the flow macro defined (for example `iverilog -DVLSIT_SYNTHESIS`, or `+define+VLSIT_SYNTHESIS`). The latency is deterministic; this run is the one whose waveforms are compared with the specification (section 6 of this guide).
-3. **Simulation branch.** Compile without the macro and run the same testbench with at least three seeds (the plusargs named in the specification, for example `+APBCDC_MSYNC_SEED=<n>`), the model enabled. The latency changes from run to run, so a check that depends on a fixed latency shall accept the range that the specification states (for example the latency bound of a requirement), not one value.
+3. **Simulation branch.** Compile without the macro and run the same testbench with at least three seeds (the plusargs named in the specification, for example `+AFIFO_MSYNC_SEED=<n>`), the model enabled. The latency changes from run to run, so a check that depends on a fixed latency shall accept the range that the specification states (for example the latency bound of a requirement), not one value.
 4. **Log line.** The testbench prints at the start of every run the line that tells the branch, for example:
 
 ```systemverilog
@@ -128,7 +128,7 @@ initial begin
 `ifdef VLSIT_SYNTHESIS
   $display("SIM-BRANCH: synthesis");
 `else
-  if (!$value$plusargs("APBCDC_MSYNC_SEED=%d", seed)) seed = 1;
+  if (!$value$plusargs("AFIFO_MSYNC_SEED=%d", seed)) seed = 1;
   $display("SIM-BRANCH: metastable seed=%0d", seed);
 `endif
 end

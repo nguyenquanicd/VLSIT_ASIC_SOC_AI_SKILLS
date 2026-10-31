@@ -155,9 +155,9 @@ MUST ask the user which naming rule the specification follows (a rule file or do
 ## Diagrams and waveforms
 
 ### R-017 Block diagram and key waveforms
-MUST include in every specification a block diagram in section 5.2 and the key waveform of each important transaction of every external interface (at least one success case and one error case per interface), each as an image file with its source file beside it. The complete list of waveforms is agreed with the user under R-024.
+MUST include in every specification a block diagram in section 5.2 and the key waveform of each important transaction of every external interface (at least one success case and one error case per interface), each as an image file with its source file beside it. Every waveform MUST be drawn with WaveDrom: its source is a WaveJSON file (`.json`) beside the image, and the image (SVG or PNG) and any HTML viewer are generated from that WaveJSON, by the bundled WaveDrom or by `scripts/vlsit_waveform_svg.py`; a waveform taken from a simulation is first converted from its VCD to WaveJSON (`vlsit-wavedrom-waveform`, `vcd-to-wavejson`) and then drawn the same way. A specification written before 2026-10-30 may keep figures that come from a simulation without a WaveJSON when its waveform plan marks them `R-017 exempt`. The complete list of waveforms is agreed with the user under R-024.
 - Why: a reader checks a protocol bridge by looking at its handshakes, and an image with a source can be reviewed and edited.
-- Check: manual - section 5.2 links a block diagram and the interface sections link waveform images whose `.json` or `.tex` sources exist.
+- Check: manual - section 5.2 links a block diagram and the interface sections link waveform images whose `.json` or `.tex` sources exist; `vlsit_wavedrom_waveform.py lint` prints PASS for every WaveJSON.
 
 ### R-018 draw.io first
 MUST draw the block diagram of section 5.2 as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from sections 5, 6 and 14.2 of the specification; LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.

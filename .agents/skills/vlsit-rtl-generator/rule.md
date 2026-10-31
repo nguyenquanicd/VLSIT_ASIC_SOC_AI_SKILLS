@@ -127,6 +127,39 @@ MUST change an example of `reference/rtl_example/` whenever it breaks a rule of 
 - Why: an example that breaks a rule teaches the wrong pattern to every module written from it.
 - Check: `vlsit_rtl_check.py check reference/rtl_example` prints RESULT: PASS and lint of each example prints RESULT: PASS with 0 errors; manual - each example was inspected against the manual rules of `vlsit_rtl_check.py coverage`.
 
+### R-044 Use functions only when they improve reuse or clarity
+MUST prefer direct RTL for a simple expression used once; use an `automatic`, deterministic, side-effect-free function (COM-06) when it is called from multiple RTL call sites or when a nontrivial transform is clearer as one named unit. Every function has an immediately preceding comment describing its operation and any non-obvious width or bit/byte ordering; for a single-call-site transform, the comment also explains why the abstraction helps review. A function is a source-level abstraction and does not by itself imply shared hardware or reduced area.
+- Why: a one-use wrapper can hide simple logic, while synthesis may inline or replicate a function; the comment and usage rule keep RTL readable without implying an area benefit.
+- Check: manual - inspect each function's call sites and comment, and confirm any single-use function explains its clarity benefit; confirm no area claim relies only on using a function.
+
+### R-045 Name fixed protocol encodings
+MUST declare each fixed protocol encoding used by RTL as a width-matched `localparam logic` named `LPARA_<PROTOCOL>_<MEANING>` and use that name in case items, comparisons, and assignments instead of repeating its numeric encoding. Use `parameter` only when the specification explicitly makes an elaboration-time choice user-configurable; protocol-mandated encodings remain fixed. For example, AHB `HBURST` encodings are localparams, and a case uses `LPARA_HBURST_SINGLE` instead of `3'b000`.
+- Why: symbolic names expose the protocol meaning, reduce encoding mistakes, and prevent fixed standard values from being mistaken for design options.
+- Check: manual - compare every named value with the selected protocol/specification revision, confirm its width matches the field, and check that RTL references the name rather than repeating the encoding.
+
+```systemverilog
+localparam logic [2:0] LPARA_HBURST_SINGLE = 3'b000;
+localparam logic [2:0] LPARA_HBURST_INCR = 3'b001;
+localparam logic [2:0] LPARA_HBURST_WRAP4 = 3'b010;
+localparam logic [2:0] LPARA_HBURST_INCR4 = 3'b011;
+localparam logic [2:0] LPARA_HBURST_WRAP8 = 3'b100;
+localparam logic [2:0] LPARA_HBURST_INCR8 = 3'b101;
+localparam logic [2:0] LPARA_HBURST_WRAP16 = 3'b110;
+localparam logic [2:0] LPARA_HBURST_INCR16 = 3'b111;
+
+case (i_ahb_hburst)
+  LPARA_HBURST_SINGLE: w_is_single = 1'b1;
+  LPARA_HBURST_INCR,
+  LPARA_HBURST_WRAP4,
+  LPARA_HBURST_INCR4,
+  LPARA_HBURST_WRAP8,
+  LPARA_HBURST_INCR8,
+  LPARA_HBURST_WRAP16,
+  LPARA_HBURST_INCR16: w_is_single = 1'b0;
+  default:             w_is_single = 1'b0;
+endcase
+```
+
 ## CSR block
 
 ### R-039 CSR block from the generator
@@ -140,9 +173,9 @@ MUST keep the generated CSR files in their own folder (`csr` under the output fo
 - Check: `vlsit_rtl_check.py check` and `vlsit_lint_rtl.py lint` over the whole output folder print PASS; manual - no WARN R-040 is left, or the report explains each one.
 
 ### R-041 Library synchronizer in the CSR
-MUST NOT use the placeholder model `m_csr_sync` of the generator for an asynchronous sheet (`Asynchronous` = 1); the adapter `m_csr_sync` that `vlsit_csr_generate.py` writes forwards to the library wrapper `m_vlsit_apbcdc_cell_sync`, and MUST be listed in the filelist after the wrapper and its cells (R-037), in place of the generator's `models/m_csr_sync.sv`, and the testbench of such a design runs both branches (R-034).
+MUST NOT use the placeholder model `m_csr_sync` of the generator for an asynchronous sheet (`Asynchronous` = 1); the adapter `m_csr_sync` that `vlsit_csr_generate.py` writes forwards to the library wrapper `m_vlsit_afifo_cell_sync`, and MUST be listed in the filelist after the wrapper and its cells (R-037), in place of the generator's `models/m_csr_sync.sv`, and the testbench of such a design runs both branches (R-034).
 - Why: the placeholder is a plain two-flop model without a library cell; the library wrapper holds the technology synchronizer cell and the metastability model, so every design crosses a clock the same checked way.
-- Check: the filelist names `m_vlsit_apbcdc_cell_sync.sv` and the adapter and not the generator's `models` folder; manual - the report says which synchronizer stages were chosen.
+- Check: the filelist names `m_vlsit_afifo_cell_sync.sv` and the adapter and not the generator's `models` folder; manual - the report says which synchronizer stages were chosen.
 
 ### R-042 CSR integration
 MUST instantiate the CSR module once, in the top module or in a wrapper that the specification names, with every port connected by name: the APB ports of the IP (section 6.2) to `i_apb_paddr`, `i_apb_pwdata`, `i_apb_pwrite`, `i_apb_penable`, `i_apb_psel`, `i_apb_pstrb`, `i_apb_pprot`, `o_apb_pready`, `o_apb_pslverr`, `o_apb_prdata`; `i_protect_en` and `i_slverr_en` to a port of the IP or to a constant from the library module `m_vlsit_tie` as section 11 says (never open, never toggled after reset); the field ports to the design signals of section 11.3 in the register clock domain; and `i_clk_apb`, `i_rst_n_apb`, `i_clk_reg`, `i_rst_n_reg` to the two clock domains of the specification. A design signal of another clock domain MUST pass its own synchronizer before it reaches a field port.
