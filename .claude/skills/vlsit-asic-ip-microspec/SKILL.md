@@ -42,7 +42,7 @@ Before any name is written, ask the user which naming rule the specification fol
 
 ### 4. Understand the IP
 
-Ask the user what the IP does, its protocols, configurations, performance goals and constraints. Use the question style of [reference/vlsit_question_bank.md](reference/vlsit_question_bank.md): at most four questions per message, each with options, explanations, an example and an open choice (rule R-003). Record every "you decide" as an assumption (rule R-004).
+Ask the user what the IP does, its protocols, configurations, performance goals and constraints, and the real-world application of each main feature (rule R-041: which product or system uses it, what number the application fixes, what fails without it; for a PWM generator, for example, the dead-time feature serves the three-phase inverter of a brushless motor drive). Use the question style of [reference/vlsit_question_bank.md](reference/vlsit_question_bank.md): at most four questions per message, each with options, explanations, an example and an open choice (rule R-003). Record every "you decide" as an assumption (rule R-004).
 
 ### 5. Ground the protocols
 
@@ -90,7 +90,7 @@ Run `vlsit_spec_tool.py check` (add `--naming user` when the user supplied their
 
 ### 12. Verify against the rules
 
-Check the result against every rule ID in [rule.md](rule.md): R-013, R-014, R-015, R-016, R-019, R-020, R-024, R-025, R-026 and R-031 (validate part) by the script outputs, the others by inspection of the conversation and the files. Report which rules were verified and how, and say plainly what could not be verified.
+Check the result against every rule ID in [rule.md](rule.md): R-013, R-014, R-015, R-016, R-019, R-020, R-024, R-025, R-026, R-031 and R-041 (validate part) by the script outputs, the others by inspection of the conversation and the files. Report which rules were verified and how, and say plainly what could not be verified.
 
 ## Reference
 

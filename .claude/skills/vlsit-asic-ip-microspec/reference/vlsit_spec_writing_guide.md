@@ -4,7 +4,7 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to
 
 | Section | What to put there | Typical questions to the user |
 |---|---|---|
-| 1 Purpose, scope | Problem, boundary, included and excluded functions, SoC context, feature list | Which function must it do and not do? Which SoC and workload? |
+| 1 Purpose, scope | Problem, boundary, included and excluded functions, SoC context, feature list, and the real-world applications of every feature in 1.4 (R-041) | Which function must it do and not do? Which SoC and workload? Which real product uses each feature and what number does it fix? |
 | 2 References | Exact title, revision and clauses; conflict order; compliance table | Which protocol revision and role? Which deviations are accepted? |
 | 3 Requirements | One shall per requirement with REQ-ID, source, applicability and verification method | Which behaviors are mandatory and how are they verified? |
 | 4 Features and configurations | Configuration table; optional features absent, tied off or runtime-disabled | Which configurations ship? |
@@ -25,6 +25,24 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to
 | 19 Traceability | Every REQ to module, test, method, configuration | Generated from sections 3 and 15 |
 | 20 Assumptions, decisions | Assumptions, dependencies, decisions, open items, TBD with impact | Which points remain open? |
 | 21 Glossary, 22 References | Terms and the sources actually used | Not applicable |
+
+## Real-world applications of the features, section 1.4 (rule R-041)
+
+One row per feature ID of 1.3. Columns: Feature ID, Real-world application, What the application needs, Typical values, Consequence if missing or wrong, Requirements, Source. How to write each cell:
+
+- **Application:** a named system and an example product, not a field. Good: "three-phase inverter of a brushless DC motor drive in an e-bike controller". Bad: "motor control", "many systems".
+- **Need:** the physical or system reason, in one sentence, that fixes a value of the IP (frequency, resolution, throughput, latency, depth, voltage or current class).
+- **Typical values:** at least one number with unit and a range, so parameters and test corners can be chosen from it.
+- **Consequence:** the failure the user would see; it shows which behavior must never fail and which test is critical.
+- **Requirements and Source:** the REQ-IDs and where the statement comes from (user answer with date, standard clause, reference IP, or an assumption ASM-nnn of section 20). Ask the user; if the user does not know, propose an application from a reference IP or a standard and record it as an assumption (R-004), never invent a product.
+
+Example for a PWM generator:
+
+| Feature ID | Real-world application | What the application needs from the feature | Typical values | Consequence if missing or wrong | Requirements | Source |
+|---|---|---|---|---|---|---|
+| FEAT-001 | Speed control of a brushed DC fan or pump motor in a home appliance | Average motor voltage set by the duty cycle of a switched supply, with a switching rate above the audible range | PWM 20 kHz to 25 kHz, duty resolution 10 bit | Audible whine below 20 kHz; coarse speed steps with a low resolution | REQ-FUNC-001 | User answer 2026-10-28 |
+| FEAT-003 | Three-phase inverter of a brushless DC motor drive in an e-bike controller | High-side and low-side switch of a half-bridge never conduct together, so their gate signals are separated by a dead time longer than the switch turn-off time | Dead time 0.5 us to 2 us, step 10 ns at 100 MHz | Shoot-through destroys the power transistors | REQ-FUNC-012, REQ-FUNC-013 | Gate-driver datasheet, assumption ASM-003 |
+| FEAT-005 | LED dimming of a car tail light | Brightness set by the duty cycle without a visible flicker, in-phase outputs to keep the color steady | PWM above 200 Hz, 8 bit | Visible flicker on camera and on eye movement | REQ-FUNC-020 | User answer 2026-10-28 |
 
 ## Port table of 6.2 (rule R-025)
 

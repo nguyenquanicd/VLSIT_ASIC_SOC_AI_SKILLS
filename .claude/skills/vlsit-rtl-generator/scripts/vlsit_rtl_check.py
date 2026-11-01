@@ -534,7 +534,7 @@ GENERATED_REASON = ("generated CSR file of an APB-CSR-Generator older than 2.0 (
 
 def is_generated(path):
     head = Path(path).read_text(encoding="utf-8-sig")[:1500]
-    return GENERATED_MARK in head and "Design Rule v2" not in head
+    return re.search(r"Project:\s*" + GENERATED_MARK, head) is not None and "Design Rule v2" not in head
 
 
 def check_file(path, f):

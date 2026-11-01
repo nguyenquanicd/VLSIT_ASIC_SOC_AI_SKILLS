@@ -394,6 +394,41 @@ def check_verification_ids(sec, errors):
             errors.append("section 19: %s names no TEST, SVA or COV ID (rule R-015)" % cells[0])
 
 
+GENERIC_APP_RE = re.compile(r"(used in (many|various|several)|many (other )?(systems|applications|products|designs)|various (systems|applications|products)|"
+                            r"general[- ]purpose|any (system|application)|and so on|etc)", re.I)
+
+
+def check_applications(text, errors):
+    """R-041: section 1.4 names the real-world application of every feature of 1.3, with a need, a number and a consequence."""
+    s13, s14 = subsection(text, "1.3"), subsection(text, "1.4")
+    feats = re.findall(r"^\|\s*(FEAT-\d+)\s*\|", s13, re.M)
+    if not feats:
+        return
+    if not s14.strip():
+        errors.append("section 1.4 (real-world applications of the features) is missing (rule R-041)")
+        return
+    if NR_RE.search(s14):
+        return
+    head, rows = table_rows(s14)
+    by_id = {r[0]: r for r in rows if r and re.fullmatch(r"FEAT-\d+", r[0])}
+    for f in feats:
+        r = by_id.get(f)
+        if r is None:
+            errors.append("section 1.4: %s has no row (rule R-041)" % f)
+            continue
+        if len(r) < 7:
+            errors.append("section 1.4: %s needs 7 cells: feature, application, need, values, consequence, requirements, source (rule R-041)" % f)
+            continue
+        names = ("application", "need", "typical values", "consequence", "requirements", "source")
+        for cell, name in zip(r[1:7], names):
+            if not cell or cell.startswith("<") or cell.upper() == "TBD":
+                errors.append("section 1.4: %s has an empty or placeholder %s cell (rule R-041)" % (f, name))
+        if GENERIC_APP_RE.search(r[1]) or len(r[1]) < 25:
+            errors.append("section 1.4: %s application is generic or too short; name a concrete system and an example product (rule R-041)" % f)
+        if not re.search(r"\d", r[3]):
+            errors.append("section 1.4: %s typical values hold no number (rule R-041)" % f)
+
+
 def check_csr_sections(text, base, errors):
     """R-031: when a CSR workbook sits beside the specification, 11.3 and 11.4 are filled."""
     if base is None or not any("csr" in p.name.lower() for p in Path(base).glob("*.xlsx")):
@@ -474,6 +509,7 @@ def findings_for(text, base=None, naming="default"):
     check_template_text(text, errors)
     check_verification_ids(sec, errors)
     check_csr_sections(text, base, errors)
+    check_applications(text, errors)
     tbd_secs = [n for n, _, s, e in secs if n != 20 and re.search(r"\bTBD\b", strip_code("\n".join(lines[s + 1:e])))]
     if tbd_secs and "TBD" not in s20:
         errors.append("TBD used in section(s) %s but section 20 records none" % tbd_secs)

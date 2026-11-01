@@ -20,6 +20,7 @@ C. Other: write your own idea.
 1. What is the main function, and what must it not do? (Example: "convert an APB write into a TL-UL write; must not decode addresses".)
 2. Which interfaces and roles? (Example: APB subordinate and TL-UL host; options: add an interrupt, a debug port, a test port.)
 3. How many transactions in flight? (A: one, simple and small; B: several with a FIFO, hides latency but costs area; C: other.)
+3a. Which real product or system uses each main feature, and what does it need from it? (rule R-041. Example for a PWM generator: "dead-time insertion is for the three-phase inverter of a brushless motor drive in an e-bike; shoot-through must never happen; dead time 0.5 to 2 us"; options: A, you name the application and numbers; B, I propose from a reference IP or a standard and you confirm, recorded as an assumption; C, other.)
 
 ## Protocol
 

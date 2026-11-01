@@ -73,6 +73,16 @@ The bridge lets an APB4 manager (for example a peripheral subsystem or a debug p
 | FEAT-004 | Error mapping to PSLVERR | Required | Always present | REQ-ERR-001, REQ-ERR-002, REQ-ERR-003 |
 | FEAT-005 | Response timeout with drain | Optional | PARA_TIMEOUT_CNT > 0 | REQ-ERR-004 |
 
+### 1.4 Real-world applications of the features
+
+| Feature ID | Real-world application (named system, example product) | What the application needs from the feature | Typical values | Consequence if missing or wrong | Requirements | Source |
+|---|---|---|---|---|---|---|
+| FEAT-001 | Firmware configuration of a UART or timer peripheral behind a TL-UL interconnect in a microcontroller-class SoC (APB peripheral library reused in a TL-UL SoC) | A 32-bit register write from the CPU reaches the APB4 peripheral as one full write | 32-bit data, 1 write per 4 to 8 clock cycles | A configuration write is lost or split and the peripheral starts in the wrong mode | REQ-FUNC-001 | User answer 2026-10-27 |
+| FEAT-002 | Byte write of a status byte or a FIFO data byte of an APB UART from a CPU store-byte instruction | Only the enabled byte lanes are written, the other bytes of the register keep their value | PSTRB with 1 to 3 of 4 lanes enabled | A byte store overwrites the neighbouring byte of a control register | REQ-FUNC-002, REQ-FUNC-004 | AMBA APB4 IHI 0024, assumption ASM-002 |
+| FEAT-003 | Polling of a peripheral status register or reading a received UART byte by the CPU | The read data of the APB peripheral is returned with the TL-UL response within one access | 32-bit read, latency below 16 cycles | The CPU reads stale or wrong status and mis-times the next transfer | REQ-FUNC-003, REQ-FUNC-006 | User answer 2026-10-27 |
+| FEAT-004 | Bus error reporting of an access to an unmapped or faulty peripheral address in a safety-related controller | An error of the TL-UL fabric becomes a visible PSLVERR so software can take a fault handler | 1 error response per failed access | The CPU continues with wrong data and no fault is raised | REQ-ERR-001, REQ-ERR-002, REQ-ERR-003 | AMBA APB4 IHI 0024, TL-UL specification |
+| FEAT-005 | Hang protection when an APB peripheral in a power-gated domain never asserts PREADY | The bridge ends the access after a programmable number of cycles so the bus does not hang | Timeout 256 to 4096 cycles | One dead peripheral freezes the whole CPU bus and the SoC must be reset | REQ-ERR-004 | User answer 2026-10-27 |
+
 ## 2. Normative references and precedence
 
 ### 2.1 Normative references
