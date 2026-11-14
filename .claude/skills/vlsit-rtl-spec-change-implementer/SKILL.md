@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later; offline RTL analysis with the standard libra
 
 # RTL Specification Change Analysis and Implementation
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Operating contract
 
 1. Read [rule.md](rule.md) completely before doing anything. Its numbered rules (RSC-xxx) are mandatory and rank above everything else.

@@ -1,5 +1,9 @@
 # HAS guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Hardware Architecture Specification (HAS). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The hardware architecture specification is the reference the integration is judged
 against. The review extracts these sections, and records the ones the document promises
 and does not contain as a gap (rule R-011).

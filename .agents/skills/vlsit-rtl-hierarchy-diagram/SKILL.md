@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later; offline, using the standard library for RTL 
 
 # VLSIT RTL Hierarchy Analysis and draw.io Diagram
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Finite-State Machine (FSM); Advanced Peripheral Bus (APB); Advanced eXtensible Interface (AXI). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Operating contract
 
 1. Read [rule.md](rule.md) completely before doing anything. Its numbered rules (RHD-xxx) are mandatory and rank above everything else; this file only orders the work.

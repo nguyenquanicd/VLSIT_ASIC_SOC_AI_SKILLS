@@ -1,5 +1,9 @@
 # Drawing a figure that the source does not provide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Read this file at step 9 when the document needs a figure and the input folder has none, or has
 only a format the DOCX cannot hold. The rules that bind this work are R-018 to R-024 in
 [rule.md](../rule.md); this file explains the method and the exact commands.

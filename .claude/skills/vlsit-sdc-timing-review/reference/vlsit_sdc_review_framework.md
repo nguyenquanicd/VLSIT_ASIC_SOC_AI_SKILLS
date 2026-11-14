@@ -1,5 +1,9 @@
 # SDC review framework
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Synopsys Design Constraints (timing context) (SDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The criterion for each constraint category, the failure that is common in practice, and the
 evidence a reviewer must demand. Read it at steps 6 and 7.
 

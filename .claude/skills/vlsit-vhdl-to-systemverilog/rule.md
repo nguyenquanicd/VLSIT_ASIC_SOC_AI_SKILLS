@@ -1,5 +1,8 @@
 # Rules: vlsit-vhdl-to-systemverilog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC); VHSIC Hardware Description Language (VHDL); Finite-State Machine (FSM). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Authority: this file is the highest-priority source for the skill. Every rule below is mandatory. `SKILL.md` defines the workflow that satisfies these rules; `reference/` holds supporting information and examples that rank below this file, with one exception: `reference/VLSIT_RTL_Design_Rule.md` is the RTL coding rule and is made normative by V2S-010. If any other file conflicts with a rule here, follow the rule and report the conflict.
 
 Keywords: MUST and MUST NOT admit no waiver. SHOULD is followed by default and may be deviated from only with a stated reason in the final report.

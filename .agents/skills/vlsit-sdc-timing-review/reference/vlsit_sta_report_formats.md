@@ -1,5 +1,9 @@
 # Timing report formats
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Synopsys Design Constraints (timing context) (SDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 How to read the report of each common tool, which lines carry the evidence, and how the evidence
 maps to a fix owner. Read it at step 8.
 

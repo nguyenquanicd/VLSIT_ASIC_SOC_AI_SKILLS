@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later using the standard library only. Windows Powe
 
 # WaveDrom waveform
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Value Change Dump (VCD). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Turns a short request, a VCD file or a waveform image into WaveJSON and a self-contained HTML page that draws it with the bundled WaveDrom, so the user can open the result at once, offline. It asks the user about anything missing or unclear, with options and explanations, and it does not draw analog or free-form graphics.
 
 Reply to the user in the language they use.

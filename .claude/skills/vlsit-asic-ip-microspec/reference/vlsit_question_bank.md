@@ -1,5 +1,9 @@
 # Question bank
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-003, R-004, R-024, R-025). Each question has at least two options with explanations and an example, and ends with an open choice. At most four questions per message. Adapt the wording to the IP.
 
 ## Format

@@ -1,5 +1,9 @@
 # Lint tools and installation
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013, R-014, R-015). Read this when you run lint, read its output, or have to tell the designer how to get a tool.
 
 ## Tools the script uses

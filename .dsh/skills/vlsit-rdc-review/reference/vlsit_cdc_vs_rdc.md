@@ -1,5 +1,9 @@
 # CDC versus RDC
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 A clock domain crossing asks whether two clocks are asynchronous and whether a
 synchroniser protects the signal. A reset domain crossing asks whether two regions can
 leave reset at different times and whether one of them samples the other while it is

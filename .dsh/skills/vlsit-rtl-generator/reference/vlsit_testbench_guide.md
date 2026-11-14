@@ -1,5 +1,9 @@
 # Simulation testbench guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Design Under Test (DUT); Finite-State Machine (FSM). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-010, R-022 to R-026, R-033 to R-034, R-088 to R-094). Read this before you write or change a simulation testbench. A testbench is written only when the user asks for one (R-022).
 
 ## 1. What the testbench is derived from (R-023)

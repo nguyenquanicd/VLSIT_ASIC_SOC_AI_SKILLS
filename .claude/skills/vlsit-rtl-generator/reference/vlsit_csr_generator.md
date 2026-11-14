@@ -1,5 +1,9 @@
 # APB-CSR-Generator: what the specification must know
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-016, R-030, R-031, R-049 to R-050, R-073 to R-087). The canonical repository `https://github.com/nguyenquanicd/APB-CSR-Generator` is at v3.3; the embedded VLSIT copy is v2.7. Both support the APB register-event sideband and `wo` hardware-clear behavior. The generator's specification is `spec/CSR_Generator_Specification.md` in that repository. The RTL skill chooses the newest discovered generator unless a path is supplied explicitly; this document describes the APB4 behavior used by the common RTL designs.
 
 ## What it builds

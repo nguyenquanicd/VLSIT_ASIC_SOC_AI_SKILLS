@@ -6,6 +6,9 @@ compatibility: "Python 3.8 or later, standard library only, no network access, n
 
 # Clock domain crossing review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Review a CDC sign-off from four independent evidences — the RTL, the SDC, the tool
 reports and the waiver — and deliver one dated English report whose every finding has a
 severity, a verdict and, when it can be fixed, the RTL change with its reason.

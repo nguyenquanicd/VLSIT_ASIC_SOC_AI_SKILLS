@@ -1,5 +1,8 @@
 # Rules
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Bus Functional Model (BFM); Verification Intellectual Property (Verification IP) (VIP); Verilog Procedural Interface (VPI); Direct Programming Interface (DPI); Design Under Test (DUT); Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Universal Verification Methodology (UVM); Application-Specific Integrated Circuit (ASIC); System on Chip (SoC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 These rules are mandatory every time this skill runs. When this file, SKILL.md and a file in `reference/` differ, this file wins; SKILL.md wins over the files in `reference/`.
 
 Each rule is one checkable requirement. It has a permanent ID (R-NNN) that is never reused or renumbered, a statement that starts with MUST or MUST NOT, a Why line and a Check line. No two rules may repeat or contradict each other.
@@ -14,6 +17,7 @@ The rules are grouped by verification level and by cross-cutting concern. The ru
 | Block | R-160–R-169 | A verification block, and every block inside a SoC |
 | SoC | R-180–R-189 | A SoC or system verification environment |
 | Test design and reporting | R-250–R-259 | Every run that selects, designs or reports tests |
+| Scalable verification | R-260-R-275 | Every run, with profile-specific applicability |
 | Coverage | R-200–R-207 | Every run that plans, measures or closes coverage |
 | Regression | R-215–R-222 | Every run that selects, executes or reports regression tests |
 | AI | R-230–R-239 | Every run that uses an AI model for any verification artifact |
@@ -57,7 +61,7 @@ MUST write each question with at least two options, a concrete example per optio
 ### R-106 Vplan before code
 MUST complete and approve the verification plan at gate G0 before any verification code is written.
 - Why: a code-first plan hides missing requirements until late, when changing the environment is expensive.
-- Check: `scripts/vlsit_verify_plan.py check` reports no error, and the G0 approval is recorded in `00_plan/signoff.md`.
+- Check: `scripts/vlsit_verify_plan.py check` reports no error, and the G0 approval is recorded in `sim/docs/00_plan/signoff.md`.
 
 ### R-107 Traceability links
 MUST link every scenario, test, checker and assertion to a requirement ID or a protocol clause.
@@ -80,9 +84,9 @@ MUST keep verification files out of the design source set and the design file li
 - Check: manual or lint - the design file list contains no verification path.
 
 ### R-111 Record the tool baseline
-MUST record the simulator, UVM library, VIP versions, operating system and compile and run options in the run manifest.
-- Why: a result produced with an unknown tool version cannot be compared with a later result or reproduced by another engineer.
-- Check: `scripts/vlsit_verify_evidence.py check` finds every tool-baseline field in the manifest.
+MUST record the simulator, reference models, operating system, compile/run options and each tool actually used. Record UVM/VIP versions only when used, otherwise record N/A and the no-VIP environment contract.
+- Why: a lightweight environment must be reproducible without pretending it contains a VIP or UVM.
+- Check: the run manifest identifies every dependency and its version or hash.
 
 ### R-112 One evidence bundle per run
 MUST save one evidence bundle per run with logs, coverage, waveforms, reports and hashes.
@@ -92,7 +96,7 @@ MUST save one evidence bundle per run with logs, coverage, waveforms, reports an
 ### R-113 Human gates
 MUST stop at gates G0 to G6 and obtain a named human approval before continuing.
 - Why: each gate covers a decision that a tool cannot make, such as scope, architecture, waivers and residual risk.
-- Check: manual - each gate record in `00_plan/signoff.md` names the approver, the date and the decision.
+- Check: manual - each gate record in `sim/docs/00_plan/signoff.md` names the approver, the date and the decision.
 
 ### R-114 Report by rule ID
 MUST report every rule as passed, failed, waived, manual or not run, using its rule ID.
@@ -127,7 +131,7 @@ MUST obtain approval before sending specification, RTL, VIP or verification data
 ## Component rules (R-120–R-129)
 
 ### R-120 UVM standard APIs
-MUST build every UVM component on the IEEE 1800.2 and UVM 2020-3.2 APIs, with factory registration and the standard phase methods.
+MUST use the project-selected compatible IEEE 1800.2/UVM APIs, factory registration and standard phases when UVM is selected. Plain SystemVerilog/C++/Python components follow their reviewed API contract without UVM-specific obligations.
 - Why: vendor-specific or private APIs make the component unusable on another simulator and hard to maintain.
 - Check: manual - compile the component against the pinned UVM library and review the registration and phase methods.
 
@@ -162,7 +166,7 @@ MUST link every covergroup bin to a requirement or protocol clause, including an
 - Check: manual - the component contract lists each bin with its requirement or clause, and `scripts/vlsit_verify_plan.py check` reports no unlinked bin.
 
 ### R-127 Objections and timeouts
-MUST manage sequence objections and timeouts so that no sequence can hang a test indefinitely.
+MUST give every test and transaction a finite timeout; when UVM is selected, also manage sequence objections so no sequence hangs or ends the test prematurely.
 - Why: a missing objection ends a test early, and a missing timeout turns a deadlock into a hung regression job.
 - Check: static review for objection raise and drop pairs and for a finite timeout in every test.
 
@@ -335,19 +339,19 @@ MUST complete SoC sign-off and define the post-silicon correlation plan.
 ## Test design and reporting rules (R-250–R-259)
 
 ### R-250 Combined-function tests
-MUST combine several functions of the IP, component or block in one test whenever the specification allows those functions to run together.
-- Why: a combined test exposes interaction defects that separate feature tests miss, and it reaches more coverage with fewer runs.
-- Check: manual - the vplan marks each combined test in `test_type` and names every function it exercises in `combines`.
+MUST select legal combined-function scenarios where shared resources, timing or state create relevant interaction risk, preserving per-function and interaction checkers. Do not require every possible feature combination.
+- Why: purposeful combinations expose interaction defects while controlling run count and debug cost.
+- Check: each selected combination names distinct functions and its interaction rationale.
 
 ### R-251 Constrained-random stimulus
-MUST drive the widest legal random value range using constraints derived from the specification and the protocol standard, never an unconstrained random value.
-- Why: constrained random reaches corner cases that directed tests miss, while unconstrained random produces illegal traffic and shallow coverage.
-- Check: manual - each random test records its constraints and the requirement or protocol clause that bounds them, and the seed is recorded by R-109.
+MUST define random stimulus domains, exclusions, distributions, boundary samples and seeds from the verification contract. Full-range random data is allowed when its entire domain is legal; negative tests deliberately violate a named rule and check the specified error response.
+- Why: legal traffic and intentional negative traffic need different expectations; overconstraints also hide bugs.
+- Check: stimulus constraints and negative-test expectations cite requirements or protocol clauses.
 
 ### R-252 Coverage-efficient tests
-MUST design each test to cover as many requirement-linked bins as possible with the fewest tests, and merge tests when the merge adds coverage without losing debug resolution.
-- Why: a large suite of narrow tests costs regression time and hides which test proves which requirement.
-- Check: manual - the vplan lists the bins per test, and the coverage report shows the incremental bins gained by each test.
+MUST select tests using measured incremental coverage, runtime, interaction risk, checker diversity and retained bug regressions. Keep high-risk directed tests, distinct fault-detection tests and required stress even when they add no unique bin; record the reason.
+- Why: equal bin sets do not imply equal bug-detection capability.
+- Check: the test-selection record lists gain, cost and retained-test reasons before removing or merging a test.
 
 ### R-253 Fault-injection tests
 MUST add a fault-injection test for every safety mechanism and error path named by the specification, including a DCLS comparison error when the design implements dual-core lock-step.
@@ -387,9 +391,9 @@ MUST deliver one verification report file that contains the test results, bug an
 ## Coverage rules (R-200–R-207)
 
 ### R-200 Coverage plan
-MUST write the coverage plan before stimulus, naming metrics, targets, scope and exclusions.
-- Why: a target chosen after the run is a description of what happened, not a commitment to what must be covered.
-- Check: `scripts/vlsit_verify_plan.py check` finds the coverage fields, and gate G0 records the targets.
+MUST approve a coverage contract before stimulus, with an authoritative requirement inventory, configurations, unique obligations, explicit bins, assertion kinds, separate metric denominators/targets, scope and exclusions.
+- Why: targets and denominators chosen after a run can hide verification gaps.
+- Check: vlsit_verify_plan.py check with --spec-index and vlsit_verify_closure.py validate the respective plan and measured closure inputs.
 
 ### R-201 Code coverage is not enough
 MUST treat code coverage as necessary but not sufficient for sign-off.
@@ -397,14 +401,14 @@ MUST treat code coverage as necessary but not sufficient for sign-off.
 - Check: the closure report shows functional, assertion and mutation evidence alongside code coverage.
 
 ### R-202 Coverage credit
-MUST credit a functional coverage bin toward closure only when its requirement link, its test and its evidence all exist.
-- Why: a bin that is hit without a linked test and evidence shows activity but proves nothing about the requirement.
-- Check: the closure report shows the requirement link, test and evidence for every credited bin.
+MUST credit coverage from accepted source-bound runs only, using approved bin catalogs and a set union by bin identity/configuration. Reconcile aggregate counts, bin IDs and contributing run IDs exactly; a high self-reported percentage is not evidence.
+- Why: summed seeds, unrelated reports and invented denominators inflate coverage.
+- Check: schema v2 closure recomputes metrics and rejects mismatched catalogs/counters/sources.
 
 ### R-203 Assertion non-vacuity
-MUST require every assertion to fire at least once and fail the run when an assertion is vacuous.
-- Why: a property that never fires proves nothing and creates false confidence.
-- Check: the simulation assertion table reports a non-zero fired count for every assertion, and the run exits non-zero on a vacuous assertion.
+MUST require explicit per-property status and failure/activity counters. Simulation properties need accounted attempts, completions, pending, disabled, cancellations and implication antecedents; missing fields are unknown. Formal properties need unbounded proof/non-vacuity results with reviewed, source-bound assumptions and proof artifacts.
+- Why: default-zero failures and contradictory counters permit false closure.
+- Check: closure rejects not_run properties, inconsistent counters, absent assumptions and incomplete evaluations.
 
 ### R-204 Mutation coverage
 MUST measure mutation coverage for checkers at the level's target.
@@ -498,7 +502,7 @@ MUST record AI provenance with the model, version, prompt hash, context hashes, 
 ### R-235 Assertion acceptance gate
 MUST validate every AI-generated assertion with compile, non-vacuity, mutation detection and a semantic-alignment review against the specification.
 - Why: formal proof against the RTL shows consistency with the implementation, not fidelity to the specification, and weak or vacuous properties can pass.
-- Check: the assertion validation report lists the compile result, fired count, mutation kills and the reviewer's alignment decision.
+- Check: the assertion validation report lists the compile result, per-property activity/non-vacuity, mutation kills and the reviewer's alignment decision.
 
 ### R-236 Reject trivial AI coverage bins
 MUST reject an AI-generated coverage bin that is reachable but does not represent a specification scenario, even when it is linked to a requirement.
@@ -519,3 +523,85 @@ MUST require every AI debug hypothesis to cite log lines, waveform times or asse
 MUST apply data classification, model-version pinning, license review and prompt-injection defenses before AI use.
 - Why: unclassified data, a silently upgraded model and an injected instruction can each invalidate the result or leak the design.
 - Check: the AI governance checklist is part of the run record and names the data class, model version, license decision and prompt-injection review.
+
+## Scalable verification rules (R-260-R-275)
+
+### R-260 Complete requirement inventory
+MUST reconcile the approved in-scope inventory, including protocol clauses, with the vplan in both directions. Represent out-of-scope items in the reviewed scope record; never silently remove them from the specification.
+- Why: A partial plan cannot establish completeness.
+- Check: vlsit_verify_plan.py check --spec-index reports missing and unknown IDs.
+
+### R-261 DUT boundary and applicability
+MUST choose level from the DUT boundary and verification purpose, not CPU/accelerator/memory-map keywords. Apply VIP release rules only to released VIP packages; record the applicability of inherited rules for local BFMs.
+- Why: Block verification should not acquire unnecessary SoC/UVM infrastructure.
+- Check: The scope record names the DUT boundary, applicable rules, configurations and abstraction layers.
+
+### R-262 Verification without a VIP
+MUST inventory reusable agents first; when none fits, define a project-local BFM, passive monitor, independent checker, assertions and coverage for the supported interface subset. Do not label a local BFM a qualified full-protocol VIP.
+- Why: A scoped environment can verify an IP without claiming unsupported compliance.
+- Check: The no-VIP contract states supported roles, standard revisions, timing, unsupported features and agent self-tests.
+
+### R-263 Independent executable models
+MUST independently derive and qualify C/C++/Python models and their scoreboards, recording actual source hashes, numeric/state/reset/error semantics, limits and reviewed known-answer, boundary, negative, reset and fault-detection evidence. A data checker must reference its qualified model and show positive reconciled comparisons with no mismatches or pending work.
+- Why: an unqualified or idle scoreboard can label untested behavior passing.
+- Check: schema v2 validates model/checker qualification, source files and per-run comparison counters.
+
+### R-264 Model coupling and speed
+MUST choose the least complex available model coupling that meets feedback/timing needs: batch vectors first, transaction streams next, in-process DPI/C++ or existing Python simulation bindings when needed. Keep cycle/protocol checks outside untimed functional models.
+- Why: A functional model does not verify cycle timing or a physical link.
+- Check: The integration record explains the coupling, simulator support, backpressure, concurrency and replay behavior.
+
+### R-265 Required scenario dimensions
+MUST maintain a reviewed scenario matrix assigning each in-scope requirement/configuration to normal, boundary, error, recovery, reset, backpressure and concurrency obligations or justified N/A entries. Include additional dimensions required by the selected architecture/profile.
+- Why: requirement ID presence alone cannot establish scenario completeness.
+- Check: closure reconciles the matrix, inventory, configurations and every vplan obligation.
+
+### R-266 Measured coverage closure
+MUST iterate measured gaps through triage, targeted stimulus or formal analysis, rerun and updated evidence. Distinguish unreachable, illegal, unimplemented checker, missing stimulus and tool limitation. A coverage plateau triggers analysis rather than automatic closure.
+- Why: More seeds alone do not establish completeness.
+- Check: The gap log records classification, next action, runtime budget and measured change.
+
+### R-267 Baseline and result integrity
+MUST re-hash every actual RTL, include, filelist, verification, model and build dependency listed in the reviewed build manifest. Bind source receipts to actual compiled inputs/top/parameters/defines/options, configuration/tool identity, contract and baseline. Use qualified result producers and hash-verified raw logs; normalized results must exactly match receipt payloads.
+- Why: hashing an opaque manifest or a log does not bind measured behavior to the current DUT.
+- Check: schema v2 rejects changed inputs, mismatched receipts, unqualified producers and recognized raw failure markers; review producer/dependency-export trust separately.
+
+### R-268 Requirement closure
+MUST close each requirement only after all matrix obligations/configurations have source-bound measured results or explicit current waivers. Reconcile vplan status and evidence IDs before closure. Require every metric family to be measured or explicitly declared N/A with a reviewed reason; applicable functional/assertion obligations cannot suppress their coverage family.
+- Why: one normal-path pass or an inconsistent plan cannot establish complete verification.
+- Check: closure validates the complete matrix/policy and outputs measured/waived/unmet counts separately.
+
+### R-269 Scalable IP profiles
+MUST select and adapt a processor, packet/interconnect, compute-accelerator or codec profile to the actual supported architecture and standard revision. Record physical-layer and system-level exclusions.
+- Why: Large IP families need different oracles and abstractions.
+- Check: The profile decisions are recorded using reference/vlsit_large_ip_verification.md.
+
+### R-270 Honest execution and sign-off
+MUST distinguish plan/artifact validation, measured closure, conditional closure and human sign-off. Default CI exit 0 is reserved for MET without waivers; MET_WITH_WAIVERS returns 3 unless an explicit allow-waivers policy is selected. A campaign with no accepted run cannot close. Preserve unknowns and trust limitations.
+- Why: a shared success code or a fully waived unexecuted campaign can be mistaken for verified hardware.
+- Check: machine-readable closure verdicts, explicit waiver approval artifacts and regression tests enforce the distinction.
+
+### R-271 Bounded regression complexity
+MUST define compile reuse, simulation/runtime budgets, deterministic seeds, failure replay and stimulus reduction. Prefer one harness and shared transaction APIs; introduce UVM/PSS or extra model dependencies only when justified by project needs and available tools.
+- Why: Infrastructure and unconstrained cross products can cost more than the verification they enable.
+- Check: The plan records environment size, tiers, retained-test rationale and measured coverage per runtime.
+
+### R-272 Independent simulation workspace
+MUST create a separate sim/ workspace outside the original design RTL tree for every new simulation project, following reference/vlsit_sim_workspace.md. Record a compatibility map for existing layouts and preserve original evidence. Keep design inputs separate from per-run build outputs; never reuse a run directory for a fresh execution.
+- Why: mixing generated outputs with design sources or reusing stale builds undermines handoff and clean replay.
+- Check: init rejects overlapping/nonempty trees; execute/replay refuse existing run IDs; package checks verify retained structure.
+
+### R-273 Retained replay inputs
+MUST retain every build/runtime dependency, complete environment/testbench, model, vector, generated source, root build file, configuration and required coverage artifact. Reconcile a reviewed transitive compiler/runtime dependency export with actual retained inputs; unresolved discovery cannot support a completeness or replay claim. Maintain a catalog of all baseline snapshots and complete failed/passing run inventories; preserve and back up the entire package. Do not automatically delete or overwrite history.
+- Why: hashes of an incomplete input set or only the selected baseline cannot reveal missing dependencies or deleted historical evidence.
+- Check: schema 2 validates dependency closure, runner, literal includes and explicit filelists; all registered runs/snapshots and root/coverage files are checked. Missing catalog/history blocks resealing even with --force. Review exporter completeness and actual compiled-input evidence under R-267.
+
+### R-274 Exact commands and environment records
+MUST retain actual setup/build/compile/simulation/coverage commands, argv, working directories, tool versions, seeds, timeouts, exit codes and logs. Record relevant variable values, source, setup order and overrides; execute cold replay with an isolated declared environment. An empty declaration needs a reason. Provision secrets externally by name without retained values. Preserve nested tool commands and review generated files before sharing.
+- Why: handwritten command metadata and an uncontrolled inherited shell can hide dependencies and reproduce a different build.
+- Check: project instructions and per-run execution receipts agree; the runner captures actual subprocesses/version output and public environment configuration. Secret argv is rejected and captured output is redacted for provisioned secret values; other files require review.
+
+### R-275 Detailed handoff and cold replay
+MUST deliver a detailed bilingual sim/README.md and state the exact replay case/configuration/seed/observable scope. Never accept handwritten cold_replay=pass. Require a fresh snapshot-bound build and simulation, actual successful command receipts, new build/result artifacts, completed checked cases, matching tool versions and an explicit comparison with a registered original execution of the same baseline before claiming replay success. Qualify result producers; report unavailable replay as not_run and failures as fail. Keep package integrity, executed replay, measured closure and human sign-off separate.
+- Why: stale logs, exit code zero, unchecked results or one smoke case cannot prove campaign reproducibility.
+- Check: execute/replay use retained helper/runner, fresh run IDs and isolated variables; check reconciles receipts, case scope and exact normalized results. The self-tests cover missing history/dependencies, false replay metadata and actual subprocess success/failure. Hashes/receipts do not authenticate an untrusted producer or prove exhaustive hardware correctness.

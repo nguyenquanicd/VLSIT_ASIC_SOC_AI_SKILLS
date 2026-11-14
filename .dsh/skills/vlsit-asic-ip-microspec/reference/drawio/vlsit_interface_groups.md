@@ -1,5 +1,9 @@
 # Interface group catalog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Finite-State Machine (FSM); Advanced Peripheral Bus (APB). See the [skill glossary](../vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Reference only. `rule.md` (RHD-058, RHD-059, RHD-078) takes precedence. The catalog is a non-exhaustive set of names and identification hints. Use a name only when the RTL evidence satisfies RHD-035/073. Add entries only after user approval (RHD-078).
 
 | Interface name | Category | Typical signals (present and connected only) | Identification evidence | Usual active side |

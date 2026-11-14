@@ -6,6 +6,9 @@ compatibility: "Python 3.8 or later, standard library only, no network access, n
 
 # Reset domain crossing review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC); Application-Specific Integrated Circuit (ASIC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Review the reset structure of a design from three independent sources — the RTL, the
 SDC and the tool reports — and deliver one English report whose every verdict names a
 reset domain, a numbered crossing, a mechanism and the risk of accepting it.

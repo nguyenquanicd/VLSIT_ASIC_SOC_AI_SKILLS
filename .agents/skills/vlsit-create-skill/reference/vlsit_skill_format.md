@@ -1,5 +1,9 @@
 # Skill format: shared facts and repository integration
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Application Programming Interface (API). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Checked on 2026-10-16 against the official pages:
 [Claude Code skills](https://code.claude.com/docs/en/skills) and
 [Codex skills](https://learn.chatgpt.com/docs/build-skills). Tool documentation

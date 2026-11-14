@@ -11,7 +11,7 @@ Actions:
   check   validate the schema, vocabulary, traceability edges, evidence links
           and waiver fields of a vplan CSV.
   export  write the plan as a Markdown table or JSON.
-  stats   print counts by level and status and requirement coverage.
+  stats   print inventory/status counts; never grants measured closure.
 
 Standard library only (Python 3.8 or later). Exit codes: 0 success, 1 findings,
 2 bad input.
@@ -29,7 +29,7 @@ REQUIRED_COLUMNS = [
     "req_id", "level", "feature", "scenario", "stimulus", "checker",
     "coverage_bin", "test", "priority", "status", "evidence", "owner",
 ]
-OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "notes"]
+OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "notes", "obligation_id", "configuration", "dimension"]
 ALLOWED_LEVELS = {"component", "vip", "block", "soc"}
 ALLOWED_PRIORITIES = {"high", "medium", "low"}
 ALLOWED_STATUSES = {"planned", "implemented", "passing", "failing", "blocked", "waived"}
@@ -99,6 +99,8 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
     if "test_type" not in columns:
         add("INFO", "-", "test_type column is absent; R-250 to R-253 are manual")
 
+    if not spec_index:
+        raise PlanError("--spec-index is required; use the approved in-scope requirement and protocol inventory")
     known_requirements = None
     if spec_index:
         index_path = Path(spec_index)
@@ -132,6 +134,8 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
         line = row["_line"]
         for name in REQUIRED_COLUMNS:
             if not row.get(name, ""):
+                if name == "checker" and row.get("assertion"):
+                    continue
                 if name == "evidence" and row.get("status") != "passing":
                     continue
                 if name == "coverage_bin" and row.get("assertion"):
@@ -154,7 +158,7 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
         if test_type and test_type not in ALLOWED_TEST_TYPES:
             add("ERROR", line, "test_type '%s' is not one of %s" % (test_type, ", ".join(sorted(ALLOWED_TEST_TYPES))))
         if test_type == "combined":
-            functions = [item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()]
+            functions = {item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()}
             if len(functions) < 2:
                 add("ERROR", line, "combined test must name at least two functions in combines")
 
@@ -166,7 +170,7 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
             add("ERROR", line, "row has no test")
 
         req_id = row.get("req_id", "")
-        if known_requirements is not None and req_id and not req_id.startswith("PROTO-"):
+        if known_requirements is not None and req_id :
             if req_id not in known_requirements:
                 add("ERROR", line, "requirement '%s' is not in the specification index" % req_id)
 
@@ -211,6 +215,16 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
         if evidence_path is None and evidence:
             add("INFO", line, "evidence bundle existence was not checked (no --evidence-root)")
 
+    planned_requirements = {row.get("req_id") for row in rows}
+    for missing in sorted(known_requirements - planned_requirements):
+        add("ERROR", "-", "in-scope requirement missing from plan: %s" % missing)
+    if not known_requirements:
+        add("ERROR", "-", "specification index is empty")
+    for prefix, planned in (("test", plan_tests), ("coverage bin", plan_bins), ("assertion", plan_assertions)):
+        if scan_root:
+            for missing in sorted(planned - scanned):
+                add("WARN", "-", "%s referenced by plan was not found in scanned sources: %s" % (prefix, missing))
+
     if scanned:
         for missing in sorted(scanned - plan_tests):
             if missing.startswith("t_"):
@@ -228,7 +242,7 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
     if errors:
         print("RESULT: FAIL")
         return 1
-    print("RESULT: PASS")
+    print("RESULT: PASS (plan validation only; verification closure is not established)")
     return 0
 
 
@@ -260,7 +274,7 @@ def export_plan(path, output, fmt, force):
     return 0
 
 
-def plan_stats(path, evidence_root):
+def plan_stats(path, evidence_root, spec_index):
     _columns, rows = read_rows(path)
     by_level = Counter(row.get("level", "") for row in rows)
     by_status = Counter(row.get("status", "") for row in rows)
@@ -271,12 +285,15 @@ def plan_stats(path, evidence_root):
         if not req:
             continue
         requirements.setdefault(req, set()).add(row.get("status", ""))
-    covered = sum(1 for statuses in requirements.values() if "passing" in statuses)
+    authoritative = {line.strip() for line in Path(spec_index).read_text(encoding="utf-8-sig").splitlines() if line.strip() and not line.strip().startswith("#")}
+    candidates = sum(1 for req in authoritative if req in requirements and requirements[req] == {"passing"})
+    missing = authoritative - set(requirements)
     print("LEVELS: " + ", ".join("%s=%d" % item for item in sorted(by_level.items())))
     print("STATUS: " + ", ".join("%s=%d" % item for item in sorted(by_status.items())))
     if by_type:
         print("TEST TYPES: " + ", ".join("%s=%d" % item for item in sorted(by_type.items())))
-    print("REQUIREMENTS: %d, WITH PASSING ROW: %d" % (len(requirements), covered))
+    print("IN-SCOPE REQUIREMENTS: %d, MISSING FROM PLAN: %d, ALL ROWS MARKED PASSING: %d" % (len(authoritative), len(missing), candidates))
+    print("CLOSURE: NOT ASSESSED; status labels do not establish measured coverage")
     if evidence_root:
         print("EVIDENCE ROOT: %s (existence is checked by the check action)" % evidence_root)
     return 0
@@ -292,7 +309,7 @@ def main(argv=None):
     p_check = sub.add_parser("check", help="validate a vplan")
     p_check.add_argument("vplan", help="path to vplan.csv")
     p_check.add_argument("--evidence-root", help="folder that holds the evidence bundles")
-    p_check.add_argument("--spec-index", help="text file with one requirement ID per line")
+    p_check.add_argument("--spec-index", required=True, help="text file with one requirement ID per line")
     p_check.add_argument("--scan-root", help="source tree to scan for orphan t_, cg_ and a_ identifiers")
     p_check.add_argument("--today", help="date for waiver expiry checks (YYYY-MM-DD, default: today)")
 
@@ -304,6 +321,7 @@ def main(argv=None):
 
     p_stats = sub.add_parser("stats", help="print plan statistics")
     p_stats.add_argument("vplan", help="path to vplan.csv")
+    p_stats.add_argument("--spec-index", required=True, help="approved in-scope inventory, one ID per line")
     p_stats.add_argument("--evidence-root", help="folder that holds the evidence bundles")
 
     args = parser.parse_args(argv)
@@ -319,8 +337,8 @@ def main(argv=None):
             return check_plan(Path(args.vplan), args.evidence_root, args.spec_index, args.scan_root, today)
         if args.action == "export":
             return export_plan(Path(args.vplan), args.output, args.format, args.force)
-        return plan_stats(Path(args.vplan), args.evidence_root)
-    except PlanError as error:
+        return plan_stats(Path(args.vplan), args.evidence_root, args.spec_index)
+    except (PlanError, OSError, ValueError) as error:
         print("ERROR %s" % error)
         return 2
 

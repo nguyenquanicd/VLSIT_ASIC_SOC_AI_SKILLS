@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later. Standard library for most scripts; openpyxl 
 
 # ASIC IP micro-specification
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Value Change Dump (VCD); Application-Specific Integrated Circuit (ASIC); Finite-State Machine (FSM); Advanced Peripheral Bus (APB). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Guides the user from an idea to a complete ASIC IP design specification in the VLSIT template. The authoritative specification is Markdown; equations use TeX math, figures use relative Markdown image links, and Pandoc can create optional DOCX and PDF deliverables. The workflow asks questions with options and examples, grounds protocol statements in converted standards, studies evidence-backed reference IP, fills the CSR workbook, describes every signal, and creates sourced block/FSM diagrams and user-confirmed waveforms. It does not write RTL.
 
 Reply to the user in the language the user writes; write the specification in English (rule R-005).

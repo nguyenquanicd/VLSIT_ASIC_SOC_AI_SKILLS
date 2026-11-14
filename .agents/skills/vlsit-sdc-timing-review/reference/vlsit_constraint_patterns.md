@@ -1,5 +1,9 @@
 # Constraint patterns
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The constraint that matches each CDC structure, the exception that is legitimate, and the
 anti-pattern that hides a real path. Read it at step 7.
 

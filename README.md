@@ -1,5 +1,10 @@
 # VLSIT Skill Library / Thư viện skill VLSIT
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** See [Terminology and abbreviations](GLOSSARY.md) and each skill's local glossary. For example, Bus Functional Model (BFM) models bus transactions, while Verification IP (VIP), Verilog Procedural Interface (VPI) and Direct Programming Interface (DPI) have different roles.
+
+**VI:** Xem [thuật ngữ và từ viết tắt](GLOSSARY.md) cùng glossary của từng skill. BFM là Bus Functional Model (mô hình giao tiếp bus); cần phân biệt VIP với VPI và DPI.
+<!-- VLSIT_TERMINOLOGY_END -->
 **EN** — Eighteen engineering skills for ASIC, RTL, verification, documentation and design review. Each skill is stored in three repository discovery trees: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex, and `.dsh/skills/` for DeepSeek Harness.
 
 **VI** — Mười tám skill cho thiết kế ASIC, RTL, verification, tài liệu và review. Mỗi skill có trong ba cây để công cụ nhận diện: `.claude/skills/` cho Claude Code, `.agents/skills/` cho Codex và `.dsh/skills/` cho DeepSeek Harness.
@@ -33,7 +38,7 @@ See [SKILLS_CONSOLIDATION_REPORT.md](SKILLS_CONSOLIDATION_REPORT.md) for the aud
 | [`vlsit-sdc-timing-review`](.agents/skills/vlsit-sdc-timing-review/README.md) | **EN:** Review SDC constraints and timing evidence against RTL and specification. **VI:** Review ràng buộc SDC và timing theo RTL và đặc tả. | Timing review and violation ownership / Báo cáo timing và phân loại xử lý |
 | [`vlsit-soc-review`](.agents/skills/vlsit-soc-review/README.md) | **EN:** Review SoC connectivity and integration evidence. **VI:** Review kết nối SoC và evidence tích hợp. | SoC review bundle and findings / Bộ báo cáo SoC và findings |
 | [`vlsit-spec-to-docx`](.agents/skills/vlsit-spec-to-docx/README.md) | **EN:** Convert a Markdown specification into the VLSIT DOCX template and review its layout. **VI:** Chuyển đặc tả Markdown sang template DOCX VLSIT và soát bố cục. | Updated Markdown, DOCX and render evidence / Markdown, DOCX và evidence render |
-| [`vlsit-verification-generator`](.agents/skills/vlsit-verification-generator/README.md) | **EN:** Plan and govern IP verification, VIP, coverage, regressions and evidence. **VI:** Lập kế hoạch và quản trị verification IP, VIP, coverage, regression và evidence. | Verification plan, contracts and evidence report / Kế hoạch, contract và báo cáo evidence |
+| [`vlsit-verification-generator`](.agents/skills/vlsit-verification-generator/README.md) | **EN:** Plan and execute scoped IP verification with or without VIP, C/C++/Python models, requirement/scenario completeness and source-bound schema v2 closure; retain a cataloged `sim/` workspace with dependency review, isolated execution and evidence-bound fresh replay. **VI:** Lập kế hoạch và thực hiện verification có/không có VIP, dùng model C/C++/Python, kiểm đủ requirement/scenario và đóng coverage schema v2 theo receipt, source hash và hợp bin; giữ workspace `sim/` có catalog, review dependency, thực thi cách ly và replay mới có bằng chứng. | Verification plan, lightweight environment, model/closure contracts and evidence report / Kế hoạch, môi trường gọn, model/closure contract và báo cáo evidence |
 | [`vlsit-vhdl-to-systemverilog`](.agents/skills/vlsit-vhdl-to-systemverilog/README.md) | **EN:** Translate a complete VHDL design into synthesizable SystemVerilog under the bundled VLSIT rules. **VI:** Chuyển toàn bộ thiết kế VHDL sang SystemVerilog tổng hợp được theo rule VLSIT đi kèm. | SystemVerilog, source map and rule evidence / SystemVerilog, source map và evidence rule |
 | [`vlsit-wavedrom-waveform`](.agents/skills/vlsit-wavedrom-waveform/README.md) | **EN:** Create offline timing waveforms from a description, VCD or image. **VI:** Tạo waveform ngoại tuyến từ mô tả, VCD hoặc ảnh. | WaveJSON and self-contained HTML / WaveJSON và HTML tự chứa |
 

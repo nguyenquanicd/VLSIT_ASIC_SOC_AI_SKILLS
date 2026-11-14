@@ -6,6 +6,9 @@ compatibility: "Python 3.8 or later, standard library only, no network access, n
 
 # Equivalence check review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Logical Equivalence Checking (LEC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Review a sign-off run from four independent evidences — the setup script, the logs, the
 RTL and the netlist — and deliver one bilingual report whose every finding has a
 severity and whose five deepest fails have a traced cone, a proof and a root cause.

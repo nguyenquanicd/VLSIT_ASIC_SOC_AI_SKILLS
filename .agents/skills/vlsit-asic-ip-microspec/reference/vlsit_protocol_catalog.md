@@ -1,5 +1,9 @@
 # Protocol catalog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Advanced Peripheral Bus (APB); Advanced eXtensible Interface (AXI). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-006 to R-009). Status was observed on 2026-10-18 from this machine; re-check before relying on it.
 
 ## Standards of the first set

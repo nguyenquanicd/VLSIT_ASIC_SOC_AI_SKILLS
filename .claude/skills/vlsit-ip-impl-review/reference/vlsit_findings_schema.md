@@ -1,5 +1,9 @@
 # Findings and matrix format
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The machine-readable half of an implementation review: `findings.json` for the findings and
 `matrix.csv` for the requirement-to-RTL-to-test evidence. Read it at step 11.
 

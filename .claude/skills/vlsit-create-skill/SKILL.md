@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later using the standard library only, and works of
 
 # Create a skill in the house format
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 This skill builds other skills. Every skill it produces has the same four parts, so
 any of them can be read, checked and maintained the same way:
 
@@ -132,6 +135,8 @@ a Check line. Read [reference/vlsit_writing_rules.md](reference/vlsit_writing_ru
 are unsure how to word a rule or how to settle a duplicate or conflict.
 
 ### 8. Write the workflow, reference files and scripts
+
+Apply R-044: define domain abbreviations on first use and add a scoped English glossary; use bilingual explanations in README/guideline files. Spell out Bus Functional Model (BFM), distinguish it from Verification IP (VIP), and do not confuse VIP with Verilog Procedural Interface (VPI). Preserve API and identifier spellings.
 
 - **SKILL.md**: read [reference/vlsit_writing_skill_md.md](reference/vlsit_writing_skill_md.md)
   for the description, the step style and what to keep out of the file. Keep the

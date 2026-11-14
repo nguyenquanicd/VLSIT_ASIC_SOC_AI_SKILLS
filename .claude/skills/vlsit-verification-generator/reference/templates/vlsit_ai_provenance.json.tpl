@@ -1,6 +1,6 @@
 {
   "artifact_id": "vc_apb_master_driver",
-  "artifact_path": "verification/01_component/vc_apb_master_driver/vc_apb_master_driver.sv",
+  "artifact_path": "sim/tb/component/vc_apb_master_driver/vc_apb_master_driver.sv",
   "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "model": {
     "provider": "example",

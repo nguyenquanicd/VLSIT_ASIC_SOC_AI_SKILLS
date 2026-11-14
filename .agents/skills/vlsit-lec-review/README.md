@@ -1,5 +1,16 @@
 # VLSIT LEC Review / Review equivalence check
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| LEC | Logical Equivalence Checking | Kiểm tương đương logic dưới mapping và giả định cụ thể. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 **EN** — Reviews a logic-equivalence run from its setup script, logs, RTL, and netlist. It examines compare-point configuration, constants, black boxes, and `dont_verify` risks; explains tool messages; and traces the first failing compare points to a proven cone and root cause.
 
 **VI** — Review một lần chạy logic-equivalence dựa trên setup script, log, RTL và netlist. Skill kiểm tra cấu hình compare point, constant, black box và rủi ro `dont_verify`; giải thích thông báo công cụ; truy vết các compare point lỗi đầu tiên tới cone và nguyên nhân gốc.

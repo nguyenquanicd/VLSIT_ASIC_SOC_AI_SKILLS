@@ -1,5 +1,9 @@
 # From specification to RTL
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Control and Status Register (CSR); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this when you turn a specification in the VLSIT template into modules.
 
 ## Where each RTL decision comes from

@@ -1,5 +1,15 @@
 # VLSIT RTL Specification Change Implementer
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Purpose / Mục đích
 
 Analyze existing RTL against a new feature request and optional old specification; propose minimal changes, wait for sign-off, then implement the approved plan.

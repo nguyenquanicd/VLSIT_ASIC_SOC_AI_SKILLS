@@ -1,5 +1,9 @@
 # Diagram spec (input of `scripts/vlsit_drawio_frame_diagram.py`)
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON). See the [skill glossary](../vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Reference only; `rule.md` takes precedence. A complete worked example is [example/vlsit_axi_bridge_diagram_spec.json](example/vlsit_axi_bridge_diagram_spec.json). The spec holds the analysis results, so a new design needs only a new JSON file, not new drawing code.
 
 | Field | Meaning |

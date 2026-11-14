@@ -1,5 +1,17 @@
 # VLSIT CDC Review / Review clock domain crossing
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| SDC | Synopsys Design Constraints (timing context) | Trong timing là định dạng ràng buộc Synopsys Design Constraints; trong độ tin cậy có thể là Silent Data Corruption. |
+| CDC | Clock-Domain Crossing | Truyền tín hiệu giữa miền clock; cần phân tích cấu trúc và giả định timing. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 **EN** — Reviews clock-domain crossings using RTL, SDC, CDC tool reports, and waivers as separate evidence. It identifies clock domains and crossing signals, checks synchronization mechanisms and constraints, groups violations by root cause, and assigns a verdict and risk to each finding.
 
 **VI** — Review clock-domain crossing dựa trên RTL, SDC, báo cáo công cụ và waiver như các nguồn bằng chứng độc lập. Skill xác định clock domain và tín hiệu crossing, kiểm tra cơ chế đồng bộ và constraint, nhóm violation theo nguyên nhân gốc, rồi đưa ra verdict và risk cho từng finding.

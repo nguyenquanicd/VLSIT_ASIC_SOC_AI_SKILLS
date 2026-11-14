@@ -1,5 +1,9 @@
 # Writing implementation decisions back into the specification
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are R-046 and R-054 to R-061 in [rule.md](../rule.md). Read this at step 5c.
 
 ## When it applies

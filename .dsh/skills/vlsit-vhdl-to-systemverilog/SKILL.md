@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later; openpyxl is optional for Excel or CSV inputs
 
 # VHDL to SystemVerilog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC); VHSIC Hardware Description Language (VHDL); Finite-State Machine (FSM). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Operating contract
 
 1. Read [rule.md](rule.md) completely before doing anything. Its numbered rules (V2S-xxx) are mandatory and rank above everything else. V2S-010 makes [reference/VLSIT_RTL_Design_Rule.md](reference/VLSIT_RTL_Design_Rule.md) normative; read it in full too.

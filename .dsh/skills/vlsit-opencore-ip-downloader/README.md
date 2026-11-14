@@ -1,5 +1,20 @@
 # VLSIT OpenCores IP Downloader
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| VIP | Verification Intellectual Property (Verification IP) | Bộ thành phần verification tái sử dụng theo phạm vi công bố; phải nêu rõ kiểm tra, coverage và qualification. |
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| IP | Intellectual Property (hardware IP) | Khối thiết kế hoặc tài sản verification tái sử dụng; không nhầm Internet Protocol trong mạng. |
+| VHDL | VHSIC Hardware Description Language | Ngôn ngữ mô tả phần cứng; VHSIC là Very High Speed Integrated Circuit. |
+| ASIC | Application-Specific Integrated Circuit | Vi mạch cho ứng dụng cụ thể; mức sẵn sàng ASIC cần evidence thực tế. |
+| APB | Advanced Peripheral Bus | Bus ngoại vi AMBA; cần nêu phiên bản APB. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Purpose / Mục đích
 
 Find distinct, clearly licensed open-source hardware IP projects with actual RTL and collect their full project packages.

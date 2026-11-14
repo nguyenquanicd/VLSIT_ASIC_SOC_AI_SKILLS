@@ -1,5 +1,9 @@
 # Semantic preservation notes
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Clock-Domain Crossing (CDC); Finite-State Machine (FSM); VHSIC Hardware Description Language (VHDL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Read this reference during baseline analysis and revisit the relevant items for each module. Resolve behavior using the actual VHDL standard, imported package implementation, architecture binding, and selected tool. The original source remains the baseline, including documented defects; corrections require a separately approved redesign.
 
 ## Processes, scheduling, and state

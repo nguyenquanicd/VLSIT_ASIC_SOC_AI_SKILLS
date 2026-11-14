@@ -1,5 +1,9 @@
 # Writing SKILL.md
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Bus Functional Model (BFM); Synopsys Design Constraints (timing context) (SDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md).
 
 ## The description is the trigger
@@ -69,3 +73,7 @@ The template in [templates/vlsit_SKILL.md.tpl](templates/vlsit_SKILL.md.tpl) has
 - requirements phrased as background advice: if it is mandatory, it is a rule;
 - long copies of material that already lives in `reference/`;
 - time-sensitive statements without a date.
+
+## Terminology (R-044)
+
+Define domain abbreviations on first use as Full term (ABBR). Keep a portable local English glossary for multi-term skills, and explain terms bilingually in README files. Resolve ambiguous words such as SDC/SVF/NPU/VPU from the supplied specification or exact tool manual; do not guess. Do not expand or rename code identifiers, schema keys, signal names, rule IDs or brand names. For example, write Bus Functional Model (BFM) before using BFM alone.

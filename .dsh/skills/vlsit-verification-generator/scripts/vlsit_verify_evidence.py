@@ -30,7 +30,7 @@ ALLOWED_DECISIONS = {"approved", "approved_with_changes", "rejected"}
 REQUIRED_TOP = ["project", "level", "artifact", "version", "spec", "tools", "test", "result", "artifacts", "ai", "review"]
 REQUIRED_TOOLS = ["simulator", "simulator_version", "uvm", "os", "compile_options", "run_options", "seed", "timeout_s"]
 REQUIRED_ALWAYS = ["compile.log", "sim.log", "assertions.csv", "review.md"]
-COVERAGE_SUFFIXES = (".xml", ".ucdb")
+COVERAGE_SUFFIXES = (".xml", ".ucdb", ".dat", ".json", ".info", ".csv")
 
 
 class EvidenceError(Exception):
@@ -123,8 +123,8 @@ def build_manifest(args):
     coverage = parse_pairs(args.coverage, "--coverage")
     mutation = parse_pairs(args.mutation, "--mutation")
     vip_versions = parse_pairs(args.vip, "--vip")
-    if args.level in ("block", "soc") and not vip_versions:
-        raise EvidenceError("a %s manifest needs at least one --vip name=version" % args.level)
+    if args.level in ("block", "soc") and not vip_versions and not args.no_vip_reason:
+        raise EvidenceError("a %s manifest needs --vip name=version or --no-vip-reason" % args.level)
     assertions = {
         "total": args.assertions_total,
         "fired": args.assertions_fired,
@@ -147,6 +147,7 @@ def build_manifest(args):
             "compile_options": args.compile_option,
             "run_options": args.run_option,
             "vip_versions": vip_versions,
+            "no_vip_reason": args.no_vip_reason,
             "seed": args.seed,
             "timeout_s": args.timeout_s,
         },
@@ -231,8 +232,8 @@ def check_manifest(path):
         vip_versions = tools.get("vip_versions", {})
         if not isinstance(vip_versions, dict):
             add("ERROR", "tools.vip_versions must be an object")
-        elif level in ("block", "soc") and not vip_versions:
-            add("ERROR", "tools.vip_versions is empty; a %s run must record every VIP version" % level)
+        elif level in ("block", "soc") and not vip_versions and not tools.get("no_vip_reason"):
+            add("ERROR", "tools.vip_versions is empty; a %s run must record VIP versions or tools.no_vip_reason" % level)
 
     result = data.get("result", {})
     if not isinstance(result, dict):
@@ -254,7 +255,7 @@ def check_manifest(path):
                     add("ERROR", "result.assertions.%s must be a non-negative integer" % field)
             if isinstance(assertions.get("total"), int) and assertions.get("total", 0) > 0:
                 if assertions.get("fired", 0) == 0:
-                    add("WARN", "no assertion fired; check non-vacuity (R-203)")
+                    add("WARN", "legacy aggregate assertion counters cannot establish per-property non-vacuity (R-203)")
                 elif assertions.get("fired", 0) < assertions.get("total", 0):
                     add("WARN", "only %s of %s assertions fired" % (assertions.get("fired"), assertions.get("total")))
             if isinstance(assertions.get("failed"), int) and assertions.get("failed", 0) > 0:
@@ -348,7 +349,7 @@ def check_manifest(path):
     if errors:
         print("RESULT: FAIL")
         return 1
-    print("RESULT: PASS")
+    print("RESULT: PASS (artifact validation only; not a verification pass or sign-off)")
     return 0
 
 
@@ -371,10 +372,11 @@ def main(argv=None):
     p_manifest.add_argument("--test", default="", help="test ID")
     p_manifest.add_argument("--simulator", default="", help="simulator name")
     p_manifest.add_argument("--simulator-version", default="", help="simulator version")
-    p_manifest.add_argument("--uvm", default="", help="UVM library version")
+    p_manifest.add_argument("--uvm", default="N/A", help="UVM library version")
     p_manifest.add_argument("--os", default="", help="operating system and version")
     p_manifest.add_argument("--compile-option", action="append", default=[], help="compile option (repeatable; use --compile-option=-sv for leading dashes)")
     p_manifest.add_argument("--run-option", action="append", default=[], help="run option (repeatable; use --run-option=+NAME for leading plus signs)")
+    p_manifest.add_argument("--no-vip-reason", default="", help="supported local BFM/model scope and reason no VIP is used")
     p_manifest.add_argument("--vip", action="append", default=[], help="VIP name=version (repeatable; required for block and soc)")
     p_manifest.add_argument("--seed", default="", help="seed")
     p_manifest.add_argument("--timeout-s", default="", help="test timeout in seconds")

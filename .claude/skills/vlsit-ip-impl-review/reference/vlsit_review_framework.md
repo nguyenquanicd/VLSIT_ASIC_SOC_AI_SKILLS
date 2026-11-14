@@ -1,5 +1,9 @@
 # Review framework
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The criterion for each review area: what a good design must state, the failure that is common in
 practice, and the evidence a reviewer must demand. Read it at step 8 and cite the area name in the
 report chapter.

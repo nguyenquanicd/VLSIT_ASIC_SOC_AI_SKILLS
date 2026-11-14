@@ -1,5 +1,23 @@
 # vlsit-rtl-generator
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| DUT | Design Under Test | Thiết kế và cấu hình cụ thể đang được kiểm chứng. |
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| IP | Intellectual Property (hardware IP) | Khối thiết kế hoặc tài sản verification tái sử dụng; không nhầm Internet Protocol trong mạng. |
+| CSR | Control and Status Register | Thanh ghi điều khiển và trạng thái, thường được phần mềm truy cập. |
+| CDC | Clock-Domain Crossing | Truyền tín hiệu giữa miền clock; cần phân tích cấu trúc và giả định timing. |
+| VCD | Value Change Dump | Định dạng waveform số; cần nêu phạm vi và cửa sổ thời gian. |
+| ASIC | Application-Specific Integrated Circuit | Vi mạch cho ứng dụng cụ thể; mức sẵn sàng ASIC cần evidence thực tế. |
+| FSM | Finite-State Machine | Máy trạng thái hữu hạn; coverage trạng thái chưa đủ kiểm hành vi. |
+| APB | Advanced Peripheral Bus | Bus ngoại vi AMBA; cần nêu phiên bản APB. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 Generates synthesizable SystemVerilog design RTL from a specification written in the VLSIT ASIC IP specification template, or changes existing RTL after the designer approves a change plan. Every file follows the bundled `reference/VLSIT_RTL_Design_Rule.md` (v2), unless the user supplies a different rule file. The result is checked by a rule checker (`scripts/vlsit_rtl_check.py`) and by lint (`scripts/vlsit_lint_rtl.py`), and the final report is given by rule ID. For an IP with software-visible registers it builds the CSR block from the CSR workbook with APB-CSR-Generator (`scripts/vlsit_csr_generate.py`, submodule `APB-CSR-Generator` of `VLSIT_RTL_Generator_AI_Model`) and never writes that RTL by hand. Open points of the specification are never guessed: the skill asks the designer with options and examples.
 
 Tạo RTL SystemVerilog tổng hợp được từ specification theo mẫu ASIC IP của VLSIT, hoặc sửa RTL có sẵn sau khi designer duyệt kế hoạch thay đổi. Mọi file tuân theo `VLSIT_RTL_Design_Rule.md` (v2). Kết quả được kiểm bằng script kiểm rule (`scripts/vlsit_rtl_check.py`) và lint (`scripts/vlsit_lint_rtl.py`), báo cáo cuối theo ID quy tắc. Điểm chưa rõ trong specification không bao giờ bị đoán: skill hỏi designer kèm các lựa chọn và ví dụ.

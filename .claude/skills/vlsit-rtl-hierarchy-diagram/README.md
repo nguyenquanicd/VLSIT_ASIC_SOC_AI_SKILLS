@@ -1,5 +1,18 @@
 # VLSIT RTL Hierarchy Diagram
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| FSM | Finite-State Machine | Máy trạng thái hữu hạn; coverage trạng thái chưa đủ kiểm hành vi. |
+| APB | Advanced Peripheral Bus | Bus ngoại vi AMBA; cần nêu phiên bản APB. |
+| AXI | Advanced eXtensible Interface | Họ giao diện AMBA; phải phân biệt AXI, AXI-Lite và AXI-Stream cùng phiên bản. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Purpose / Mục đích
 
 Trace an existing RTL design from its top module through submodules and show hierarchy and important functional connections in an editable Draw.io diagram.

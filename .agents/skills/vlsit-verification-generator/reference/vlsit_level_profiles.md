@@ -1,17 +1,21 @@
 # Verification level profiles
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Register-Transfer Level (RTL); Design Under Test (DUT). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this file after selecting a level and before writing an artifact.
 
 ## 1. The four levels
 
 | Level | Unit under verification | Composed of | Primary question | Sign-off evidence |
 |---|---|---|---|---|
-| Component | One UVM component or a tightly coupled component group | Nothing below it | Does this component do one thing correctly, with a stable contract? | Compile, lint, self-test, assertion hits, mutation, component coverage |
+| Component | One driver, monitor, checker or tightly coupled component group | Nothing below it | Does this component do one thing correctly, with a stable contract? | Compile, lint, self-test, assertion hits, mutation, component coverage |
 | VIP | One protocol or IP verification package | Many components | Is the protocol or IP verified, reusable and qualifiable? | Compliance suite, VIP self-testbench, protocol coverage, mutation, manifest, integration guide |
-| Block | One subsystem or DUT | Many VIPs plus block-specific models | Does the block meet its specification end to end? | Block vplan closure, reference-model checks, assertions, formal where applicable, regression, mutation |
+| Block | One subsystem or DUT | Scoped agents or VIPs plus block-specific models | Does the block meet its specification end to end? | Block vplan closure, reference-model checks, assertions, formal where applicable, regression, mutation |
 | SoC/system | One chip or system | Many blocks plus processor, firmware and system infrastructure | Does the system work for its use cases, including hardware and software interaction? | Boot tests, use-case coverage, system scoreboard, performance, security and power checks, regression, post-silicon plan |
 
-The hierarchy is compositional. A VIP contains components, a block contains VIPs, and a SoC contains blocks. A defect at a lower level propagates upward, and a missing check at a lower level cannot be recovered by more tests at a higher level.
+The hierarchy is compositional. A VIP contains components, a block may use local agents or VIPs, and a SoC contains blocks. A defect at a lower level propagates upward, and a missing check at a lower level cannot be recovered by more tests at a higher level.
 
 ### 1.1 Test design at every level
 
@@ -19,7 +23,7 @@ Rules R-250 to R-259 apply at every level, not only to block and SoC tests:
 
 - Combine functions in one test when the specification allows them to run together (R-250).
 - Bound every random value by the specification or protocol clause (R-251).
-- Add only tests that bring unique coverage bins, and merge tests when debug resolution survives (R-252).
+- Select using coverage gain, runtime, risk and bug-detection diversity; preserve bug regressions and merge when debug resolution survives (R-252).
 - Inject a fault into every safety mechanism and error path; a DCLS design needs a one-core mismatch test (R-253).
 - Reuse an existing VIP where one fits, and report before creating or changing a VIP (R-254, R-256).
 - Verify against the protocol standard and report every design deviation (R-255).
@@ -29,15 +33,7 @@ Read `vlsit_test_design_guide.md` for the method and examples.
 
 ## 2. Level selection
 
-Apply these rules in order:
-
-1. The request names a chip, SoC, boot, firmware, processor or accelerator model, memory map or system use case: select **SoC**.
-2. The request names a block, subsystem, DUT, interconnect or several protocols inside one DUT: select **block**.
-3. The request names a protocol VIP, a protocol agent set or a reusable package for one protocol: select **VIP**.
-4. The request names one UVM class or component, such as a driver, monitor, scoreboard, coverage collector or sequence: select **component**.
-5. The request is ambiguous: ask one question with the four options and one concrete example of each.
-
-Record the level and the reason in the run record. A later change of level is a scope change and returns to gate G0.
+Select by DUT boundary and intended reuse, following SKILL.md step 3 and R-261. Standalone CPU/accelerator/codec IPs are block-level DUTs unless system integration is the target. Reusable BFMs and monitors can be plain SystemVerilog, C++ or Python; UVM is optional. A block may use local agents rather than released VIPs. Apply release/qualification requirements only when releasing a VIP. Read vlsit_large_ip_verification.md for the lightweight path.
 
 ## 3. Question format
 
@@ -74,11 +70,11 @@ Do not ask a question whose answer is already in the specification or the protoc
 | G5 | Coverage closure approved | Closure report, exclusions, waivers | Verification lead |
 | G6 | Sign-off | Evidence bundle, clean regression, residual risk | Project lead |
 
-A gate record in `00_plan/signoff.md` contains the gate ID, the date, the approver, the decision, the evidence bundle ID and any condition. An AI model never signs a gate (R-230).
+A gate record in `sim/docs/00_plan/signoff.md` contains the gate ID, the date, the approver, the decision, the evidence bundle ID and any condition. An AI model never signs a gate (R-230).
 
 ## 5. Component profile
 
-**Scope:** one reusable UVM component or a tightly coupled group with one contract.
+**Scope:** one reusable verification component (plain SV/C++/Python or UVM) or a tightly coupled group with one contract.
 
 **Inputs:** the specification requirement IDs, the protocol clause table, the component's role, the transaction type and the integration contract.
 
@@ -93,15 +89,15 @@ A gate record in `00_plan/signoff.md` contains the gate ID, the date, the approv
 **Steps:**
 
 1. Write the contract and review it before coding.
-2. Start from the project's UVM template; keep one responsibility.
-3. Compile and lint against the pinned UVM library.
+2. Use the reviewed project API; use the project's UVM template only when UVM is selected.
+3. Compile and lint with the pinned dependencies; use UVM libraries only when selected.
 4. Build a minimal self-testbench with a stub DUT or a protocol checker.
 5. Run reset, normal transfer, backpressure, error and boundary tests.
 6. Inject at least three specification-relevant faults and record which check catches each one. Record an equivalent mutant with a reason.
 7. Measure assertion hits and component coverage.
 8. Freeze the API, document the limitations and request G2 if the component is released as reusable.
 
-**Exit criteria:** compile and lint clean; self-test passes; every assertion fires; mutation report exists; contract and limitations documented; API reviewed.
+**Exit criteria:** compile and lint clean; self-test passes; applicable properties have reviewed activity/non-vacuity evidence; mutation report exists; contract and limitations documented; API reviewed.
 
 ## 6. VIP profile
 
@@ -135,7 +131,7 @@ A gate record in `00_plan/signoff.md` contains the gate ID, the date, the approv
 
 ## 7. Block profile
 
-**Scope:** one subsystem or DUT with several interfaces and VIPs.
+**Scope:** one subsystem or DUT with interfaces and scoped agents or VIPs.
 
 **Inputs:** the block specification, the SoC interface contract, the VIP manifests and the memory map.
 
@@ -151,8 +147,8 @@ A gate record in `00_plan/signoff.md` contains the gate ID, the date, the approv
 
 1. Build the block vplan: features, scenarios, checks, coverage, assertions, formal, performance and power obligations.
 2. Review the topology: interfaces, VIP roles, clocks, resets, memory map, scoreboard placement and virtual sequencer.
-3. Instantiate the pinned VIPs and connect the reference model and scoreboard.
-4. Write virtual sequences for multi-VIP scenarios; keep cross-agent coordination explicit.
+3. Instantiate scoped local agents or pinned VIPs and connect the independently qualified model and scoreboard.
+4. Coordinate multi-agent scenarios using a small explicit scheduler or an existing virtual sequencer.
 5. Bind assertions to interfaces and block-level properties.
 6. Run smoke, directed and constrained-random tests; close functional and assertion coverage.
 7. Inject end-to-end faults and verify that the block scoreboard, not only the VIP checkers, detects them.
@@ -229,7 +225,7 @@ AI may cluster logs, search waveforms and propose hypotheses, but the root-cause
 | Protocol deviations | Deviation table | Design lead and verification lead |
 | VIP creation or update decisions | VIP change report | Project lead |
 | Force report | Force table and static review | Verification lead |
-| Single verification report | `verification/verification_report.md` | Verification lead |
+| Single verification report | `sim/docs/verification_report.md` | Verification lead |
 | Tool and version manifest | Evidence manifest | DV infrastructure |
 | AI provenance, if used | AI records | Reviewer |
 | Post-silicon correlation, SoC only | Plan | System lead |

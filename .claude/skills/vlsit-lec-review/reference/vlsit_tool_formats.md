@@ -1,5 +1,9 @@
 # Setup and log syntax of the three tools
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Logical Equivalence Checking (LEC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Each parser reads one tool and writes the same two models: `lec_config.json` (commands,
 dont_verify, constants, mapping, cells, black boxes) and `lec_log.json` (messages and
 failing compare points). One parser per tool (rule R-033).

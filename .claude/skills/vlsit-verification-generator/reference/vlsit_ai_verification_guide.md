@@ -1,5 +1,9 @@
 # AI-assisted verification guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Register-Transfer Level (RTL); SystemVerilog Assertions (SVA). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this file before using an AI model for any verification artifact.
 
 ## 1. What the evidence supports

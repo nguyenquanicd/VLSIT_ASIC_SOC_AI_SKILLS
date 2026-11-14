@@ -1,5 +1,9 @@
 # Reference-IP criteria and research log
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Intellectual Property (hardware IP) (IP); Universal Verification Methodology (UVM). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-010 to R-012).
 
 ## Evidence that counts

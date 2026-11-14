@@ -1,5 +1,9 @@
 # CSR workbook
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-016).
 
 The workbook `templates/VLSIT_CSR_Specification_Template.xlsx` has three sheets: `CSR` (synchronous), `ASYNC_CSR` (asynchronous bus-to-register domain) and `Register_Description` (register types). Each of the first two has `Table - Configuration` (A2:C8) and `Table - Register Definition` (from row 15).

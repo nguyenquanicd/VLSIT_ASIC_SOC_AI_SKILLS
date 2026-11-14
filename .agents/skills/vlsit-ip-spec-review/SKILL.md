@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later using the standard library only. Optional web
 
 # ASIC IP specification review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC); Application-Specific Integrated Circuit (ASIC); Advanced Peripheral Bus (APB); System on Chip (SoC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Review one IP specification and report whether the design is worth building, where it departs
 from its standards, how it compares with commercial practice, and what must change before
 integration or tapeout. The review never invents a fact: every statement is labelled `FACT` with

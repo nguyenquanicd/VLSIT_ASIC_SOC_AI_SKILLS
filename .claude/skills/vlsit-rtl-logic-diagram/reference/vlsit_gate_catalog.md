@@ -1,5 +1,9 @@
 # Gate catalogue
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The drawing uses the symbol library `reference/drawio/VLSIT_DRAWIO_LIB_LOGIC.xml`. It
 is the VLSIT library `VLSIT_DRAWIO_LIB_V1.drawio.xml` of `vlsit-asic-ip-microspec`
 (SHA-256 `D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6`, 39

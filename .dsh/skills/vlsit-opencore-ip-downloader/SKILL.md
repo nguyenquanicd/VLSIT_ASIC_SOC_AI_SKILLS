@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later. Uses network access for public catalog searc
 
 # VLSIT OpenCores IP Search and Download
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); VHSIC Hardware Description Language (VHDL); Application-Specific Integrated Circuit (ASIC); Advanced Peripheral Bus (APB). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 ## Operating contract
 
 1. Read [rule.md](rule.md) completely before doing anything. Its numbered rules (OCI-xxx) are mandatory and rank above everything else.

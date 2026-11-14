@@ -1,5 +1,9 @@
 # Protocol role dictionary
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Intellectual Property (hardware IP) (IP); Hardware Architecture Specification (HAS); Design for Test (DFT). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The dictionary gives the role of a signal from its name. The review compares the role at
 the source with the role at the destination (rule R-018); when a name is not listed, the
 HAS and then the IP specification are consulted, and failing both the finding is marked

@@ -1,5 +1,9 @@
 # Review gate policy
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Logical Equivalence Checking (LEC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Seven methods, one shared script (`vlsit_review_gate.py`), applied to every review skill.
 The gate is what turns a report into a decision.
 

@@ -1,5 +1,9 @@
 # WaveJSON cheat sheet
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: JavaScript Object Notation (JSON). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). WaveJSON written for this skill is strict JSON (double quotes, no comments, no trailing commas).
 
 ## Structure

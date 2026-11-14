@@ -6,6 +6,9 @@ compatibility: "Python 3.8 or later, standard library only, no network access, n
 
 # RTL logic diagram and functional analysis
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Turn a set of synthesizable Verilog or SystemVerilog files into evidence: a hierarchy
 and interface JSON, a gate-level logic diagram with the fewest crossings, one SVG per
 page, and a function description per module. The RTL is read-only; the comment-free

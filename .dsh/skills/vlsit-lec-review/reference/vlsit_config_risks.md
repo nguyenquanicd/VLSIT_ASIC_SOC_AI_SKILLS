@@ -1,5 +1,9 @@
 # Configuration risk catalogue
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Design for Test (DFT). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Every entry of the setup that removes logic or fixes a value is a risk, and each one gets
 one severity (rule R-019). The table is the default; the review may raise a severity with
 the evidence that justifies it.

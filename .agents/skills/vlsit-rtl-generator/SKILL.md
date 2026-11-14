@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later, standard library only, except the CSR step: 
 
 # VLSIT RTL generator
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Design Under Test (DUT); Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Clock-Domain Crossing (CDC); Value Change Dump (VCD); Application-Specific Integrated Circuit (ASIC); Finite-State Machine (FSM); Advanced Peripheral Bus (APB). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 This skill writes synthesizable SystemVerilog design RTL from a specification that follows the VLSIT ASIC IP specification template, or changes existing RTL after the designer approves a plan. Every file follows the VLSIT RTL design rules, and the result is checked by a rule-check script and by lint. It writes a simulation testbench with protocol assertions only when the designer asks for one, always from the specification and the protocol standards and never from the RTL, and it never decides an open point of the specification by itself: it asks the designer.
 
 Reply to the user in the language they use.

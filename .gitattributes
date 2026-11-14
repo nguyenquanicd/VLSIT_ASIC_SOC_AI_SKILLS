@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Portable shell locators must retain LF on Windows checkouts.
+*.sh text eol=lf

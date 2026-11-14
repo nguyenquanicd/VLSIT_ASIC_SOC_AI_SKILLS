@@ -1,5 +1,9 @@
 # Writing guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 How to write the content that goes into the template. Read it at step 7. It is guidance; the
 mandatory statements are the rules [rule.md](../rule.md), especially R-006 to R-011.
 

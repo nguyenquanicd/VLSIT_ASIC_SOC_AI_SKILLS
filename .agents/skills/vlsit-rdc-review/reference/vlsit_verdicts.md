@@ -1,5 +1,9 @@
 # Grouping and verdicts
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 ## Grouping by root cause (rule R-021)
 
 Two violation records join one group when one of these holds:

@@ -1,5 +1,9 @@
 # Test design and reporting guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Intellectual Property (hardware IP) (IP); Advanced Peripheral Bus (APB). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this file when selecting tests, designing stimulus, injecting faults, reusing or building a VIP, or writing the verification report. Rules R-250 to R-259 apply at every level.
 
 ## 1. Combined-function tests (R-250)
@@ -18,7 +22,7 @@ Example: an APB component with a write path, a read path and an error path. A di
 
 ## 2. Constrained-random stimulus (R-251)
 
-Random stimulus is legal only when every random value is bounded by the specification or the protocol standard. Unconstrained random produces illegal traffic, shallow coverage and false failures.
+Declare domains from the contract. Full-width random payload data is legal when the complete domain is legal. Keep negative traffic in scenarios with explicit violated rules and expected error/recovery checks; do not constrain away specified error paths.
 
 For each constrained-random test record:
 
@@ -42,7 +46,7 @@ Method:
 2. Map each bin to the smallest set of tests that reaches it.
 3. For each new test, state which bins it adds that no earlier test reaches.
 4. Merge two tests when the merge adds no debug cost, and keep them separate when a failure would be ambiguous.
-5. Delete a test that adds no unique bin, unless it is a directed check of a high-risk requirement.
+5. Retain bug regressions, distinct checker/mutation tests, required stress and high-risk directed tests even without new bins. Record the reason before deleting or merging any other redundant test.
 
 The coverage report shows the incremental bins gained by each test, so a test with zero unique bins is visible. Debug resolution is the limit on merging: one test that covers five functions but cannot say which one failed is worse than two tests that can.
 
@@ -144,7 +148,7 @@ A static review of the testbench finds every `force` and `release` and compares 
 
 ## 10. One verification report (R-259)
 
-Deliver one file, `verification/verification_report.md`, built from `templates/vlsit_verification_report.md.tpl`. It contains:
+Deliver one file, `sim/docs/verification_report.md`, built from `templates/vlsit_verification_report.md.tpl`. It contains:
 
 - Identification: project, artifact, version, level, specification revision, protocol revision, tools, date.
 - Scope: what is verified and what is not.
@@ -162,3 +166,7 @@ Deliver one file, `verification/verification_report.md`, built from `templates/v
 - Attachments: paths and hashes of evidence bundles and logs.
 
 Every exception in the report has a reason. A report that says "waived" or "excluded" without a reason is incomplete, even when every test passes. Supporting files may be linked, but the report itself must let a reviewer see the whole verification state without opening them.
+
+## 11. Large IP and measured closure
+
+Use [vlsit_large_ip_verification.md](vlsit_large_ip_verification.md) for no-VIP verification and C/C++/Python reference models. Use [vlsit_closure_contract.md](vlsit_closure_contract.md) for explicit obligations and measured results. Combined scenarios are selected for interaction risk rather than every legal feature cross product.

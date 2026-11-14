@@ -1,5 +1,9 @@
 # Validation and report contract
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 ## Rule evidence matrix
 
 Read the complete bundled rule before using its matrix. scripts/vlsit_create_rule_matrix.py creates rule_compliance.json from that exact document and records SHA-256. The helper includes numbered rules/prohibitions and supporting table, list, and naming instructions. Auxiliary AUX identifiers belong to the helper, not the original rule.

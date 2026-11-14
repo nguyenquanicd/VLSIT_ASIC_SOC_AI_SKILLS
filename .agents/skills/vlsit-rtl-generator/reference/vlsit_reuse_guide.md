@@ -1,5 +1,9 @@
 # Reusing the library common_rtl
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are R-037 and R-049 to R-053 in [rule.md](../rule.md). Read this before step 4c of the workflow.
 
 ## 1. What the library is

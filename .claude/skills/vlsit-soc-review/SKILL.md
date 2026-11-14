@@ -6,6 +6,9 @@ compatibility: "Python 3.8 or later; standard library plus python-docx and PyMuP
 
 # SoC top-level integration review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Hardware Architecture Specification (HAS); Advanced Peripheral Bus (APB); Advanced eXtensible Interface (AXI); System on Chip (SoC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Review the chip top from the architecture specification down to every wire: the maps
 that software will use, the tree of instances, the function of both ends of every
 connection, and the four defects lint never sees — a wrong protocol connection, a

@@ -1,5 +1,9 @@
 # Log causes and fixes
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Every message gets a cause and a fix (rule R-022). The table is the default; the parser
 fills `cause` and `fix` from these patterns and marks an unmatched message
 `cause: unknown` for the reviewer to fill.

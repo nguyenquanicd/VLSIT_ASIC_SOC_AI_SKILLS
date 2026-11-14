@@ -1,5 +1,9 @@
 # Tool baseline guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Bus Functional Model (BFM); Verification Intellectual Property (Verification IP) (VIP); Universal Verification Methodology (UVM). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this file when recording the tools that a project uses.
 
 ## 1. Why a tool baseline
@@ -56,11 +60,11 @@ tools:
     version: "24H2"
 ```
 
-The Phase 1 regression and coverage scripts use this file through a small adapter: the script calls the command named here instead of hard-coding a vendor command. A missing tool is reported as `not run`; the skill does not install it without the user's agreement.
+Generate and review project-specific run/report adapters for the recorded tool commands. A universal vendor adapter is not bundled. Record normalizer revisions and compare their output against raw logs before closure. A missing tool is reported as `not run`; the skill does not install it without the user's agreement.
 
 ## 4. Discovery
 
-The skill does not search the disk for proprietary tools. It reports what the project records and what is visible in `PATH` when a Phase 1 script asks. A safe discovery command list is:
+The skill does not search the disk for proprietary tools. It reports what the project records and what is visible in `PATH` during project setup. A safe discovery command list is:
 
 ```sh
 command -v vcs xrun vsim verilator iverilog
@@ -73,7 +77,7 @@ On Windows PowerShell, use `Get-Command` with the same names. A tool found in `P
 
 ## 5. Version pinning
 
-- Pin the simulator, UVM library and VIP versions in every run manifest.
+- Pin the simulator and all dependencies actually used; mark UVM/VIP N/A when a local BFM/model is used.
 - Pin the Python version used by the skill scripts when a result depends on the script.
 - Record the version of every third-party VIP and model.
 - A version change is a change event: re-run the affected checks and create a new evidence bundle (R-116).
@@ -91,7 +95,7 @@ When a required tool is missing:
 
 - Every tool has an exact version.
 - The compile and run options are recorded.
-- The UVM library and VIP versions are pinned.
+- Used UVM/VIP/model versions are pinned; no-VIP scope and model/compiler/binding hashes are recorded.
 - The coverage format and merge command are recorded.
 - The formal tool and version are recorded when formal checks are required.
 - The Python and OS versions are recorded.

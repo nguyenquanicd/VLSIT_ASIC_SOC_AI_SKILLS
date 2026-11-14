@@ -1,5 +1,9 @@
 # VLSIT FSM diagram rules (section 10.1)
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON); Finite-State Machine (FSM). See the [skill glossary](../vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance for rules R-068 to R-071. The mandatory requirements are in [rule.md](../../rule.md); this file explains how `scripts/vlsit_fsm_diagram.py` implements them. The block diagram of section 5.2 follows [vlsit_diagram_rules.md](vlsit_diagram_rules.md) instead.
 
 ## 1. Input: the FSM spec JSON

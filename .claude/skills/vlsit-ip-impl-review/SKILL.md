@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later using the standard library only. Optional Ver
 
 # ASIC IP implementation review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC); Reset-Domain Crossing (RDC); Application-Specific Integrated Circuit (ASIC); Finite-State Machine (FSM); Advanced Peripheral Bus (APB); System on Chip (SoC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Answer one question: **does the RTL implement what the specification says, and does the evidence
 prove it?** The review reads the specification, the RTL and every verification, lint, CDC, RDC,
 SDC and synthesis artefact that exists, builds a consistency matrix, and reports the gaps with a

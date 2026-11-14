@@ -1,5 +1,8 @@
 # Rules
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 These rules are mandatory every time this skill runs, and they describe what every skill it creates must satisfy. When this file, SKILL.md and a file in `reference/` differ, this file wins.
 
 Each rule has a permanent ID that is never reused or renumbered. New house-format skills use a level-3 heading (`### R-001 Title`), a statement beginning with MUST or MUST NOT, a Why line and a Check line. Established domain-specific skills may retain their documented one-line ID namespace (for example, `- OCI-001 (MUST): ...`); do not mix the two formats in one rule file. No two rules may repeat or contradict each other. "validate" below means `scripts/vlsit_skillkit.py validate`.
@@ -234,3 +237,8 @@ MUST add the new skill to the README skills table and layout, in every language 
 MUST report only the checks that were actually run and list what remains untested.
 - Why: the user decides whether to trust the new skill from this report.
 - Check: manual - every claim in the report points to a command output.
+
+### R-044 Defined terminology
+MUST expand domain abbreviations at first use in generated prose and provide a scoped glossary when several shortened terms are used. Explain context-dependent terms from the specification instead of guessing. Preserve code identifiers and do not invent expansions for brands or tool names; keep README explanations bilingual where this repository requires it.
+- Why: a reader can confuse a bus model, verification package and simulator interface when BFM, VIP, VPI and DPI are left undefined.
+- Check: manual - read the first occurrence and glossary, verify ambiguous meanings, and confirm identifiers are unchanged.

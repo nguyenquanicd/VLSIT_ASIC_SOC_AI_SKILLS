@@ -1,5 +1,9 @@
 # CDC synchronisation mechanisms
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Seven mechanisms, one per crossing (rule R-017), each with the RTL pattern that proves it
 (rule R-019) and one SVG figure (rule R-018).
 

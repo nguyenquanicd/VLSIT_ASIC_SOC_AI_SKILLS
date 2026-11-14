@@ -1,5 +1,8 @@
 # Rules
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Value Change Dump (VCD). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 These rules are mandatory every time this skill runs. When this file, SKILL.md and a file in `reference/` differ, this file wins.
 
 Each rule is one checkable requirement. It has a permanent ID (R-NNN) that is never reused or renumbered, a statement that starts with MUST or MUST NOT, a Why line and a Check line. No two rules may repeat or contradict each other.

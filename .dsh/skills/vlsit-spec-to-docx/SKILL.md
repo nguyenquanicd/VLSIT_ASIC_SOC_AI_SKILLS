@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later. python-docx and lxml are required for fillin
 
 # Specification to DOCX template
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC); Application-Specific Integrated Circuit (ASIC); Advanced Peripheral Bus (APB); System on Chip (SoC). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Turn a Markdown design specification into a filled copy of the VLSIT IP Microarchitecture
 Specification DOCX template. The source specification stays the technical authority; this skill
 does not invent a value, a waveform, or a constraint that the source, a reference RTL file, or a

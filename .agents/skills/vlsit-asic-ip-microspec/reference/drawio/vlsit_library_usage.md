@@ -1,5 +1,9 @@
 # VLSIT draw.io library usage
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON). See the [skill glossary](../vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The sole symbol source is [VLSIT_DRAWIO_LIB_V1.drawio.xml](VLSIT_DRAWIO_LIB_V1.drawio.xml). The bundled file is an exact copy of the user-supplied library, not a generated substitute.
 
 - Format: mxlibrary XML containing a JSON array of 39 templates.

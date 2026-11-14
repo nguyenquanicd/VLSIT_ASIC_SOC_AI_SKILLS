@@ -1,5 +1,9 @@
 # Improvement log
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Intellectual Property (hardware IP) (IP); Application Programming Interface (API). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Append one entry per skill improvement (rule OCI-093). Newest last.
 
 

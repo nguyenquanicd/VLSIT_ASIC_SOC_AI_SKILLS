@@ -1,5 +1,9 @@
 # Diagrams and waveforms
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON); Finite-State Machine (FSM). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-017 to R-020, R-024, R-027 to R-029, R-057, R-058, R-068 to R-071, R-073 and R-074).
 
 ## Figure source set (R-057)

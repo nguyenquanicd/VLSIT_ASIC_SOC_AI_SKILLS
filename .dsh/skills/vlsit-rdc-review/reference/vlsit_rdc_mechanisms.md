@@ -1,5 +1,9 @@
 # Reset mechanism catalogue
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 One mechanism per crossing (rule R-017). Every mechanism has an RTL pattern that
 proves it (rule R-019), a failure mode, and one SVG figure produced by
 `vlsit_rdc_svg.py` (rule R-018).

@@ -6,6 +6,9 @@ compatibility: Python 3.8 or later using the standard library only. Optional syn
 
 # SDC and timing review
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Synopsys Design Constraints (timing context) (SDC); Clock-Domain Crossing (CDC); Application-Specific Integrated Circuit (ASIC); Finite-State Machine (FSM); Advanced Peripheral Bus (APB). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
+<!-- VLSIT_TERMINOLOGY_END -->
 Check the constraint set against the design it constrains and against the specification it must
 meet. The review answers three questions: **is every clock and crossing constrained, is every
 exception justified by the RTL, and does the implementation close timing — and if not, who must

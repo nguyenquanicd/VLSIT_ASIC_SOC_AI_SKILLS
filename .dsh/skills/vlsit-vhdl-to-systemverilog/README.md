@@ -1,5 +1,19 @@
 # VLSIT VHDL to SystemVerilog / Chuyển VHDL sang SystemVerilog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| CDC | Clock-Domain Crossing | Truyền tín hiệu giữa miền clock; cần phân tích cấu trúc và giả định timing. |
+| RDC | Reset-Domain Crossing | Tương tác qua miền reset; khác với CDC. |
+| VHDL | VHSIC Hardware Description Language | Ngôn ngữ mô tả phần cứng; VHSIC là Very High Speed Integrated Circuit. |
+| FSM | Finite-State Machine | Máy trạng thái hữu hạn; coverage trạng thái chưa đủ kiểm hành vi. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 Convert complete VHDL RTL designs into readable, synthesizable SystemVerilog while preserving approved behavior and applying the entire bundled VLSIT rule file.
 
 Chuyển đầy đủ thiết kế RTL VHDL sang SystemVerilog dễ đọc, tổng hợp được, giữ hành vi đã thống nhất và áp dụng toàn bộ file rule VLSIT đi kèm.

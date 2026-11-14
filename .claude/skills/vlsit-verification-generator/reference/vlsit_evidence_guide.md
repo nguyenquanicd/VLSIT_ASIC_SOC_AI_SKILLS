@@ -1,13 +1,17 @@
 # Evidence guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Verification Intellectual Property (Verification IP) (VIP); Universal Verification Methodology (UVM); JavaScript Object Notation (JSON). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read this file when creating or checking an evidence bundle.
 
 ## 1. One bundle per run
 
-A run is one invocation of a test or one regression job that produces a result used in a review or gate. Every run has one immutable folder under `92_evidence/`:
+A run is one invocation of a test or one regression job that produces a result used in a review or gate. Every run has one immutable folder under `sim/runs/`:
 
 ```text
-92_evidence/ev_<level>_<artifact>_<run>/
+sim/runs/ev_<level>_<artifact>_<run>/
   manifest.json
   compile.log
   sim.log
@@ -123,19 +127,19 @@ The bundle also labels every AI-generated artifact as AI-generated (R-117). A to
 
 A review is not a rubber stamp of a passing log. The reviewer reads the artifact, checks that it derives from the specification, and records the decision.
 
-The review record is an input to the single verification report, `verification/verification_report.md` (R-259). Do not treat a bundle `review.md` as the verification report: the report summarizes every bundle, every exception and every residual risk in one file.
+The review record is an input to the single verification report, `sim/docs/verification_report.md` (R-259). Do not treat a bundle `review.md` as the verification report: the report summarizes every bundle, every exception and every residual risk in one file.
 
 ## 8. Commands
 
 ```sh
-<python> scripts/vlsit_verify_evidence.py manifest verification/92_evidence/ev_vip_apb_0007 --level vip --project example_soc --artifact vip_apb_master --version 1.0.0 --spec spec/APB.md --test t_vip_apb_write_0wait --simulator questa --simulator-version 2026.1 --uvm 2020-3.2 --os "Windows 11" --compile-option=-sv --run-option=+UVM_TESTNAME=t_vip_apb_write_0wait --seed 1 --timeout-s 60 --coverage functional=96.4% --reviewer dv_lead
-<python> scripts/vlsit_verify_evidence.py hash verification/92_evidence/ev_vip_apb_0007
-<python> scripts/vlsit_verify_evidence.py check verification/92_evidence/ev_vip_apb_0007/manifest.json
+<python> scripts/vlsit_verify_evidence.py manifest sim/runs/ev_vip_apb_0007 --level vip --project example_soc --artifact vip_apb_master --version 1.0.0 --spec spec/APB.md --test t_vip_apb_write_0wait --simulator questa --simulator-version 2026.1 --uvm 2020-3.2 --os "Windows 11" --compile-option=-sv --run-option=+UVM_TESTNAME=t_vip_apb_write_0wait --seed 1 --timeout-s 60 --coverage functional=96.4% --reviewer dv_lead
+<python> scripts/vlsit_verify_evidence.py hash sim/runs/ev_vip_apb_0007
+<python> scripts/vlsit_verify_evidence.py check sim/runs/ev_vip_apb_0007/manifest.json
 ```
 
 `manifest` refuses to overwrite an existing `manifest.json` unless `--force` is given. `check` exits 0 when the manifest, the hashes and the required files are valid, 1 on a finding and 2 on bad input.
 
-A block or SoC run repeats `--vip name=version` for every VIP instance. The command refuses to write a block or SoC manifest without at least one VIP, because R-111 requires the VIP versions and R-162 requires exact pins. An option that starts with a dash is written with `=`: `--compile-option=-sv`.
+A block or SoC run repeats `--vip name=version` for every VIP instance. When no VIP is used, record --no-vip-reason and --uvm N/A rather than inventing a VIP version. An option that starts with a dash is written with `=`: `--compile-option=-sv`.
 
 ## 9. Bundle review checklist
 
@@ -147,3 +151,15 @@ A block or SoC run repeats `--vip name=version` for every VIP instance. The comm
 - The review record names the reviewer and the decision.
 - AI provenance exists when AI was used.
 - The bundle contains no credential, token or restricted data.
+
+## Artifact validation versus closure
+
+Manifest PASS means metadata/files/hashes validate; it does not change a recorded failed simulation into a pass. Use vlsit_closure_contract.md for measured closure. For block/SoC without VIP use --no-vip-reason and --uvm N/A; record local agents and C/C++/Python model versions/hashes. Per-property activity and normalized observations supplement legacy aggregate assertion counters.
+
+## Schema v2 closure
+
+An artifact manifest remains a storage/integrity record, even for a failed simulation. Source-bound closure separately requires an approved contract/scenario matrix, actual compiled source hashes, qualified producers/models/checkers, exact run receipts, reconciled vplan status and recomputed bin unions. MET_WITH_WAIVERS has default exit 3; use the JSON verdict in CI. See vlsit_closure_contract.md for schema and trust boundaries.
+
+## Retained simulation package (R-272 to R-275)
+
+Use vlsit_sim_workspace.md. Run bundles live under sim/runs; the complete environment/testbench and immutable baseline inputs are retained separately under sim/. Keep exact argument lists, working directories, relevant environment records and tool-version evidence alongside source-bound receipts. A storage manifest alone is not proof of a successful cold replay.

@@ -1,5 +1,9 @@
 # Scorecard schema
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Clock-Domain Crossing (CDC); Synopsys Design Constraints (timing context) (SDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 The scorecard is the machine-readable half of the SDC and timing review. The reviewer fills it; the
 script computes the weighted score, the verdict and the Markdown table, so the arithmetic never
 depends on the prose.

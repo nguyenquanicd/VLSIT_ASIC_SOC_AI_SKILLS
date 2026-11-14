@@ -1,5 +1,20 @@
 # VLSIT SoC Integration Review / Review tích hợp SoC
 
+<!-- VLSIT_TERMINOLOGY_START -->
+**EN:** Read the [local glossary](reference/vlsit_glossary.md) for expansions and context. Common terms used here are defined below.
+
+**VI:** Xem [bảng thuật ngữ của skill](reference/vlsit_glossary.md) để hiểu đầy đủ và tránh nhầm ngữ cảnh. Các từ chính được giải thích dưới đây.
+
+| Abbreviation | English full term | Nghĩa trong ngữ cảnh |
+|---|---|---|
+| RTL | Register-Transfer Level | Mức mô tả phần cứng bằng thanh ghi và logic tổ hợp. |
+| IP | Intellectual Property (hardware IP) | Khối thiết kế hoặc tài sản verification tái sử dụng; không nhầm Internet Protocol trong mạng. |
+| HAS | Hardware Architecture Specification | Đặc tả kiến trúc phần cứng dùng cho review tích hợp SoC. |
+| APB | Advanced Peripheral Bus | Bus ngoại vi AMBA; cần nêu phiên bản APB. |
+| AXI | Advanced eXtensible Interface | Họ giao diện AMBA; phải phân biệt AXI, AXI-Lite và AXI-Stream cùng phiên bản. |
+| SoC | System on Chip | Hệ thống tích hợp trên chip; CPU/accelerator độc lập có thể vẫn là DUT cấp block. |
+
+<!-- VLSIT_TERMINOLOGY_END -->
 **EN** — Reviews SoC top-level integration from the hardware architecture specification (HAS) through the RTL hierarchy and every connection. It checks address, IO, interrupt, and bus structure; source/destination function and fanout; protocol roles; floating or tied-off signals; pulse capture; and destination limits.
 
 **VI** — Review tích hợp SoC từ hardware architecture specification (HAS) tới hierarchy RTL và từng kết nối. Skill kiểm tra địa chỉ, IO, interrupt, cấu trúc bus; chức năng nguồn/đích và fanout; vai trò protocol; tín hiệu treo hoặc tie-off; khả năng bắt pulse và giới hạn phía nhận.

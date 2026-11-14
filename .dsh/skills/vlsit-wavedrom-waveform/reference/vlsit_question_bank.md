@@ -1,5 +1,9 @@
 # Question bank
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Advanced eXtensible Interface (AXI). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-005). Each question below has options with explanations and ends with an open choice; adapt the wording to the request and send at most four per message. Show a draft next to the questions when the request is short.
 
 ## Short request (no file)

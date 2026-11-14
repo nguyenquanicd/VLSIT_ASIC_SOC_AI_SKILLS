@@ -1,5 +1,9 @@
 # Standards catalog
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Clock-Domain Crossing (CDC). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 How to name and cite the standards a VLSIT IP usually implements. Read it at step 6. Cite the
 standard, its revision and the clause; never cite a clause that was not read (R-005).
 

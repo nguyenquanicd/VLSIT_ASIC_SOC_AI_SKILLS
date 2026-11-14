@@ -1,5 +1,9 @@
 # Specification writing guide
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to R-017, R-024, R-025, R-046 to R-066). The template is `templates/VLSIT_ASIC_IP_Design_Specification_Template.md`; follow its section titles exactly.
 
 The specification source is Markdown. Write inline equations in TeX as `$...$` and display equations as `$$...$$`; keep each display equation outside Markdown tables. Link figures by relative Markdown paths under the specification's `figures/` directory. See [vlsit_document_formats.md](vlsit_document_formats.md) for examples and optional DOCX/PDF export.

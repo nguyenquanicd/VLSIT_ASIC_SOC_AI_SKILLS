@@ -12,39 +12,57 @@
     "simulator_version": "2026.1",
     "uvm": "2020-3.2",
     "os": "Windows 11 24H2",
-    "compile_options": ["-sv", "+incdir+src"],
-    "run_options": ["+UVM_TESTNAME=t_vip_apb_write_0wait"],
+    "compile_options": [
+      "-sv",
+      "+incdir+src"
+    ],
+    "run_options": [
+      "+UVM_TESTNAME=t_vip_apb_write_0wait"
+    ],
     "vip_versions": {},
     "seed": 1,
-    "timeout_s": 60
+    "timeout_s": 60,
+    "no_vip_reason": ""
   },
   "test": "t_vip_apb_write_0wait",
   "result": {
-    "compile": "pass",
-    "simulation": "pass",
+    "compile": "not_run",
+    "simulation": "not_run",
     "assertions": {
-      "total": 42,
-      "fired": 42,
+      "total": 0,
+      "fired": 0,
       "failed": 0
     },
     "coverage": {
-      "functional": "96.4%",
-      "code": "91.2%"
+      "functional": "not_measured"
     },
-    "mutation": {
-      "injected": 12,
-      "killed": 10,
-      "equivalent": 1,
-      "survived": 1
-    }
+    "mutation": {}
   },
   "artifacts": [
-    {"path": "compile.log", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    {"path": "sim.log", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    {"path": "assertions.csv", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    {"path": "coverage/merged.xml", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    {"path": "mutation/report.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
-    {"path": "review.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}
+    {
+      "path": "compile.log",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "sim.log",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "assertions.csv",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "coverage/merged.xml",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "mutation/report.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "review.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
   ],
   "ai": {
     "used": false,

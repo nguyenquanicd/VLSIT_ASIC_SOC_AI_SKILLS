@@ -13,7 +13,7 @@ This is the single verification report (R-259). It must be complete on its own: 
 | Specification | <path> revision <rev>, SHA-256 <hash> |
 | Protocol standard | <standard and revision, or "none"> |
 | Simulator and version | <tool and version> |
-| UVM version | <version> |
+| UVM version | <version or N/A with reason> |
 | VIP versions | <name=version; name=version, or "none"> |
 | Verification plan | <path to vplan.csv> |
 | Evidence root | <path> |
@@ -55,7 +55,7 @@ Status is `pass`, `fail`, `waived` or `not applicable`. Every `fail` and `waived
 
 One row per test run. A test with several seeds has one row per seed.
 
-| Test ID | Level | Type | Vplan requirement | Seed | Result | Assertions fired / failed | Evidence bundle | Notes |
+| Test ID | Level | Type | Vplan requirement | Seed | Result | Property activity / failures | Evidence bundle | Notes |
 |---|---|---|---|---|---|---|---|---|
 | <t_...> | <level> | <test_type> | <REQ-...> | <seed> | <pass/fail> | <n>/<n> | <ev_...> | <flaky, quarantined, ...> |
 
@@ -92,7 +92,7 @@ Report each metric separately, never one average. Give the value, the goal and t
 
 ### 5.1 Coverage-efficient tests
 
-For each test, the bins it adds that no other test reaches. A test with zero unique bins is either merged or justified here (R-252).
+For each test, the bins it adds that no other test reaches. A test with zero unique bins may be retained for bug regression, distinct fault detection, risk or required stress; record the reason here (R-252).
 
 | Test ID | Unique bins added | Cumulative functional coverage |
 |---|---|---|
@@ -191,7 +191,53 @@ Every AI-generated artifact is labeled and reviewed by a named engineer (R-117).
 
 | Path | Description | SHA-256 |
 |---|---|---|
-| <verification/92_evidence/ev_...> | <evidence bundle> | <hash> |
-| <verification/00_plan/vplan.csv> | <verification plan> | <hash> |
+| <sim/runs/ev_...> | <evidence bundle> | <hash> |
+| <sim/docs/00_plan/vplan.csv> | <verification plan> | <hash> |
 | <coverage report> | <merged coverage> | <hash> |
 | <regression log> | <full regression> | <hash> |
+
+## 15. Measured closure and reference models
+
+| Verdict | Result | Basis |
+|---|---|---|
+| Plan validation | <pass/fail/not run> | <inventory, vplan and command> |
+| Artifact validation | <pass/fail/not run> | <manifest checker, hashes> |
+| Measured closure | <met/unmet/not run> | <contract, normalized observations, raw sources> |
+| Human sign-off | <decision/pending> | <named reviewer and record> |
+
+Report inventory requirements, missing requirements, atomic obligations measured,
+waived and unmet separately per configuration. List source specification and RTL
+manifest hashes and adapters/manual-extraction review records. Per-property evidence
+states applicability, attempts/completions, implication antecedent hits, failures,
+formal bounds/status and non-vacuity evidence. Do not use an aggregate fired count
+as proof of activity for every assertion.
+
+Record model provenance, qualification, coupling (batch/stream/DPI/Python binding),
+numeric semantics, excluded layers/features and protocol-agent limits. State which
+simulators, formal checks, models or standards were unavailable. No full-IP or
+full-standard compliance claim is justified by a limited profile or schema PASS.
+
+## 16. Schema v2 anti-false-closure evidence
+
+Record the approved contract and inventory digests, complete scenario matrix and N/A reasons; live source/dependency hash checks and actual compiled-input identity; producer/model/checker qualification; source receipt/raw log reconciliation; per-property consistent counters and proof assumptions; recomputed bin universes/unions and contributing runs; vplan status/evidence reconciliation; and waived-record approvals. Attach closure_result.json with MET/UNMET/MET_WITH_WAIVERS and exit code. List unverified tool/producer trust and source-discovery boundaries. Neither an approval name in JSON nor a hash authenticates a human or proves execution.
+
+## 17. Retained simulation workspace and replay
+
+| Item | Retained path / status / evidence |
+|---|---|
+| Independent workspace and legacy map | <sim/ path; original RTL path; map or none> |
+| Complete environment and DUT baseline | <TB, BFM, monitors, assertions, scoreboards, models, generated sources, vectors, configurations and source/build manifests> |
+| Package baseline | <snapshot ID and workspace_manifest.json; corresponding RTL/build baseline> |
+| Detailed bilingual handoff | <sim/README.md> |
+| Commands and environment | <replay_manifest.json; per-run argv/cwd/variables/tool versions/seeds/timeouts/exits/logs> |
+| External dependencies | <exact versions, provisioning instructions and replay limitations; secret names only> |
+| Package integrity | <valid/invalid/not_run; checker command and log> |
+| Dependency discovery | <tool-export/review method, transitive input list, reviewer, pending/reviewed, unresolved items> |
+| Retention catalog | <all baseline/run IDs, full-package backup location, catalog check command/log> |
+| Cold replay | <pass/fail/not_run; registered original/fresh run IDs, generated receipts, measured versions and comparison or blocking reason> |
+| Replay scope | <exact cases, configurations, seeds, checked observables and excluded campaign portions> |
+| Failed and successful run retention | <run IDs, retained outputs and archive location> |
+
+List any missing input, unavailable dependency or legacy-layout exception explicitly.
+Package integrity does not establish simulation success, measured closure or cold-replay success.
+No automatic cleanup is permitted after report generation (R-272 to R-275).

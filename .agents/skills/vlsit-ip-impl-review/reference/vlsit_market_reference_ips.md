@@ -1,5 +1,9 @@
 # Market baseline by block class
 
+<!-- VLSIT_TERMINOLOGY_START -->
+Terminology: Intellectual Property (hardware IP) (IP); Advanced Peripheral Bus (APB); Advanced eXtensible Interface (AXI). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
+<!-- VLSIT_TERMINOLOGY_END -->
+
 A checklist of what commercial IP of each class normally offers, used at step 7 to ask the right
 questions of the web search. It contains **no numeric claim about a named vendor**: every row is a
 baseline expectation to confirm with a dated source (R-015), and a row that cannot be confirmed
