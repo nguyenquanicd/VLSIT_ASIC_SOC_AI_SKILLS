@@ -16,7 +16,7 @@ Precedence: this `rule.md` overrides `SKILL.md`; `SKILL.md` overrides supporting
 - V2S-011 (MUST): Apply every applicable requirement of that file to every generated design module. MUST/MUST NOT of that file admit no waiver. SHOULD is followed by default, and only deviations that the file explicitly permits may be documented with a reason.
 - V2S-012 (MUST): N/A requires proof that the feature is absent or the condition is inapplicable. Missing tools or evidence is NOT_RUN, never N/A or PASS.
 - V2S-013 (MUST NOT): Weaken or edit the rule file to make a conversion pass.
-- V2S-014 (MUST): When source behavior conflicts with a mandatory rule, document the conflict and ask for a compliant resolution. A user-approved behavior change is redesign, not equivalent translation, and MUST be labeled so. An unresolved conflict blocks a compliant handoff.
+- V2S-014 (MUST): When source behavior conflicts with a mandatory rule, document the conflict and ask for a compliant resolution. A user-approved behavior change is redesign, not equivalent translation, and MUST be labeled as a redesign. An unresolved conflict blocks a compliant handoff.
 
 ## C. Inputs
 

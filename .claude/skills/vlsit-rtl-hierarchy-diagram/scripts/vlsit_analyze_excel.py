@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-# Function: Analyze Excel and CSV workbooks read-only and emit a compact structure summary.
-# Author: VLSI Technology
-# GitHub: https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
+# -------------------------------------------------------------------------
+# File     : vlsit_analyze_excel.py
+# Function : analyze an Excel or CSV signal list
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicid/VLSIT_CODEX_CLAUDE_SKILLS
+# -------------------------------------------------------------------------
+
 """Compact, read-only Excel/CSV analyzer for AI-assisted workbook updates.
 
 Formats: .xlsx, .xlsm, .xltx, .xltm, .xls, .csv
@@ -285,10 +289,10 @@ def find_soffice(requested: str | None) -> str | None:
     candidates = [requested, os.environ.get("SOFFICE_PATH"), shutil.which("soffice"),
                   shutil.which("libreoffice")]
     if platform.system() == "Windows":
-        candidates.extend([
-            r"C:\Program Files\LibreOffice\program\soffice.exe",
-            r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
-        ])
+        for variable in ("ProgramFiles", "ProgramFiles(x86)"):
+            program_root = os.environ.get(variable)
+            if program_root:
+                candidates.append(str(Path(program_root) / "LibreOffice" / "program" / "soffice.exe"))
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
             return str(Path(candidate))

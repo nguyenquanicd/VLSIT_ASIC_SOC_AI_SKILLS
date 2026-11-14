@@ -13,6 +13,7 @@
 
 - **SCP-01** Covers synthesizable design RTL only. Testbenches, verification-only SVA, and models belong to separate verification source sets.
 - **SCP-02** The synthesis environment (top, filelist, parameter overrides, tool and version, options, constraints, libraries) MUST be recorded with every synthesis result. A construct is accepted only when the selected frontend elaborates and synthesizes it as intended.
+- **SCP-03** `[NEW]` The only simulation code allowed inside a design file is the simulation branch selected by the flow macro `VLSIT_SYNTHESIS`: the body of `` `ifndef VLSIT_SYNTHESIS `` (up to its `` `else `` or `` `endif ``) or the `` `else `` body of `` `ifdef VLSIT_SYNTHESIS ``, with at most one `` `else `` and no `` `elsif ``. The synthesis, lint, CDC, formal, and equivalence flows define the macro, so this branch is never compiled for them. The synthesizable branch and all other lines follow every rule; the simulation branch is excluded from the rules of this document (it may use P1, P2, P6, P14, P20, P27 constructs) and the checker reports each such branch as a warning with this reason. No other macro gets this exception. It extends SCP-01 and P12 and does not change them.
 
 ## 2. Naming (single source)
 
@@ -40,10 +41,12 @@ Use lowercase snake_case for name portions unless the table says uppercase.
 | FSM state enum member | `ENUM_ST_<FUNCTION>` uppercase | `ENUM_ST_IDLE` |
 | Instance, single | `u_<function>` (module name without `m_`) | `m_decode` → `u_decode` |
 | Instance, repeated in one parent | `u_<function>_<index>` | `u_lane_0`, `u_lane_1` |
+| Instance of a library cell or macro | `u_dont_touch_<function>` | `u_dont_touch_sync_ff`, `u_dont_touch_sram` |
 | Generate block | `gen_<function>` | `gen_lane` |
 | Combinational process label | `p_com_<function>` | `p_com_control` |
 | Sequential process label | `p_ff_<function>` | `p_ff_control` |
 
+- **NAM-09** `[NEW]` The instance name of every technology library cell or memory macro (an instance of a module that is not a design module `m_<function>`) is `u_dont_touch_<function>`, lowercase, with `<function>` naming what the cell does and the whole name within NAM-07. The prefix lets the implementation flow apply `dont_touch` by name pattern. Such cells are instantiated only in the dedicated wrapper modules (CLK-02, HIE-07). It specializes the instance row of the table and does not change `u_<function>` for design modules.
 - **NAM-01** Every replicated name, signal, array, instance, or generated structure uses a zero-based index (`_0`, `_1`, …), local to the parent module and object group. Packed ranges include bit 0 (`[PARA_DATA_W-1:0]`).
 - **NAM-02** Values and identifiers fixed by an external protocol or the spec keep their external form.
 - **NAM-03** `reg_` means sequential state, not the Verilog `reg` type. Declare such signals as `logic` (or a logic-based enum).
@@ -92,15 +95,51 @@ Keep in full, never abbreviate: `data`, `valid`, `ready`, `mode`, `depth`, `done
 - **TYP-03** Because every port has an explicit type, undeclared identifiers (implicit nets) are found by lint and elaboration checks (see P5). The `default_nettype` directive is not used in design RTL: it is compile-unit state that changes the meaning of every file compiled after it.
 - **TYP-04** Internal signals and state use `logic`. Enum-typed signals are allowed only with a logic-based enum.
 - **TYP-05** Port interfaces are packed vectors. Types are module-local. SV `interface` and `package` are used only in simulation (verification source set), never in design RTL (see P11).
+- **TYP-06** `[NEW]` No redundant declarations. A one-bit port, internal signal, or enum base type is declared without a range (`logic w_x`, `input wire i_x`, `typedef enum logic {...}`), never with a one-bit range such as `[0:0]`; one bit of a vector is selected with `[i]`, never `[i:i]`. An internal signal, localparam, or type that nothing in the module uses is not declared. Ports and parameters belong to the interface and are exempt. A one-bit signal may connect to a vector port of width 1. The "explicit dimensions" of TYP-01 apply to vectors of two or more bits.
+- **TYP-07** `[NEW]` Every declared dimension, packed or unpacked, is written most-significant bit (MSB) first and least-significant bit (LSB) last, `[MSB:LSB]`, never `[LSB:MSB]`. A packed vector and an unpacked array both follow this order, for example `logic [PARA_BLK_BITS-1:0] reg_chain [PARA_CTX_N-1:0];`, never `logic [PARA_BLK_BITS-1:0] reg_chain [0:PARA_CTX_N-1];`. A dimension with literal bounds is written high to low, so `[3:0]`, never `[0:3]`; a one-bit range is not written at all (TYP-06). This applies to ports, internal signals, memories, function and task arguments, and user-defined types.
 
 ### 3.2 Parameters and constants
 
-- **PAR-01** Overridable parameters: `parameter logic [31:0] PARA_<NAME> = <default>`. Dependent constants: `localparam logic [31:0] LPARA_<NAME>`, placed in the parameter port list immediately after the parameters (confirm frontend support). Localparams are not instance overrides.
+- **PAR-01** Overridable parameters: `parameter logic [31:0] PARA_<NAME> = <default>`. Derived localparams use `localparam logic [31:0] LPARA_<NAME>` and are placed in the parameter port list immediately after the parameters (confirm frontend support). Fixed protocol encodings follow PAR-04 and use the exact field width. Localparams are not instance overrides.
 - **PAR-02** Immediately above every parameter, write exactly these three comment lines, in this order. "Configurable" alone is not acceptable.
   - `// Parameter Description: ...` purpose of the parameter, plus dependencies or restrictions on other parameters.
   - `// Parameter values: ...` legal values or inclusive range, and the default value.
   - `// Parameter unit: ...` unit of the value (for example `bit`, `byte`, `us`). This line is required. A parameter without a physical unit uses `count` for a quantity or `none` for a mode or flag code.
-- **PAR-03** Derive dependent widths (address, counter, field positions) from parameters or localparams; do not repeat literals. Design-specific constants are named parameters, localparams, or enum members.
+- **PAR-03** Derive dependent widths (address, counter, field positions) from parameters or localparams; do not repeat literals. Name design-specific constants as parameters, localparams, or enum members; fixed protocol encodings follow PAR-04.
+- **PAR-04** Fixed protocol encodings (for example, burst types, response codes, opcodes, and status values) are named width-matched `localparam logic` constants with the prefix `LPARA_`; use those names in `case` items, comparisons, and assignments instead of repeating the numeric encoding. Use an overridable `parameter` only for a configuration choice that the specification explicitly allows the integrator to select; a standard-defined encoding itself is never overridable. For example, AHB `HBURST` values use localparams, while a selected burst policy may be a parameter if the specification exposes that option.
+
+```systemverilog
+module m_ahb_ctrl #(
+  localparam logic [2:0] LPARA_HBURST_SINGLE = 3'b000,
+  localparam logic [2:0] LPARA_HBURST_INCR = 3'b001,
+  localparam logic [2:0] LPARA_HBURST_WRAP4 = 3'b010,
+  localparam logic [2:0] LPARA_HBURST_INCR4 = 3'b011,
+  localparam logic [2:0] LPARA_HBURST_WRAP8 = 3'b100,
+  localparam logic [2:0] LPARA_HBURST_INCR8 = 3'b101,
+  localparam logic [2:0] LPARA_HBURST_WRAP16 = 3'b110,
+  localparam logic [2:0] LPARA_HBURST_INCR16 = 3'b111
+) (
+  input  wire [2:0] i_ahb_hburst,
+  output logic      o_hburst_valid
+);
+
+// HBURST decode: marks each defined 3-bit encoding as valid.
+always_comb begin : p_com_hburst
+  o_hburst_valid = 1'b0;
+  case (i_ahb_hburst)
+    LPARA_HBURST_SINGLE,
+    LPARA_HBURST_INCR,
+    LPARA_HBURST_WRAP4,
+    LPARA_HBURST_INCR4,
+    LPARA_HBURST_WRAP8,
+    LPARA_HBURST_INCR8,
+    LPARA_HBURST_WRAP16,
+    LPARA_HBURST_INCR16: o_hburst_valid = 1'b1;
+    default:             o_hburst_valid = 1'b0;
+  endcase
+end
+endmodule
+```
 
 ```systemverilog
 // Parameter Description: datapath width of the operands and the result.
@@ -144,6 +183,8 @@ ctrl_state_type_def reg_fsm_ctrl_current_state;
 ctrl_state_type_def w_fsm_ctrl_nxt_state;
 ```
 
+- **ENM-06** `[NEW]` The current-state register of an FSM (`reg_fsm_<function>_current_state`) is assigned in an `always_ff` of its own that holds that register only: its reset value and its update from the next state. Every other flip-flop of the module (output registers, counters, flags, handshake bits) is in another `always_ff`. Each FSM has its own current-state block. This is part 1 of the three-process FSM structure (SEQ-02) made explicit, and it keeps the state update visible to the FSM extraction of the synthesis frontend.
+
 ## 4. Combinational logic
 
 - **COM-01** Use `always_comb` or continuous assignment. One process owns each output; one assignment source per signal.
@@ -168,9 +209,12 @@ end
 ```
 
 - **COM-05** `[NEW]` Combinational loops are not allowed. Feedback passes through a register.
-- **COM-06** `[NEW]` Functions used in RTL are `automatic`, deterministic, and side-effect free (see P9).
+- **COM-06** `[NEW]` Functions used in RTL are `automatic`, deterministic, and side-effect free (see P9). Prefer direct RTL for a simple expression used once; use a function when logic is reused at multiple RTL call sites or a nontrivial transform is clearer as one named unit. Every function MUST have an immediately preceding comment describing its behavior and any non-obvious width or bit/byte ordering. If a nontrivial function has one call site, its comment also states why the abstraction improves clarity. A function is a source-level abstraction and does not by itself imply shared hardware or reduced area.
 - **COM-07** `[NEW]` An inferred latch is not allowed. Every signal that a combinational process drives MUST be assigned on every path: assign its default at the top of the process (COM-02) so that no `if` or `case` branch leaves it unassigned, and give every `case` a `default` (COM-03). A latch reported by lint (for example verilator `LATCH` or slang `inferred-latch`) is an error and MUST NOT be waived. Intentional storage uses a flip-flop (SEQ-01).
 - **COM-08** `[NEW]` A selection with three or more conditional branches (an `if` followed by two or more `else if`) MUST be written as a `case` or `casez` statement, chosen under COM-03 and COM-04, not as an `if` / `else if` chain. A selection on the value of one signal is a plain `case`. A priority selection among independent conditions is a `casez` on the concatenated condition bits with `?` for the bits of lower priority; it keeps the original priority, and its `default` assigns a defined value unless COM-04 allows `'x`. A chain of one or two conditions (with or without a final `else`), the reset test that opens a sequential process, and an elaboration-time `if` in a generate block are not counted.
+- **COM-09** `[NEW]` A value-producing expression uses the bitwise operators `&`, `|`, `^`, and `~`, never the logical operators `&&`, `||`, and `!`. For example, write `assign o_in_rd_en = w_start_new | w_coll_rd;`, never `assign o_in_rd_en = w_start_new || w_coll_rd;`. This applies to continuous assignments, procedural assignments, concatenations, port connections, and the value branches of `? :`.
+- **COM-10** `[NEW]` The logical operators `&&`, `||`, and `!` are used only in a condition: the condition of `if` / `else if`, the condition of `? :`, and the condition of a `for` or `while` loop. They are never used where a value is produced (COM-09). Use `~` for bitwise inversion, `&` for bitwise AND, and `|` for bitwise OR in a value expression. The relational operators (`==`, `!=`, `<`, `<=`, `>`, `>=`) are not logical operators and are allowed in both contexts.
+- **COM-11** `[NEW]` Procedural control nesting MUST NOT exceed four levels in one `always_comb`, `always_ff`, or function. Count each `if` / `else if` / `else` chain and each `case` / `casez` statement as one level; an `else if` continues the level of its `if`, and a `begin` / `end` block does not add a level. A `case` or `if` inside a `case` item, and a `case` inside an `if`, adds one level. `for` and `while` bodies do not add a level under this rule, and the reset test that opens a sequential process is not counted (COM-08). When a function needs more than four levels, restructure it with a `case`, a helper function, or a submodule.
 
 ## 5. Arithmetic and widths
 
@@ -223,7 +267,7 @@ end
 
 - **HIE-01** One synthesizable module per `.sv` file; the file name equals the module name.
 - **HIE-02** The design top is a structural wrapper: interface, parameters, interconnect declarations, and submodule instances only. Any logic goes in a named child module.
-- **HIE-03** Connect all ports and parameter overrides by name. Keep bus and its valid/ready/sideband order stable. Group ports by role: clock and reset, control in, data in, control out, data out.
+- **HIE-03** Connect all ports and parameter overrides by name. Keep bus and its valid/ready/sideband order stable. The grouping and the layout of the module ports follow FIL-06 and FIL-05.
 - **HIE-04** Repeated explicit instances of one module get zero-based suffixes. Generate replication starts at index 0 with a descriptive block name; the elaborated hierarchy carries the index (`gen_lane[0].u_lane`).
 - **HIE-05** Use compile-time parameters and statically bounded generate loops for structural variation. The `genvar` is declared in the generate-`for` header (`for (genvar gen_idx = 0; ...)`), never separately outside it. Keep elaboration choices separate from run-time behavior.
 - **HIE-06** Describe arrays and memories in the pattern the frontend and memory flow support. Confirm inference (depth, width, ports) in synthesis reports. A memory macro sits behind a wrapper that follows the project integration rules. `[NEW]` The wrapper provides the DFT/BIST hooks and bypass required by the methodology.
@@ -253,6 +297,34 @@ end
 - **FIL-01** Header fields: Project, Author (`<USER_NAME> (user)`), AI Flow, AI Flow Page, Date, Description. The human user is the author; the AI flow is recorded separately.
 - **FIL-02** Use ANSI-style declaration.
 - **FIL-03** `[NEW]` Indent and align with space characters only. The examples in this document use 2 spaces per indent level.
+- **FIL-04** `[NEW]` Branch layout: in an `if`, `else if`, or `else` without `begin`, the statement of the branch is on its own line, indented two spaces more than the `if` or `else`; it never follows the condition or `else` on the same line, and statements of different branches are not aligned to a common column. With `begin`, the `begin` stays at the end of the `if` or `else` line and the statements are indented two spaces more. Example:
+
+```systemverilog
+always_ff @(posedge i_clk_core, negedge i_rst_n_core) begin : p_ff_control
+  if (!i_rst_n_core)
+    reg_valid <= 1'b0;
+  else
+    reg_valid <= w_valid_nxt;
+end
+```
+
+- **FIL-05** `[NEW]` Port list alignment: the ports of a module are written one per line in four columns, direction keyword, type, width, and name, and each column starts at the same position for every port of the module. Each column is as narrow as its longest entry plus one space: the direction column is as wide as the longest keyword used, the type column as wide as the longest type, the width column as wide as the longest width. A port without a width leaves the width column blank, so that the names stay aligned. The comma follows the name. Example:
+
+```systemverilog
+module m_example (
+  // Clock and reset
+  input  wire                          i_clk_core,
+  input  wire                          i_rst_n_core,
+
+  // Data interface
+  input  wire                          i_valid,
+  input  wire  [PARA_DATA_W-1:0]       i_data,
+  output logic                         o_ready,
+  output logic [PARA_DATA_W-1:0]       o_result
+);
+```
+
+- **FIL-06** `[NEW]` Port groups: the ports are declared in groups of one function, not all inputs and then all outputs. A function is a clock and reset pair, a protocol or interface (for example APB, a write interface, a memory port), a control or status set, or a data path; the inputs and the outputs of the same function are in the same group. Each group starts with a comment line that names it, and one blank line separates the groups. The clock and reset group is first. This replaces the grouping by direction.
 
 ### 8.2 Template
 
@@ -372,7 +444,7 @@ endmodule
 | P7 | `always_latch` and inferred or intentional latches (COM-07) | Default assignments (COM-02, COM-07) or edge-triggered state |
 | P8 | Multiple drivers on one signal | One assignment source |
 | P9 | Functions with side effects or static state | Deterministic `automatic` functions (COM-06) |
-| P10 | Unexplained magic numbers | Named parameter, localparam, or enum member |
+| P10 | Unexplained magic numbers | Named `localparam` or enum member for fixed encodings; `parameter` only for specification-approved configurable values (PAR-04) |
 | P11 | `package` declarations and imports; SV `interface`/`modport` in design RTL. Allowed in simulation-only verification sources | Module-local types; packed-vector ports |
 | P12 | `` `define `` and `` `undef `` in RTL. Macros defined by the flow may be referenced | Parameters and localparams |
 | P13 | Positional instance connections and `.*` | Named connections (HIE-03) |
@@ -392,6 +464,10 @@ endmodule
 | P27 | `[NEW]` Non-synthesizable data types and constructs: `real`, `string`, `event`, classes, dynamic or associative arrays, queues | Static packed/unpacked `logic` arrays |
 | P28 | `[NEW]` Unregistered logic between a clock-domain crossing launch flop and its synchronizer; logic between synchronizer stages | CLK-01 |
 | P29 | `[NEW]` Tab characters (`\t`) in RTL source files | Space characters only (FIL-03) |
+| P30 | `[NEW]` One-bit ranges (`[0:0]`, `[i:i]`) and internal signals, localparams, or types that nothing uses | Range-free one-bit declarations; remove the unused declaration (TYP-06) |
+| P31 | `[NEW]` Ascending dimensions, `[LSB:MSB]` (`[0:PARA_CTX_N-1]`, `[0:3]`), for packed or unpacked arrays | MSB:LSB order for every dimension (TYP-07) |
+| P32 | `[NEW]` Logical operators `&&`, `\|\|`, `!` in a value-producing expression | Bitwise `&`, `\|`, `~` (COM-09, COM-10) |
+| P33 | `[NEW]` More than four nested `case` / `casez` / `if` / `else if` levels in one procedural block or function | Restructure with `case`, a helper function, or a submodule (COM-11) |
 
 ## 11. Tapeout readiness checklist
 
@@ -414,3 +490,22 @@ Confirm before accepting an RTL handoff:
 - **CMT-03** Keep comments synchronized with the implementation.
 - **CMT-05** `[NEW]` A comment line MUST NOT exceed 100 characters. Split a longer comment into several `//` lines, each a readable phrase, so it does not overflow the screen. The parameter comment structure is defined by PAR-02.
 - **CMT-04** Write and bind SVA in dedicated verification files that belong to the verification source set (see P19).
+
+## 13. Checker identifiers and aliases
+
+`vlsit_rtl_check.py` reports a small number of identifiers that are not rules of this document. They are kept because delivered logs cite them; each maps to a rule above or marks an exemption. A report quotes the canonical ID; the legacy identifier remains in the tool output for one release.
+
+| Checker ID | Reported meaning | Canonical rule or status |
+|---|---|---|
+| R-019 | A selection with three or more conditional branches | COM-08 |
+| R-027 | Simulation branch selected by `VLSIT_SYNTHESIS` (warning) | SCP-03 |
+| R-032 | Library cell model `VLSIT_CELL_<FUNCTION>`, pin names accepted (warning) | Exemption, section 2 table |
+| R-035 | No redundant declaration | TYP-06 |
+| R-036 | The `always_ff` of an FSM current state holds that register only | ENM-06 |
+| R-038 | No `default_nettype directive | TYP-03, P5 |
+| R-040 | Output of an APB-CSR-Generator older than 2.0 (warning) | Exemption |
+| R-049 | Every declared dimension is written MSB:LSB | TYP-07 |
+| R-050 | Value expressions use `&`, `\|`, `^`, `~` | COM-09 |
+| R-051 | `&&`, `\|\|`, `!` only in conditions | COM-10 |
+| R-052 | Procedural nesting of at most four levels | COM-11 |
+| CHK-11 | Tapeout readiness checklist of section 11 | Manual, section 11 |

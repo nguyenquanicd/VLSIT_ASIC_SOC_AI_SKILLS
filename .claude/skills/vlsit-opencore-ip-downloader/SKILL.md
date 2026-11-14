@@ -20,9 +20,9 @@ Precedence: `rule.md` overrides this file, and this file overrides the reference
 ## Workflow
 
 1. **Intake (OCI-010..013).** Confirm IP type, count, and absolute destination; ask for all gaps in one message and wait.
-2. **Search and select (OCI-020..025).** Search OpenCores and aliases, open candidate pages, verify function and license, remove duplicates and mirrors. When OpenCores has no suitable IP, search GitHub and Gitee with `python scripts/vlsit_ip_search.py search "<keywords>" --source both` and apply OCI-025 to Chinese-language sources.
-3. **Download (OCI-030..032).** Fetch the complete project package from the official link or the upstream repository.
-4. **Verify and store (OCI-040..043, OCI-060).** Run `python scripts/vlsit_verify_archive.py <ARCHIVE>` before extraction, extract into a per-project folder, write `DOWNLOAD_INFO.md` per project and update `CATALOG.md`.
+2. **Search and select (OCI-020..025).** Search OpenCores and aliases, inspect the project description and online file tree, and confirm both the requested function and at least one source file ending in `.v`, `.sv`, `.vhd`, or `.vhdl`; do not count headers, documentation, or software. For a VIP request, confirm SystemVerilog sources implement the requested verification function; for a synthesizable-IP request, confirm the source is design RTL. Confirm the license, then remove duplicates and mirrors. When OpenCores has no suitable IP, search GitHub and Gitee with `python scripts/vlsit_ip_search.py search "<keywords>" --source both` and apply OCI-025 to Chinese-language sources.
+3. **Download (OCI-030..032).** Use `vlsit_fetch_ip.py oc-fetch` or `gh-fetch`; each command preflights the online tree and refuses projects with no HDL source before downloading project files. The helper rechecks the downloaded GitHub archive before extraction.
+4. **Verify and store (OCI-040..043, OCI-060).** Run `python scripts/vlsit_verify_archive.py <ARCHIVE>` on retained or independently obtained archives; it blocks archives without an HDL source file. Store each verified project in its own folder, write `DOWNLOAD_INFO.md` and update `CATALOG.md`.
 5. **Evaluate (OCI-050..057).** Write the bilingual `README.md` using [reference/vlsit_readme_template.md](reference/vlsit_readme_template.md).
 6. **Report (OCI-061..062).** Summarize per OCI-061 without claiming validation.
 7. **Improve (OCI-090..096).** Add or fix scripts and reference files, log the change in `reference/vlsit_improvement_log.md`, and propose any rule changes to the user.

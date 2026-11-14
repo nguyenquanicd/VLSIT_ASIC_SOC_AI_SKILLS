@@ -1,6 +1,6 @@
 # Specification writing guide
 
-Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to R-017, R-024, R-025, R-046 to R-065). The template is `templates/VLSIT_ASIC_IP_Design_Specification_Template.md`; follow its section titles exactly.
+Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-013 to R-017, R-024, R-025, R-046 to R-066). The template is `templates/VLSIT_ASIC_IP_Design_Specification_Template.md`; follow its section titles exactly.
 
 The specification source is Markdown. Write inline equations in TeX as `$...$` and display equations as `$$...$$`; keep each display equation outside Markdown tables. Link figures by relative Markdown paths under the specification's `figures/` directory. See [vlsit_document_formats.md](vlsit_document_formats.md) for examples and optional DOCX/PDF export.
 
@@ -16,7 +16,7 @@ The specification source is Markdown. Write inline equations in TeX as `$...$` a
 | 8 Parameters | Parameter table, VLSIT comment lines, configurations, illegal values | Which values may change, and which are illegal? |
 | 9 Data representation | Widths, endianness, encodings, invalid behavior | Which encodings and overflow rules? |
 | 10 Functional behavior | States, operations, the waveform plan confirmed by the user (R-024), cycle tables, throughput, memories | What happens cycle by cycle, with backpressure? Which waveforms are the minimum? |
-| 11 Registers | Pointer to the CSR workbook, generator and clocks (11.1), programming/use flowchart and step table (11.2, R-043, R-060 to R-065), connection of the fields to the design (11.3), APB access behavior of the CSR (11.4, R-031, R-049 to R-050) | Which settings, actions, state and events? What is the mandatory sequence, and which optional paths can software select? (fill the workbook; question bank, Registers) |
+| 11 Registers | Pointer to the CSR workbook, generator and clocks (11.1), programming/use flowchart and step table (11.2, R-043, R-060 to R-066), connection of the fields to the design (11.3), APB access behavior of the CSR (11.4, R-031, R-049 to R-050) | Which settings, actions, state and events? What is the mandatory sequence, and which optional paths can software select? (fill the workbook; question bank, Registers) |
 | 12 Errors | Error table, precedence, recovery, waveforms | What are the errors and how does the system recover? |
 | 13 PPA | Hard requirements and goals with conditions | Frequency, area, power targets and corners? |
 | 14 RTL contract | Coding baseline, hierarchy, synthesis assumptions | Hierarchy and synthesis setup? |
@@ -28,7 +28,15 @@ The specification source is Markdown. Write inline equations in TeX as `$...$` a
 | 20 Assumptions, decisions | Assumptions, dependencies, decisions, open items, TBD with impact | Which points remain open? |
 | 21 Glossary, 22 References | Terms and the sources actually used | Not applicable |
 
-## Programming and use flow, section 11.2 (rules R-043, R-060 to R-065)
+## FSM state diagram, section 10.1 (rules R-068 to R-071)
+
+Every finite state machine represented by the 10.1 state table gets a diagram at the top of that subsection. Build it from a JSON FSM specification with `scripts/vlsit_fsm_diagram.py`; keep the JSON, editable `.drawio`, and rendered SVG beside the specification. Use VLSIT library ovals for state nodes and the complete RTL enum names. Start with the initial state, follow transition flow, minimize crossings, and check the layout report for state-label fit, transition-label conflicts, distribution, and crossings. Insert the image with the script so the JSON representation follows the image link (R-073). See [vlsit_fsm_diagram_rules.md](drawio/vlsit_fsm_diagram_rules.md).
+
+## Version register (rule R-067)
+
+When an IP has a software-visible register block, the first register is a read-only 32-bit version register at offset `0x0`, named `<prefix>_version`. The `major` field occupies `[31:16]`, `minor` occupies `[15:0]`, and the default reset value is `0x00010000` for version 1.0 unless the user supplies different version numbers. Store those numbers in the CSR JSON `ip_version` key; the CSR checker confirms the name, layout, type, and reset value. The rule does not apply to IP without a software-visible register block.
+
+## Programming and use flow, section 11.2 (rules R-043, R-060 to R-066)
 
 Include at least one Mermaid flowchart for the basic software programming and use of the IP. Do not mark 11.2 Not required, even when the IP has no software-visible CSR; in that case show its normal interface-use sequence and explain why the CSR column is N/A. Show the normal path and every optional or alternative mode the design supports. Label each node with a unique ID such as `S01` and `[M]` or `[O]`. A decision node and its branch labels state when an optional path is taken. `M` means the step is required on the shown operating path; `O` means it is conditional and may be skipped.
 

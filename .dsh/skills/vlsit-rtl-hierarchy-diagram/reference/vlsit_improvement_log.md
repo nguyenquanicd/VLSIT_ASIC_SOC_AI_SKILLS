@@ -2,8 +2,7 @@
 
 Append one entry per skill improvement (rule RHD-093). Newest last.
 
-| Date | Reason (observed friction) | Change |
-|---|---|---|
+
 | 2026-10-13 | Restructure into rule.md / reference / scripts | Moved mandatory requirements to `rule.md` with IDs; moved the sample CAN-controller report and diagram into `reference/examples/` |
 | 2026-10-13 | User-defined six-stage flow (hierarchy, module function, signal/interface analysis, grouping, one Markdown report, then draw blocks then interfaces) | Added rules RHD-070..077 and RHD-048; amended RHD-045 and RHD-063; added `vlsit_analysis_template.md`; rewrote SKILL.md workflow |
 | 2026-10-13 | New drawing rules: arrow direction from active side, no connector through blocks, arc line jumps; symbol-source rule already covered by RHD-020/023 so not duplicated | Added RHD-049, RHD-056, RHD-057; narrowed RHD-055 and removed direction from RHD-045 to avoid overlap; extended RHD-022; added `jumpStyle`/`jumpSize` to `EDITABLE` in `scripts/vlsit_library_symbols.py` (untested: no Python available); added active-side column to `vlsit_analysis_template.md` |
@@ -28,3 +27,4 @@ Append one entry per skill improvement (rule RHD-093). Newest last.
 | 2026-10-16 | User: the 00_TOP page (top module as a single block) is not needed | RHD-012/013/041/042/058 amended: levels start at 1, pages 01_LEVEL_1..N, no 00_TOP page, level 0 request explained and mapped to 1; generator no longer builds the TOP page; `top_page` removed from spec schema and CAN example; output regenerated (1 page, 0 findings) |
 | 2026-10-17 | User asked that every skill analyze Excel files with one shared script | Copied `vlsit_analyze_excel.py` into `scripts/`; added rule RHD-105 (use it for all Excel/CSV input, `openpyxl` exemption, propose script updates on problems); SKILL.md and scripts index updated |
 | 2026-11-08 | The previous Python prerequisite relied on `python --version`, which can resolve to the Microsoft Store shortcut or miss an installed interpreter (RHD-103). | Bundled `vlsit_find_python.ps1` and `.sh`; aligned `SKILL.md`, `RHD-103` and the script index to use the resolved executable; replaced machine-specific utility paths with portable repository references. The locator scripts are the sole non-Python helper exception under RHD-090. |
+| 2026-11-14 | Consolidation audit found machine-specific LibreOffice locations in the shared Excel analyzer copy and wording overlap between hierarchy page selection and group rendering. | Replaced fixed Windows executable candidates with environment-based lookup so the analyzer remains portable across installations. |

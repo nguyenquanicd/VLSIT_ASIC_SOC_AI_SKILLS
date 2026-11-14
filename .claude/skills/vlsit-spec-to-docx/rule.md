@@ -192,3 +192,104 @@ MUST reply to the user in the language the user writes.
 - Why: the users of this skill work in Vietnamese and English, and the document language is
   fixed separately by R-006.
 - Check: manual - the run report is written in the user's language.
+
+## Document shape
+
+### R-025 Cover control table
+MUST fill the cover document-control table (Document ID, Owner / author, Reviewers, Approved by,
+Status / classification) from the specification, the RTL file headers or the user, asking the user
+for every field that none of those sources states.
+- Why: an unfilled control block makes the document unusable in review, and a guessed reviewer or
+  approver is a false record.
+- Check: manual - the run report lists the value and the source of each of the five fields.
+
+### R-026 Resolvable citations
+MUST make every identifier cited in the document (FEAT-, LIM-, DEC-, REQ-) resolvable inside the
+document or through the reference section, never leaving a bare identifier with no description
+beside it.
+- Why: a reader who follows DEC-033 and finds nothing loses trust in the whole document.
+- Check: `scripts/vlsit_content_check.py --source` reports no citation that is absent from the source.
+
+### R-027 Introduction subsection
+MUST place the general introduction of the IP in an "Introduction" subsection of section 1,
+leaving no introduction prose directly under the Overview heading.
+- Why: the template separates the section lead-in from the product introduction, and a mixed block
+  reads as an editing accident.
+- Check: manual - the filled document opens with Overview, then Introduction, then IP Description.
+
+### R-028 Feature bullets
+MUST write each feature as one bullet of the form `[FEAT-NNN] description`.
+- Why: the feature ID is the anchor the traceability table and the reviewer use; burying it at the
+  end of a sentence breaks the lookup.
+- Check: `scripts/vlsit_content_check.py` reports no malformed feature bullet.
+
+### R-029 Limitation bullets
+MUST list each limitation as a bullet whose identifier is `[LIM-NNN]`, followed by what the user
+cannot do and why, linking the reference section when the detail lives elsewhere.
+- Why: a limitation without its ID cannot be traced, and a bare ID without prose tells the reader
+  nothing.
+- Check: `scripts/vlsit_content_check.py` reports no malformed limitation bullet.
+
+### R-030 Parameter section shape
+MUST keep the parameter section free of naming rules and of any parameter-specific note outside the
+table, allowing only one general introduction paragraph in the Normal style, with the four columns
+Parameter name, Value Range, Default Value and Description.
+- Why: a note that sits above the table is read by nobody, while the short introduction tells the
+  reader what the section is for.
+- Check: manual - the section has at most one intro paragraph, no naming rule, and the table has the
+  four named columns.
+
+### R-032 Caption numbering and table layout
+MUST number every table and figure caption as `<Kind> <chapter>-<n>`, rendering every table centred,
+stretched to the full width of its column and in one font and size across the document.
+- Why: a reader cites a table by chapter, and a table that is narrower than the page or in a second
+  font reads as pasted from elsewhere.
+- Check: manual - the captions read Table 1-1, Figure 3-1 and so on, and every table fills its text
+  column with the same font.
+
+### R-033 One bullet style for lists
+MUST render every item list (features, limitations, flows) with the same bullet style, never mixing
+a numbered list with a bullet list for the same kind of content.
+- Why: two bullet styles in one document look like two authors, and a numbered list promises an
+  order that the features and limitations do not have.
+- Check: manual - the features and the limitations use the same list style and the same glyph.
+
+### R-031 Wide tables on landscape pages
+MUST place every table that has four or more columns alone on a landscape page, with the page header
+and footer aligned to the landscape margins, keeping the descriptive prose on portrait pages.
+- Why: a five-column table in a portrait column either shrinks the text below legibility or runs into
+  the margin, and a header that keeps the portrait tab stop floats in the middle of the landscape page.
+- Check: manual - in the rendered document every wide table is the only content of a landscape page,
+  and the header shows its left and right text at the two page margins.
+
+### R-034 Back matter on its own pages
+MUST start the Revision History, the Acronyms and Definitions and the References each on a fresh page.
+
+- Why: a revision table that shares a page with the acronyms hides the document history, and the
+  reference list is the one place a reader jumps to by page.
+- Check: manual - the three back-matter headings each open a page.
+
+### R-035 Identifier legend in the acronym table
+MUST explain every identifier prefix the document uses (FN-, BLK-, IF-, REQ-, FEAT-, LIM-, OP-,
+ERR-, ASM-, DEC-, TBD-, TEST-, PARA_, LPARA_, mkv_) as a row of the Acronyms and Definitions table.
+
+- Why: a reader who meets FN-004 or TBD-005 for the first time has nowhere else to look, and an
+  unexplained prefix turns a traceability table into noise.
+- Check: manual - every prefix that appears in the body has a row in the acronym table.
+
+### R-036 Chapter order of the template
+MUST keep the chapter order of the bundled template, which places Security and Robustness and then
+Power Management before Synthesis Design Constraints, never inventing its own order.
+
+- Why: the integrator reads every VLSIT specification in the same sequence, and a moved chapter
+  breaks the cross-references and the reader's habit.
+- Check: manual - the chapter list matches the template order.
+
+### R-037 Identifiers in square brackets
+MUST write every identifier in square brackets — `[FN-001]`, `[IF-002]`, `[REQ-FUNC-003]`,
+`[DEC-028]` — in the body text, in the captions and in the table cells alike.
+
+- Why: a bracketed token is skimmable, unambiguous and survives a search for `[FN-` across a whole
+  set of documents.
+- Check: script - `vlsit_docx_fill.py` normalises them at write time, and a search of the finished
+  document finds no bare `FN-NNN` outside brackets.

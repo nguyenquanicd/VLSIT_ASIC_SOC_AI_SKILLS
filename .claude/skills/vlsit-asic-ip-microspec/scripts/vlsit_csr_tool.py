@@ -84,8 +84,26 @@ NAM08 = {"address": "addr", "next": "nxt", "counter": "cnt", "enable": "en", "cl
          "command": "cmd", "buffer": "buf", "pointer": "ptr", "index": "idx", "length": "len", "source": "src",
          "destination": "dst", "transmit": "tx", "receive": "rx", "write": "wr", "read": "rd"}   # NAM-08 of the RTL rule
 FIRST_ROW = 16            # first register row of the template
-SAMPLE = {"module": "m_vlsit_csr_demo", "prefix": "demo", "async": 0, "registers": [
-    {"name": "demo_ctrl", "offset": "0x0", "description": "Demo control register. Enables the demo block and selects its basic operation.", "fields": [
+SAMPLE = {"module": "m_vlsit_csr_demo", "prefix": "demo", "async": 0,
+          "ip_version": {"major": 1, "minor": 0}, "registers": [
+    {"name": "demo_version", "offset": "0x0",
+     "description": "Demo version register. Reports the major and minor version numbers of the IP.",
+     "fields": [
+        {"name": "major", "bits": "[31:16]", "type": "ro", "reset": "0x1",
+         "description": "Major version number of the IP. It increments when a software-visible behavior changes incompatibly.\n\n"
+                        "Usage: software reads it once at start-up and selects the driver path from it; it is never written.\n\n"
+                        "Values:\n"
+                        "0x1 version 1 (reset value).\n\n"
+                        "Unit: none.\n\n"
+                        "Limits: none."},
+        {"name": "minor", "bits": "[15:0]", "type": "ro", "reset": "0x0",
+         "description": "Minor version number of the IP. It increments for a backward-compatible change of the map or behavior.\n\n"
+                        "Usage: software reads it with the major number to log the exact revision; it is never written.\n\n"
+                        "Values:\n"
+                        "0x0 version 1.0 (reset value).\n\n"
+                        "Unit: none.\n\n"
+                        "Limits: none."}]},
+    {"name": "demo_ctrl", "offset": "0x4", "description": "Demo control register. Enables the demo block and selects its basic operation.", "fields": [
         {"name": "en", "bits": "[0]", "type": "rw", "reset": "0x0",
          "description": "Block enable. Turns the demo block on so that it starts to process its input data.\n\n"
                         "Usage: software writes it after all other fields are programmed; clear it before changing any timing field.\n\n"
@@ -242,6 +260,62 @@ def address_overlap_errors(doc):
     return errs
 
 
+VERSION_OFFSET = 0x0
+VERSION_LAYOUT = (("major", "[31:16]"), ("minor", "[15:0]"))
+VERSION_DEFAULT = {"major": 1, "minor": 0}
+
+
+def version_register_errors(doc):
+    """R-067: when the IP has registers, offset 0x0 holds the read-only version register."""
+    registers = doc.get("registers", [])
+    if not registers:
+        return []
+    errors = []
+    prefix = str(doc.get("prefix", ""))
+    expected_name = prefix + "_version" if prefix else ""
+
+    at_zero = None
+    for reg in registers:
+        try:
+            if to_int(reg.get("offset", "")) == VERSION_OFFSET:
+                at_zero = reg
+                break
+        except (TypeError, ValueError):
+            continue
+    if at_zero is None:
+        return ["no register at offset 0x0: the read-only version register must be the first register (R-067)"]
+
+    name = at_zero.get("name", "?")
+    if expected_name and name != expected_name:
+        errors.append("%s: the register at offset 0x0 must be named %s (R-067)" % (name, expected_name))
+
+    declared = doc.get("ip_version") or {}
+    major = to_int(declared.get("major", VERSION_DEFAULT["major"]))
+    minor = to_int(declared.get("minor", VERSION_DEFAULT["minor"]))
+    expected = ((major & 0xFFFF) << 16) | (minor & 0xFFFF)
+
+    fields = at_zero.get("fields", [])
+    layout = {}
+    for field in fields:
+        field_name = field.get("name", "?")
+        layout[field_name] = str(field.get("bits", ""))
+        if field.get("type") != "ro":
+            errors.append("%s.%s: the version register is read-only, so the field type must be ro (R-067)"
+                          % (name, field_name))
+    for field_name, bits in VERSION_LAYOUT:
+        if layout.get(field_name) != bits:
+            errors.append("%s: %s must occupy bits %s (R-067)" % (name, field_name, bits))
+    try:
+        actual = register_reset(fields)
+        actual = to_int(actual) if isinstance(actual, str) else actual
+    except (TypeError, ValueError):
+        actual = None
+    if actual is not None and actual != expected:
+        errors.append("%s: reset value 0x%08X does not match the declared version %d.%d (expected 0x%08X, R-067)"
+                      % (name, actual, major, minor, expected))
+    return errors
+
+
 def check(doc, auto_reserved=False):
     errors, seen_names, offsets = [], set(), {}
     if not MODULE_RE.fullmatch(str(doc.get("module", ""))):
@@ -249,6 +323,7 @@ def check(doc, auto_reserved=False):
     if doc.get("async", 0) not in (0, 1):
         errors.append("async must be 0 or 1")
     errors += interrupt_set_errors(doc)
+    errors += version_register_errors(doc)
     prefix = str(doc.get("prefix", ""))
     if not PREFIX_RE.fullmatch(prefix):
         errors.append("prefix must be a lower-case keyword of 2 to 8 letters and digits that represents the design (R-032)")

@@ -8,7 +8,7 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 
 ## A. General
 
-- RSC-001 (MUST): Write plans, reports, new functional RTL comments, and chat summaries in precise scientific and engineering English, and distinguish verified results, source-based reasoning, assumptions, and validation limits. Bilingual content is allowed only in README files and documents designated as user guidelines.
+- RSC-001 (MUST): Write plans, reports, and chat summaries in precise scientific and engineering English, and distinguish verified results, source-based reasoning, assumptions, and validation limits. Bilingual content is allowed only in README files and documents designated as user guidelines.
 
 ## B. Inputs and clarification
 
@@ -44,7 +44,7 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 - RSC-041 (MUST): Minimality MUST NOT compromise correctness, timing/interface contracts, reset behavior, parameterized configurations, or maintainability. If a tiny patch would be fragile or incomplete, use the smallest robust approach and explain why.
 - RSC-042 (MUST NOT): Invent unspecified behavior. If new evidence changes the planned solution, return to the approval gate.
 - RSC-043 (MUST): Modify only approved RTL files and explicitly approved supporting files. MUST NOT edit either specification unless separately requested.
-- RSC-044 (MUST): Preserve the RTL source language and existing comment style when modifying existing RTL.
+- RSC-044 (MUST): Preserve the RTL source language and existing comment style when modifying existing RTL, and write every new functional comment in precise scientific English.
 
 ## F. Validation and report
 

@@ -18,7 +18,7 @@ Chuyển đầy đủ thiết kế RTL VHDL sang SystemVerilog dễ đọc, tổ
 
 [reference/VLSIT_RTL_Design_Rule.md](reference/VLSIT_RTL_Design_Rule.md) nằm trong thư mục này và agent bắt buộc đọc đầy đủ. Khi cài, chép toàn bộ thư mục skill. Không dùng bản tóm tắt thay file này.
 
-Bundled snapshot: VLSIT Default RTL Rules v2, from spec_template/VLSIT_RTL_Design_Rule.md in the [source repository](https://github.com/nguyenquanicd/VLSIT_RTL_Generator_AI_Model). SHA-256: FDD530FB1B150F5853F1046B2FA7C63FE85C0D732C9466579AC1FCB8DE1ECE7E.
+Bundled snapshot: VLSIT Default RTL Rules v2, from spec_template/VLSIT_RTL_Design_Rule.md in the [source repository](https://github.com/nguyenquanicd/VLSIT_RTL_Generator_AI_Model). SHA-256: 883873472725EB36A0DA749871ACF18A0D40F20BA069BCFBCB1D6FB39B18B0B8.
 
 Bản đi kèm: VLSIT Default RTL Rules v2, từ spec_template/VLSIT_RTL_Design_Rule.md của [repository nguồn](https://github.com/nguyenquanicd/VLSIT_RTL_Generator_AI_Model). Hash SHA-256 ở trên dùng để nhận diện bản rule chính xác; nội dung tiếng Anh được giữ nguyên.
 

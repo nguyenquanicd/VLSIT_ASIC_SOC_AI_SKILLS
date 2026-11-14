@@ -78,7 +78,7 @@ MUST write the specification in the VLSIT template `reference/templates/VLSIT_AS
 - Check: `scripts/vlsit_spec_tool.py check` reports no section difference.
 
 ### R-041 Real-world applications of every feature
-MUST write one section 1.4 row for every feature in section 1.3, recording the application's need, typical values, consequence if the feature is missing or wrong, implementing requirements, and source (user answer, standard, reference IP or an assumption in section 20).
+MUST ask for and document one section 1.4 row for every feature in section 1.3, recording its concrete product or system application, measurable need, typical values, consequence if the feature is missing or wrong, implementing requirements, and source (user answer, cited standard or reference IP, or an assumption in section 20). Apply R-046 to R-048; do not invent user-specific application context.
 - Why: a feature that has no named real use cannot be sized, prioritized or verified with a realistic case, and a reviewer cannot judge whether a parameter range or a corner case matters; the application also tells the RTL and verification teams which behavior must never fail (for example shoot-through in a motor drive).
 - Check: `scripts/vlsit_spec_tool.py check` reports a missing section 1.4, a feature of 1.3 without a row or an empty cell; manual - each row records the listed information and its source.
 - Example (PWM generator, feature FEAT-003 dead-time insertion): Real-world application = three-phase inverter of a brushless DC motor drive in an e-bike controller; Need = the high-side and low-side switch of one half-bridge must never conduct together, so the gate signals are separated by a dead time longer than the switch turn-off time; Typical values = PWM 20 kHz, dead time 0.5 to 2 us, resolution of one 100 MHz clock (10 ns); Consequence = shoot-through destroys the power transistors; Requirements = REQ-FUNC-012, REQ-FUNC-013; Source = user answer 2026-10-28. A wrong row: "PWM is used in motor control and many other systems".
@@ -169,14 +169,9 @@ MUST lay out the description of a field with one blank line between the parts, i
 - Check: `scripts/vlsit_csr_tool.py validate` reports a description whose parts or blank lines are not in this order.
 
 ### R-039 Reserved field description
-MUST give every `reserved` field exactly these two description lines: `This field is unused.` and `Read-as-zero and write-ignored.`
+MUST give every `reserved` field exactly these two description lines, with no additional text: `This field is unused.` and `Read-as-zero and write-ignored.`
 - Why: a reserved bit is never programmable, and one fixed text tells software the safe behavior (read as zero, writes ignored).
 - Check: `scripts/vlsit_csr_tool.py validate` reports no reserved field with a different description; manual - the workbook shows the two lines in order.
-
-### R-052 No extra reserved-field text
-MUST NOT add any text to the fixed description of a `reserved` field.
-- Why: additional wording can imply behavior that does not apply to reserved bits.
-- Check: `scripts/vlsit_csr_tool.py validate` reports no reserved field with extra description text.
 
 ### R-053 Reserved fields added by the tool
 MUST apply the fixed reserved-field description to fields created by `fill`, including fields added by `--auto-reserved`.
@@ -221,14 +216,14 @@ MUST include a block diagram in section 5.2 and at least one success-case and on
 - Check: manual - section 5.2 links a block diagram and each external interface has the required success and error waveforms; the complete waveform list is agreed under R-024.
 
 ### R-057 Figure source files
-MUST provide every block diagram and waveform as an image with its editable source file beside it.
-- Why: source files let the designer review and revise the figures without reconstructing them from images.
-- Check: manual - every diagram and waveform image has its source file alongside it.
+MUST keep each generated figure's machine-readable source beside its linked image: a block diagram has its JSON diagram specification and editable `.drawio` source (or the approved `.tex` fallback); an FSM diagram has its JSON FSM specification and editable `.drawio` source; and a waveform has its WaveJSON `.json` source. Render delivered document figures as SVG; PNG is an additional compatibility copy only.
+- Why: the specification and drawing sources let the designer inspect and revise each figure without reconstructing it from a rendered image.
+- Check: `scripts/vlsit_spec_tool.py check` reports a missing source beside a block or FSM image; `scripts/vlsit_waveform_svg.py check` prints PASS for every waveform source; manual - every linked figure has the required adjacent files.
 
 ### R-058 Waveform rendering
 MUST draw each waveform with WaveDrom from an adjacent WaveJSON `.json` file, rendering SVG or PNG and any HTML viewer from that source; convert simulation VCD data to WaveJSON before drawing. A specification written before 2026-10-30 may retain a simulation waveform without WaveJSON only when its plan marks it `R-017 exempt`.
 - Why: WaveJSON gives the waveform a reproducible, editable source and preserves simulation evidence in the same format.
-- Check: `scripts/vlsit_wavedrom_waveform.py lint` prints PASS for every WaveJSON; manual - any legacy exemption meets its date and plan conditions.
+- Check: `scripts/vlsit_waveform_svg.py check <WaveJSON>` prints PASS for every WaveJSON; manual - any legacy exemption meets its date and plan conditions.
 
 ### R-018 draw.io first
 MUST draw the block diagram of section 5.2 as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from sections 5, 6 and 14.2 of the specification; LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.
@@ -321,6 +316,46 @@ MUST name the exact workbook register and field plus the value/action software w
 MUST keep the flowchart and table in one-to-one agreement and use only register names and values present in the workbook.
 - Why: mismatched artifacts or invented register data would mislead implementation and software teams.
 - Check: manual - each flowchart node has exactly one matching table row and every register name/value traces to the workbook.
+
+### R-066 Step descriptions
+MUST write each `Description` cell in the section 11.2 step table to explain why the action is performed and what IP function it serves, consistent with the flowchart and specified functional behavior.
+- Why: a step's purpose lets software and verification teams understand its role instead of seeing only an unexplained action.
+- Check: manual - each `Description` cell states the action's purpose and IP function and agrees with the corresponding flowchart step and specification behavior.
+
+### R-067 Version register at offset 0x0
+MUST place a 32-bit read-only version register at offset `0x0` when the IP has a software-visible register block, named `<prefix>_version`, with the major version in bits `[31:16]` and the minor version in bits `[15:0]`, reset to `0x00010000` (version 1.0) when the user gives no IP version and to the user's numbers when they are given, with no other register at offset `0x0`.
+- Why: a fixed address identifies the IP revision before software trusts another register, and a defined baseline makes a new specification deterministic.
+- Check: `scripts/vlsit_csr_tool.py validate` reports a missing or wrongly named register, access type, field layout, or reset value; manual - section 11.1 states the version and the workbook lists it first.
+
+### R-068 FSM diagram for every state machine
+MUST include a state diagram at the top of section 10.1 for every finite state machine represented in its state table, generated from a JSON FSM specification using `scripts/vlsit_fsm_diagram.py`; a state machine MUST NOT be represented only by prose or by a Mermaid, Graphviz, or hand-drawn figure.
+- Why: a state table is difficult to scan for transition flow, while a generated diagram keeps every state and transition reviewable.
+- Check: `scripts/vlsit_spec_tool.py check` reports a state table without its image or source; `scripts/vlsit_fsm_diagram.py check` and `build` report PASS for each FSM.
+
+### R-069 FSM state labels
+MUST render each FSM state as an oval cloned from the bundled VLSIT draw.io library and label it with the complete RTL enum member; transition labels state the event or condition that causes the transition.
+- Why: the full state name preserves traceability to the RTL, and a labelled transition exposes the actual state-machine behavior.
+- Check: `scripts/vlsit_library_symbols.py validate` reports no library violation; manual - every state-table name and labelled transition appears in the diagram.
+
+### R-070 FSM flow order and crossings
+MUST arrange FSM states in transition-flow order from the initial state and select a layout with the fewest transition crossings among readable candidate layouts.
+- Why: ordering states by behavior makes the main path and recovery paths clear without hiding branches behind crossings.
+- Check: the layout report records the selected layout and crossing count; manual - the initial state and transitions follow the state table.
+
+### R-071 Compact two-dimensional FSM layout
+MUST distribute states across rows and columns when the FSM has enough states for a two-dimensional layout, keeping labels readable and the diagram compact; split an FSM into separate diagrams only when one page cannot keep its labels legible.
+- Why: a balanced layout reduces excessive width while preserving enough space for complete state names and transition labels.
+- Check: the FSM layout report shows at least two x- and y-coordinates when a two-dimensional layout is feasible, with no text-fit or label-conflict finding.
+
+### R-073 Machine-readable figure description
+MUST place immediately after the image link of each block or FSM figure a fenced `json` block that describes the displayed blocks/states and connections/transitions, and after each waveform image link a fenced `wavedrom` block that describes the displayed signals and edges; each block must agree with its adjacent source file and must not be hidden in an HTML comment, base64 data, or an image of text.
+- Why: the in-document description is searchable and reviewable without parsing SVG geometry.
+- Check: manual - every figure image link is followed by the matching fenced block, and names and relationships agree with the source.
+
+### R-074 Waveform label fit
+MUST keep every waveform label legible: data labels fit their cell run, signal names fit the name column, and head and foot text remain within the figure; shorten or split an overlong label or widen the figure with `config.hscale` or `--cell`, never reduce the renderer's font sizes.
+- Why: clipped or overlapping labels hide the value the waveform is meant to communicate.
+- Check: `scripts/vlsit_waveform_svg.py check <WaveJSON>` reports no `OVERLAP`; inspect the SVG at 100% scale for complete, separated text.
 
 ### R-044 Markdown is the authoritative specification
 MUST use the Markdown file as the sole editable specification source, write inline and display equations in Pandoc-supported TeX math delimiters (`$...$` and `$$...$$`), and link figures with relative Markdown image paths under `figures/`; do not maintain a separate LaTeX specification source.

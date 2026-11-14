@@ -22,7 +22,8 @@ Checks  : all 22 sections present in order with the template titles; leftover te
           every REQ used elsewhere is defined; each TBD is listed in section 20; the port table of 6.2 has
           a function, a clock domain and a signal type (level, pulse, clock, reset, data, static) for every
           port (R-025); the waveform plan of 10.3 covers every operation of 10.2 and each figure and its
-          source file exist beside the specification (R-024; a figure marked 'R-017 exempt' needs no source); section 2 records the naming rule, and with
+          source file exist beside the specification (R-024; a figure marked 'R-017 exempt' needs no source);
+          every real state table of 10.1 has an FSM figure and a .drawio source beside it (R-068); section 2 records the naming rule, and with
           --naming default (the default) the port names of 6.2 follow the default naming rule of the skill
           vlsit-rtl-generator (direction prefix, i_clk_<domain>, i_rst_n_<domain>, 30 characters, NAM-08
           abbreviations); with --naming user the rule supplied by the user is checked by hand (R-026).
@@ -306,7 +307,7 @@ def _check_signal_table(head, rows, errors):
 
 
 def check_block_diagram(sec5, base, errors):
-    """R-017, R-028: section 5.2 links an existing image and its source (.drawio, .tex or .json) beside it."""
+    """R-017, R-028, R-057: section 5.2 links an existing image and its JSON source (or a .drawio/.tex export) beside it."""
     body = subsection(sec5, "5.2")
     if NR_RE.search(body):
         return
@@ -318,8 +319,42 @@ def check_block_diagram(sec5, base, errors):
         path = Path(base) / m.group(1)
         if not path.is_file():
             errors.append("section 5.2: image %s not found" % m.group(1))
-        elif not any(path.with_suffix(s).is_file() for s in (".drawio", ".tex", ".json")):
-            errors.append("section 5.2: no .drawio, .tex or .json source beside %s (rules R-017, R-028)" % m.group(1))
+        else:
+            if not path.with_suffix(".json").is_file():
+                errors.append("section 5.2: no diagram-spec .json beside %s (rules R-018, R-057)" % m.group(1))
+            if not path.with_suffix(".drawio").is_file() and not path.with_suffix(".tex").is_file():
+                errors.append("section 5.2: no editable .drawio source or approved .tex fallback beside %s (rules R-018, R-057)" % m.group(1))
+
+
+def check_fsm_diagram(sec10, base, errors):
+    """R-068, R-069, R-028: section 10.1 links an FSM figure for a real state table and its JSON source."""
+    body = subsection(sec10, "10.1")
+    if NR_RE.search(body):
+        return
+    states = []
+    for line in body.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 5 or set(cells[0]) <= set("-: "):
+            continue
+        if cells[0].lower().startswith("mode/state") or cells[0].startswith("<"):
+            continue
+        states.append(cells[0])
+    images = re.findall(r"!\[[^\]]*\]\(([^)\s]+\.(?:svg|png))\)", body)
+    if states and not images:
+        errors.append("section 10.1: no FSM state diagram image for %d state(s) (rule R-068)" % len(states))
+    for image in images:
+        if base is None:
+            continue
+        path = Path(base) / image
+        if not path.is_file():
+            errors.append("section 10.1: image %s not found (rule R-068)" % image)
+        else:
+            if not path.with_suffix(".json").is_file():
+                errors.append("section 10.1: no FSM-spec .json beside %s (rules R-068, R-057)" % image)
+            if not path.with_suffix(".drawio").is_file():
+                errors.append("section 10.1: no editable .drawio source beside %s (rules R-068, R-057)" % image)
 
 
 def check_wave_plan(sec10, base, errors):
@@ -528,6 +563,7 @@ def findings_for(text, base=None, naming="default"):
         errors.append("section 2 does not record the naming rule that the specification follows: the user's rule "
                       "or the default of vlsit-rtl-generator (rule R-026)")
     check_wave_plan(sec.get(10, ""), base, errors)
+    check_fsm_diagram(sec.get(10, ""), base, errors)
     check_block_diagram(sec.get(5, ""), base, errors)
     check_english(text, errors)
     check_empty_subsections(text, errors)

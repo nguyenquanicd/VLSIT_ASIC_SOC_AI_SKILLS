@@ -12,6 +12,9 @@ Purpose
         needs a login, so it is not used (OCI-023).
       * GitHub repositories, read from the public GitHub API and codeload archive of one
         exact commit.
+    Before downloading project files, both fetch paths inspect the online file tree and refuse
+    projects without a Verilog/SystemVerilog/VHDL HDL source file. Header-only trees
+    do not qualify.
     The script only performs HTTP GET requests to the hosts above and writes only below the
     --out folder you give. It never executes downloaded code (OCI-032).
 
@@ -52,10 +55,18 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
+from pathlib import PurePosixPath
 
 LONG_PREFIX = chr(92) * 2 + "?" + chr(92)   # extended-length path prefix on Windows
 UA = {"User-Agent": "Mozilla/5.0 (vlsit-opencore-ip-downloader)"}
 TODAY = datetime.date.today().isoformat()
+HDL_SOURCE_SUFFIXES = {".v", ".sv", ".vhd", ".vhdl"}
+
+
+def has_hdl_source(path):
+    """Return True for a Verilog/SystemVerilog/VHDL HDL source file."""
+    normalized = path.replace("\\", "/")
+    return PurePosixPath(normalized).suffix.lower() in HDL_SOURCE_SUFFIXES
 
 
 def http_get(url, timeout=90, binary=False, tries=4):
@@ -161,6 +172,11 @@ def oc_fetch(slug, out, name):
     root_html = http_get(base)
     rev = re.search(r"Revision (\d+)", root_html)
     rev = rev.group(1) if rev else "unknown"
+    listing = list(oc_list(base))  # Read directory listings only; no project file is downloaded yet.
+    rtl_files = [rel for rel, isdir in listing if not isdir and has_hdl_source(rel)]
+    if not rtl_files:
+        print("REFUSED: no Verilog/SystemVerilog/VHDL source file was found; no project files downloaded")
+        return 2
     proj = os.path.join(out, name)
     if os.path.exists(proj):
         print("REFUSED: %s already exists" % proj)
@@ -168,7 +184,7 @@ def oc_fetch(slug, out, name):
     tree = os.path.join(proj, "svn_trunk")
     os.makedirs(tree)
     files, total = [], 0
-    for rel, isdir in oc_list(base):
+    for rel, isdir in listing:
         dest = safe_join(tree, rel)
         if isdir:
             os.makedirs(dest, exist_ok=True)
@@ -200,6 +216,7 @@ def oc_fetch(slug, out, name):
         "Archive": os.path.basename(snap) + " (snapshot zip of the downloaded tree, made by this script)",
         "SHA-256 of snapshot": sha256_file(snap),
         "Files": "%d files, %d bytes" % (len(files), total),
+        "HDL source files": str(sum(1 for path in files if has_hdl_source(path))),
         "Language / stage": "%s / %s" % (info["language"], info["stage"]),
         "Not downloaded": "SVN tags and branches, bug tracker, forum, the login-only OpenCores download archive",
     })
@@ -233,6 +250,14 @@ def gh_fetch(repo, out, name, max_mb):
         print("REFUSED: repository size %.0f MB exceeds --max-mb %d" % (d["size_kb"] / 1024.0, max_mb))
         return 2
     sha = gh_api("/repos/%s/commits/%s" % (repo, d["default_branch"]))["sha"]
+    tree_info = gh_api("/repos/%s/git/trees/%s?recursive=1" % (repo, sha))
+    tree_paths = [item.get("path", "") for item in tree_info.get("tree", [])
+                  if item.get("type") == "blob"]
+    rtl_files = [path for path in tree_paths if has_hdl_source(path)]
+    if not rtl_files:
+        detail = "the GitHub tree is truncated" if tree_info.get("truncated") else "no HDL source file was found"
+        print("REFUSED: %s; no repository archive downloaded" % detail)
+        return 2
     proj = os.path.join(out, name)
     if os.path.exists(proj):
         print("REFUSED: %s already exists" % proj)
@@ -249,6 +274,9 @@ def gh_fetch(repo, out, name, max_mb):
             names = z.namelist()
             for n in names:
                 safe_join(proj, n)
+            if not any(has_hdl_source(n) for n in names if not n.endswith("/")):
+                print("FAILED: fetched archive has no Verilog/SystemVerilog/VHDL source; not extracted")
+                return 1
             extract_zip(z, proj)
     except Exception as e:
         print("FAILED: archive check/extract: %s" % e)
@@ -265,6 +293,7 @@ def gh_fetch(repo, out, name, max_mb):
         "Archive": os.path.basename(arc) + " (GitHub codeload archive of the commit above)",
         "SHA-256 of archive": sha256_file(arc),
         "Files": "%d files, extracted to %s/" % (len(files), top),
+        "HDL source files": str(sum(1 for path in files if has_hdl_source(path))),
         "Not downloaded": "git history, issues, pull requests, releases, git submodule contents (listed in .gitmodules if any)",
     })
     print("OK %s: %d files, commit %s, license %s" % (repo, len(files), sha[:7], d["license"]))

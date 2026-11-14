@@ -109,6 +109,71 @@ def render_signal(sig, x0, y0, cell, cycles):
     return parts
 
 
+def text_width(text, size):
+    """Estimated width in pixels of one label at the given font size (conservative)."""
+    narrow = set("il.,:|!'`;()[]")
+    wide = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    total = 0.0
+    for char in text:
+        if char in narrow:
+            total += 0.30
+        elif char in wide:
+            total += 0.64
+        else:
+            total += 0.54
+    return total * size
+
+
+def name_column(doc):
+    """Width of the signal-name column: the base width or the longest name, never narrower (R-074)."""
+    longest = 0.0
+    for kind, sig, _depth in flatten(doc["signal"]):
+        if kind == "signal":
+            longest = max(longest, text_width(str(sig.get("name", "")), 12))
+    return max(NAME_W, int(longest) + 18)
+
+
+def label_issues(doc, cell):
+    """R-074: every label must fit the space it is drawn in."""
+    issues = []
+    name_w = name_column(doc)
+    for kind, sig, _depth in flatten(doc["signal"]):
+        if kind != "signal" or "wave" not in sig:
+            continue
+        name = str(sig.get("name", ""))
+        if text_width(name, 12) > name_w - 12:
+            issues.append("signal '%s': the name needs %.0f px, the name column has %d px"
+                          % (name, text_width(name, 12), name_w - 12))
+        data = sig.get("data", [])
+        data = list(data) if isinstance(data, list) else str(data).split()
+        wave = str(sig.get("wave", ""))
+        step = cell * float(sig.get("period", 1))
+        runs = []
+        index = 0
+        while index < len(wave):
+            char = wave[index]
+            if char in "=2345":
+                end = index + 1
+                while end < len(wave) and wave[end] == ".":
+                    end += 1
+                runs.append((end - index, char))
+                index = end
+            else:
+                index += 1
+        label_index = 0
+        for run_length, char in runs:
+            if run_length > 0:
+                if label_index >= len(data):
+                    break
+                label = str(data[label_index])
+                label_index += 1
+                slot = run_length * step
+                if text_width(label, 11) > slot - 6:
+                    issues.append("signal '%s': the label '%s' needs %.0f px, its cell run has %.0f px"
+                                  % (name, label, text_width(label, 11), slot - 6))
+    return issues
+
+
 def render(doc, cell):
     cell = cell * int(doc.get("config", {}).get("hscale", 1))
     rows = flatten(doc["signal"])
@@ -116,13 +181,15 @@ def render(doc, cell):
     head = doc.get("head", {}).get("text", "")
     foot = doc.get("foot", {}).get("text", "")
     top = 30 if head else 8
-    width = NAME_W + cycles * cell + 2 * PAD
+    name_w = name_column(doc)
+    width = name_w + cycles * cell + 2 * PAD
+    width = max(width, int(text_width(head, 14)) + 2 * PAD, int(text_width(foot, 11)) + 2 * PAD)
     height = top + len(rows) * ROW_H + (28 if foot else 10)
     out = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Helvetica,Arial,sans-serif">' % (width, height, width, height),
            '<rect width="100%" height="100%" fill="#fff"/>']
     if head:
         out.append('<text x="%d" y="20" font-size="14" font-weight="bold">%s</text>' % (PAD, escape(head)))
-    x0 = NAME_W + PAD
+    x0 = name_w + PAD
     for i in range(cycles + 1):          # cycle grid
         out.append('<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#ccc" stroke-dasharray="2,3"/>' % (x0 + i * cell, top, x0 + i * cell, top + len(rows) * ROW_H))
     for n, (kind, item, depth) in enumerate(rows):
@@ -130,7 +197,7 @@ def render(doc, cell):
         if kind == "group":
             out.append('<text x="%d" y="%d" font-size="12" font-weight="bold" fill="#225">%s</text>' % (PAD + depth * 10, y + 19, escape(item)))
         elif kind == "signal":
-            out.append('<text x="%d" y="%d" font-size="12" text-anchor="end">%s</text>' % (NAME_W + PAD - 8, y + 19, escape(str(item.get("name", "")))))
+            out.append('<text x="%d" y="%d" font-size="12" text-anchor="end">%s</text>' % (name_w + PAD - 8, y + 19, escape(str(item.get("name", "")))))
             if "wave" in item:
                 out += render_signal(item, x0, y, cell, cycles)
     if foot:
@@ -168,9 +235,19 @@ def main():
     if bad:
         print("ERROR: signals with a missing wave, or a wave starting with '.': %s" % bad)
         return 1
+    cell = a.cell * int(doc.get("config", {}).get("hscale", 1)) if a.action == "render" else 36
+    issues = label_issues(doc, cell)
     if a.action == "check":
-        print("OK: %d signals" % len(rows))
+        for issue in issues:
+            print("OVERLAP: %s" % issue)
+        if issues:
+            print("FAIL: %d label(s) do not fit; shorten the label, split the bus, or increase "
+                  "config.hscale or --cell (R-074)" % len(issues))
+            return 1
+        print("OK: %d signals, every label fits (R-074)" % len(rows))
         return 0
+    for issue in issues:
+        print("WARN: %s (R-074)" % issue)
     out = Path(a.out)
     if out.exists() and not a.force:
         print("ERROR: %s already exists; pass --force to overwrite it" % out)

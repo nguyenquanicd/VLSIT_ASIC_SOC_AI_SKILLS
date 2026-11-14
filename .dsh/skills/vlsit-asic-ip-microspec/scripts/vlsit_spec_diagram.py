@@ -251,6 +251,7 @@ def action_build(a):
             return 1
         drawio = out_dir / name
         drawio.write_bytes((Path(tmp) / name).read_bytes())
+        drawio.with_suffix(".json").write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
         (out_dir / (Path(name).stem + "_generator_report.txt")).write_text(
             (Path(tmp) / "generator_report.txt").read_text(encoding="utf-8"), encoding="utf-8")
     status = 0
@@ -284,12 +285,17 @@ def action_insert(a):
         print("error: section 5.2 / 5.3 headings not found", file=sys.stderr)
         return 1
     fig = Path(a.figure).as_posix()
-    src = Path(a.source).as_posix()
+    src_path = Path(a.source)
+    json_path = Path(a.json_source) if a.json_source else src_path.with_suffix(".json")
+    if not json_path.is_file():
+        print(f"error: diagram JSON source not found: {json_path}", file=sys.stderr)
+        return 1
+    src = src_path.as_posix()
+    json_text = json.dumps(json.loads(json_path.read_text(encoding="utf-8-sig")), indent=2)
     caption = a.caption or "Block diagram of the top module"
-    body = (f"\n![{caption}]({fig})\n\n*Figure 5-1. {caption}. Source: `{src}` (draw.io, VLSIT library, drawn by "
-            f"`vlsit_spec_diagram.py`). The frame is the top module, the blocks are its instances, each connector is "
-            f"one interface with its mnemonic, and the two tables under the diagram in the source file describe the "
-            f"blocks and the interfaces.*\n")
+    body = (f"\n![{caption}]({fig})\n\n```json\n{json_text}\n```\n\n"
+            f"*Figure 5-1. {caption}. Source: `{src}` (draw.io, VLSIT library, drawn by "
+            f"`vlsit_spec_diagram.py`).*\n")
     text = text[:m.start(2)] + body + text[m.start(3):]
     if crlf:
         text = text.replace("\n", "\r\n")
@@ -319,6 +325,7 @@ def main():
     p.add_argument("spec")
     p.add_argument("--figure", required=True)
     p.add_argument("--source", required=True)
+    p.add_argument("--json-source", help="diagram specification JSON; defaults to the .json beside --source")
     p.add_argument("--caption")
     a = ap.parse_args()
     return {"template": action_template, "check": action_check, "from-spec": action_from_spec,

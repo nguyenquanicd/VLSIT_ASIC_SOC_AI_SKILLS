@@ -18,11 +18,40 @@ The workbook `templates/VLSIT_CSR_Specification_Template.xlsx` has three sheets:
 `vlsit_csr_tool.py template` prints a starter file:
 
 ```json
-{"module": "m_vlsit_csr_demo", "prefix": "demo", "async": 0, "registers": [
-  {"name": "ctrl", "offset": "0x0", "description": "Control", "fields": [
-    {"name": "enable", "bits": "[0]", "type": "rw", "reset": "0x0", "description": "Enable"},
-    {"name": "reserved", "bits": "[31:1]", "type": "ro", "reset": "0x0", "description": ""}]}]}
+{
+  "module": "m_vlsit_csr_demo",
+  "prefix": "demo",
+  "async": 0,
+  "ip_version": {"major": 1, "minor": 0},
+  "registers": [
+    {"name": "demo_version", "offset": "0x0", "description": "Demo version register. Reports the IP major and minor version numbers.", "fields": [
+      {"name": "major", "bits": "[31:16]", "type": "ro", "reset": "0x1", "description": "Major version number of the IP. Software reads it to select compatible driver behavior.\n\nUsage: Read after reset; software never writes this field.\n\nValues:\n0x1 major version 1 (reset value).\n\nUnit: none.\n\nLimits: 16-bit unsigned value."},
+      {"name": "minor", "bits": "[15:0]", "type": "ro", "reset": "0x0", "description": "Minor version number of the IP. Software reads it to identify compatible additions.\n\nUsage: Read after reset; software never writes this field.\n\nValues:\n0x0 minor version 0 (reset value).\n\nUnit: none.\n\nLimits: 16-bit unsigned value."}]},
+    {"name": "demo_ctrl", "offset": "0x4", "description": "Demo control register. Enables the demo block and selects its basic operation.", "fields": [
+      {"name": "en", "bits": "[0]", "type": "rw", "reset": "0x0", "description": "Block enable. Starts the demo block when set.\n\nUsage: Write before programming active operation fields.\n\nValues:\n0x0 disabled (reset value);\n0x1 enabled.\n\nUnit: none.\n\nLimits: one-bit value."},
+      {"name": "reserved", "bits": "[31:1]", "type": "ro", "reset": "0x0", "description": ""}]}
+  ]
+}
 ```
+
+
+## Version register (rule R-067)
+
+Every IP with a software-visible register block starts its map with the read-only version
+register. It is the first address, so software and the bring-up test identify the revision before
+they trust any other register.
+
+| Item | Value |
+|---|---|
+| Offset | `0x0`, always the first register; no other register may take it |
+| Name | `<prefix>_version`, for example `axi2apb_version` |
+| Fields | `major` in bits `[31:16]`, `minor` in bits `[15:0]`, both type `ro` |
+| Reset | `0x00010000` (version 1.0) when the user gives no IP version |
+| Source of the numbers | the JSON key `ip_version`: `{"major": 1, "minor": 0}`; when absent, 1.0 |
+
+`validate` reports a missing register at `0x0`, a wrong name, a field that is not `ro`, a layout
+other than `[31:16]`/`[15:0]`, and a reset value that disagrees with `ip_version`. An IP with no
+software-visible register has no workbook, so the rule does not apply to it.
 
 ## Commands
 
@@ -57,7 +86,7 @@ Limits: limits, or none.
 
 Every value line starts with the hexadecimal number as software writes it (`0x0`, `0x1 to 0xF`); never a decimal number. All lines but the last end with `;`, the last with `.`, and a blank line separates the block from `Unit:`. One blank line also separates the other parts (rule R-038).
 
-Write the lines at the level of detail of the register documentation of ARM, Synopsys and Cadence, from the viewpoint of the software engineer. A field named `reserved` always gets the exact two-line description and no additional text (rules R-039 and R-052); leave its description empty in the JSON. `vlsit_csr_tool.py fill` applies that description to all reserved fields it creates, including those added by `--auto-reserved` (R-053). It wraps the description cells so that the lines show in the workbook; APB-CSR-Generator copies the description only to its debug file, so the lines do not enter the RTL.
+Write the lines at the level of detail of the register documentation of ARM, Synopsys and Cadence, from the viewpoint of the software engineer. A field named `reserved` always gets the exact two-line description and no additional text (R-039); leave its description empty in the JSON. `vlsit_csr_tool.py fill` applies that description to all reserved fields it creates, including those added by `--auto-reserved` (R-053). It wraps the description cells so that the lines show in the workbook; APB-CSR-Generator copies the description only to its debug file, so the lines do not enter the RTL.
 
 ## Workbook format (rule R-035)
 

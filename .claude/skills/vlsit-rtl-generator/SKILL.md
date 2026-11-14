@@ -40,12 +40,12 @@ It prints the full path of a working Python 3 (called `<python>` below) and exit
 
 Decide the mode from the request, and ask once for everything that is missing:
 
-- **Generate** new RTL: the specification file (it must follow the specification template), the rule file path (see R-003), the output folder, the project name and the user name for the file headers (R-007).
+- **Generate** new RTL: the specification file (it must follow the specification template), an optional external rule file path (see R-003; the bundled VLSIT rule is the default), the output folder, the project name and the user name for the file headers (R-007).
 - **Modify** existing RTL: the RTL folder, the request or the new specification, the old specification if there is one, the rule file path, the output folder and the same header values. Read [reference/vlsit_modify_existing_rtl.md](reference/vlsit_modify_existing_rtl.md) and continue at step 4b.
 
 Also ask once whether the specification may be edited in place when implementation decisions are recorded in it (R-046, R-061, R-002): A, edit in place after saving a copy of the original in the output folder (recommended); B, write the updated copy to the output folder and leave the original unchanged; C, other.
 
-Read the rule file now (R-003). If the request is unclear about which mode applies, ask.
+Read the named external rule file or the bundled `reference/VLSIT_RTL_Design_Rule.md` now (R-003). If the request is unclear about which mode applies, ask.
 
 ### 4a. Scan the specification and ask (generate mode)
 

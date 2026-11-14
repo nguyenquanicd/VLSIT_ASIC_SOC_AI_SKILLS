@@ -22,13 +22,7 @@ import shutil
 import subprocess
 import sys
 
-CANDIDATES = (
-    "soffice", "soffice.exe", "libreoffice",
-    r"C:\Program Files\LibreOffice\program\soffice.exe",
-    r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
-    "/usr/bin/soffice", "/usr/local/bin/soffice",
-    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
-)
+CANDIDATES = ("soffice", "soffice.exe", "libreoffice")
 
 
 def find_soffice():

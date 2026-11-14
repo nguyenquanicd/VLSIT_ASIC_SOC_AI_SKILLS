@@ -124,6 +124,10 @@ COVERAGE = OrderedDict([
     ("R-038", ("script", "no `default_nettype directive in design RTL; undeclared identifiers are found by lint (TYP-03, P5)")),
     ("R-036", ("script", "the always_ff that assigns an FSM current state holds that register only")), ("ENM-06", ("script", "FSM current-state register in its own always_ff (rule file): same check as R-036")),
     ("TYP-06", ("script", "no redundant declaration (rule file): same checks as R-035, R-071 and R-072")), ("P30", ("script", "one-bit ranges and unused internal declarations (rule file): same checks as R-035, R-071 and R-072")),
+    ("TYP-07", ("script", "detects literal ascending ranges and common [0:N] declarations on declaration lines; other symbolic or multiline dimensions need review (P31)")),
+    ("COM-09", ("script", "logical operators in value-producing expressions; reported under this canonical ID (P32)")),
+    ("COM-10", ("script", "logical operators are restricted to conditions; covered by the COM-09 scan (P32)")),
+    ("COM-11", ("script", "selection nesting depth is at most four in processes and functions (P33)")),
 ])
 
 
@@ -427,6 +431,228 @@ def check_fsm_ff(code, name, f):
                   "one always_ff assigns the current state of two FSMs (%s): one always_ff per FSM (R-036, ENM-06)"
                   % ", ".join(states))
 
+
+DECL_HEAD = re.compile(
+    r"^\s*(?:(?:input|output|inout|parameter|localparam|typedef|function|task)\b|"
+    r"(?:logic|wire|reg|bit|byte|shortint|int|integer|genvar)\b|[A-Za-z_]\w*_type_def\b)")
+DIMENSION = re.compile(r"\[\s*([^:\]\n]+?)\s*:\s*([^\]\n]+?)\s*\]")
+
+
+def check_dimensions(code, name, f):
+    """TYP-07: flag statically recognizable ascending dimensions in declarations."""
+    f.mark("TYP-07", "P31")
+    for m in DIMENSION.finditer(code):
+        left, right = (part.strip() for part in m.groups())
+        line_start = code.rfind("\n", 0, m.start()) + 1
+        line_end = code.find("\n", m.end())
+        line = code[line_start:len(code) if line_end < 0 else line_end]
+        if not DECL_HEAD.match(line):
+            continue
+        ascending = False
+        left_num = re.fullmatch(r"\d+", left)
+        right_num = re.fullmatch(r"\d+", right)
+        if left_num and right_num:
+            ascending = int(left) < int(right)
+        elif left == "0" and right != "0":
+            ascending = True  # Common zero-based symbolic form, e.g. [0:PARA_DEPTH-1].
+        if ascending:
+            f.add("ERROR", "TYP-07", name, line_of(code, m.start()),
+                  "ascending dimension [%s:%s]: write dimensions MSB:LSB (TYP-07, P31)" % (left, right))
+
+
+LOGICAL = re.compile(r"&&|\|\||!(?!=)")
+
+
+def ternary_start(code, q):
+    """Index where the condition that ends at the '?' at q starts."""
+    i, depth = q - 1, 0
+    while i >= 0:
+        ch = code[i]
+        if ch in ")]}":
+            depth += 1
+        elif ch in "([{":
+            if depth == 0:
+                return i + 1
+            depth -= 1
+        elif depth == 0:
+            if ch in ";,:" or ch == "?":
+                return i + 1
+            if ch == "=" and code[i - 1:i] not in ("=", "!", "<", ">") and code[i + 1:i + 2] != "=":
+                return i + 1
+        i -= 1
+    return 0
+
+
+def condition_spans(code):
+    """Spans where a logical operator is allowed: if / for / while conditions and the condition of ?:."""
+    spans = []
+    for m in re.finditer(r"\b(if|for|while)\b", code):
+        p = code.find("(", m.end())
+        if p < 0 or code[m.end():p].strip():
+            continue
+        q = match_paren(code, p)
+        if q > p:
+            spans.append((p, q + 1))
+    for m in re.finditer(r"\?", code):
+        j = m.start() - 1
+        while j >= 0 and (code[j].isalnum() or code[j] in "_'?xzXZ"):
+            j -= 1
+        if "'" in code[j + 1:m.start()]:
+            continue  # wildcard of a based literal, not a ternary
+        spans.append((ternary_start(code, m.start()), m.start()))
+    return spans
+
+
+def check_logical_ops(code, name, f):
+    """COM-09 / COM-10: a value expression uses the bitwise operators; &&, || and ! only appear in a condition."""
+    f.mark("COM-09", "COM-10", "P32")
+    spans = condition_spans(code)
+    for m in LOGICAL.finditer(code):
+        if any(a <= m.start() < b for a, b in spans):
+            continue
+        op = m.group(0)
+        fix = "&" if op == "&&" else "|" if op == "||" else "~"
+        f.add("ERROR", "COM-09", name, line_of(code, m.start()),
+              "logical '%s' in a value expression: use the bitwise '%s'; &&, || and ! belong in if / for / while / "
+              "ternary conditions only (COM-09, COM-10, P32)" % (op, fix))
+
+
+SELECT_RE = re.compile(r"\b(if|case|casez|casex)\b")
+IF_RE = re.compile(r"(?:unique0?\s+|priority\s+)?if\b")
+CASE_RE = re.compile(r"(?:unique0?\s+|priority\s+)?case[zx]?\b")
+LOOP_RE = re.compile(r"(?:for|while)\b")
+
+
+def begin_span(code, i):
+    """(inside start, inside end, index after the closing end) of the begin block at i."""
+    depth = 0
+    for m in re.finditer(r"\b(begin|end)\b", code[i:]):
+        depth += 1 if m.group(1) == "begin" else -1
+        if depth == 0:
+            return i + 5, i + m.start(), i + m.end()
+    return i + 5, len(code), len(code)
+
+
+def record(depth, pos, found):
+    if depth > found[0]:
+        found[0], found[1] = depth, pos
+
+
+def walk_if(code, pos, level, found):
+    """Walk an if / else-if chain whose own level is level. Return the index after the chain."""
+    while True:
+        p = code.find("(", pos)
+        q = match_paren(code, p) if p >= 0 else -1
+        if q < 0:
+            return len(code)
+        body_end = walk_statement(code, q + 1, level, found)
+        m = re.match(r"\s*else\b", code[body_end:])
+        if not m:
+            return body_end
+        k = body_end + m.end()
+        m2 = re.match(r"\s*(?:unique0?\s+|priority\s+)?if\b", code[k:])
+        if m2:
+            pos = k + m2.end()
+            continue
+        return walk_statement(code, k, level, found)
+
+
+def walk_statement(code, i, depth, found):
+    """Walk the statement at i, record the deepest selection level relative to depth, return its end."""
+    while i < len(code) and code[i].isspace():
+        i += 1
+    if i >= len(code):
+        return i
+    if re.match(r"begin\b", code[i:]):
+        inner_start, inner_end, after = begin_span(code, i)
+        scan_selections(code, inner_start, inner_end, depth, found)
+        return after
+    m = IF_RE.match(code[i:])
+    if m:
+        record(depth + 1, i, found)
+        return walk_if(code, i + m.end(), depth + 1, found)
+    m = CASE_RE.match(code[i:])
+    if m:
+        level = depth + 1
+        record(level, i, found)
+        end = stmt_end(code, i)
+        p = code.find("(", i)
+        q = match_paren(code, p) if p >= 0 else -1
+        body_end = code.rfind("endcase", i, end)
+        if q >= 0 and body_end > q:
+            scan_selections(code, q + 1, body_end, level, found)
+        return end
+    m = LOOP_RE.match(code[i:])
+    if m:
+        p = code.find("(", i)
+        q = match_paren(code, p) if p >= 0 else -1
+        if q < 0:
+            return stmt_end(code, i)
+        return walk_statement(code, q + 1, depth, found)
+    return stmt_end(code, i)
+
+
+def scan_selections(code, start, end, depth, found):
+    """Find every if / case at this level in code[start:end] and walk it."""
+    pos = start
+    while pos < end:
+        m = SELECT_RE.search(code, pos, end)
+        if not m:
+            return
+        nxt = walk_statement(code, m.start(), depth, found)
+        pos = max(nxt, m.start() + 1)
+
+
+def scan_process(code, start, end, found):
+    """Scan a process body. The reset test that opens a sequential process is not counted (COM-08, COM-11)."""
+    i = start
+    while i < end and code[i].isspace():
+        i += 1
+    scan_end = end
+    if re.match(r"begin\b", code[i:]):
+        inner_start, inner_end, _ = begin_span(code, i)
+        i, scan_end = inner_start, inner_end
+        while i < scan_end and code[i].isspace():
+            i += 1
+        m_label = re.match(r":\s*\w+", code[i:])
+        if m_label:
+            i += m_label.end()
+            while i < scan_end and code[i].isspace():
+                i += 1
+    m = IF_RE.match(code[i:])
+    if m:
+        p = code.find("(", i)
+        q = match_paren(code, p) if p >= 0 else -1
+        if q > 0 and RESET_COND.match(code[p + 1:q]):
+            pos = walk_if(code, i + m.end(), 0, found)
+            scan_selections(code, pos, scan_end, 0, found)
+            return
+    scan_selections(code, i, scan_end, 0, found)
+
+
+def check_nesting(code, name, f):
+    """COM-11: at most four nested case / if levels in one always_comb, always_ff or function."""
+    f.mark("COM-11", "P33")
+    spans = []
+    for m in re.finditer(r"\balways(?:_comb|_ff|_latch)?\b", code):
+        i = m.end()
+        if code[i:].lstrip().startswith("@"):
+            p = code.find("(", i)
+            q = match_paren(code, p) if p >= 0 else -1
+            i = q + 1 if q >= 0 else i
+        spans.append(("process", i, stmt_end(code, i)))
+    for m in re.finditer(r"\bfunction\b.*?\bendfunction\b", code, re.S):
+        spans.append(("function", m.start(), m.end()))
+    for kind, start, end in spans:
+        found = [0, start]
+        if kind == "process":
+            scan_process(code, start, end, found)
+        else:
+            scan_selections(code, start, end, 0, found)
+        if found[0] > 4:
+            f.add("ERROR", "COM-11", name, line_of(code, found[1]),
+                  "selection nesting depth %d: keep case / if nesting at four levels or less and restructure with a "
+                  "case, a helper function or a submodule (COM-11, P33)" % found[0])
 
 # ------------------------------------------------------------------ one file
 
@@ -883,6 +1109,9 @@ def check_file(path, f):
     check_comb_defaults(code, name, f)
     check_redundant(code, name, f)
     check_fsm_ff(code, name, f)
+    check_dimensions(code, name, f)
+    check_logical_ops(code, name, f)
+    check_nesting(code, name, f)
     f.mark("R-038")
     for m in re.finditer(r"`default_nettype\b", code):
         f.add("ERROR", "R-038", name, line_of(code, m.start()),

@@ -21,7 +21,7 @@ MUST ask the user before overwriting or deleting a file that this skill did not 
 ## Inputs and questions
 
 ### R-003 Rule file first
-MUST read the rule file in full before writing or changing any RTL line, taking it from the path the user names or from `spec_template/VLSIT_RTL_Design_Rule.md` of the working tree, and ask for the path when neither exists.
+MUST read the rule file in full before writing or changing any RTL line, taking it from the path the user names or from this skill's `reference/VLSIT_RTL_Design_Rule.md`; ask for the path only when neither source exists.
 - Why: naming, structure and the list of prohibited constructs come from that document, and a guess about them forces rework of every file.
 - Check: manual - the report names the rule file path and its version.
 
