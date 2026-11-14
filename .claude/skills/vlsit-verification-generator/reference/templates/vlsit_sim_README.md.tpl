@@ -150,3 +150,20 @@ VI: execute/replay thực sự gọi lệnh đã lưu với biến cách ly. C�
 case hoàn tất có phép kiểm, phiên bản tool đo thực tế khớp và kết quả chuẩn hóa khớp.
 Chỉ init/seal/check không chứng minh đã replay. Không suy diễn toàn campaign/coverage
 đã đóng từ replay có giới hạn. Báo tool thiếu/producer chưa qualification là giới hạn.
+
+## Reusable generators / Script sinh có thể tái sử dụng
+
+__FILL_GENERATOR_COMMANDS_INPUTS_OUTPUTS_AND_REVIEW__
+
+EN: Link scripts/generators, generator templates/configuration, generation manifest
+and retained generated files. Document the command, working directory, input hashes,
+requirement/scenario IDs, output paths/hashes, version and review status for both
+testcase generation and applicable environment-component generation. State how to
+run a clean-copy regeneration or check/diff. Explain overwrite protection and how
+generated tests/components are reviewed and qualified before execution.
+
+VI: Link scripts/generators, template/cấu hình, generation manifest và file đã sinh.
+Ghi lệnh, thư mục chạy, hash đầu vào, requirement/scenario ID, đường dẫn/hash đầu ra,
+phiên bản và trạng thái review cho cả sinh testcase lẫn component môi trường phù hợp.
+Nêu cách sinh lại trên bản sao sạch hoặc check/diff, cách chặn ghi đè và quy trình
+review/qualification đầu ra trước khi chạy.

@@ -290,3 +290,28 @@ data but cannot restore it. Secret redaction covers known provisioned secret val
 in captured output; other generated files require review before sharing. Interrupted
 multi-file metadata updates fail closed and require explicit recovery; no automatic
 cleanup or silent history regeneration is permitted.
+
+
+## 2026-11-15 — Reusable testcase and environment generators
+
+Added permanent rule R-276 to vlsit-verification-generator; the rule book now has
+113 unique rule IDs and the scalable range is R-260-R-276. When creating a reusable
+simulation environment, the skill must provide retained project generator script(s)
+for approved, requirement/scenario-linked testcases and applicable environment
+components. One script may provide both functions. Generator sources, templates,
+reviewed configurations, commands and generated outputs remain together under sim/.
+Generation must be repeatable for fixed inputs, protect existing output from silent
+overwrite and support clean-copy regeneration or a reviewed diff. Generated code
+still requires review/qualification before execution or closure.
+
+Added the bilingual README guidance, workflow/output paths, workspace reference,
+report section and a generation-manifest template that records purpose, version/hash,
+commands, working directory, input hashes, linked IDs, output hashes, log, reviewer,
+reproduction mode and overwrite behavior. Updated the common repository README.
+
+Validation this turn: rule ID checker PASS (113 unique); canonical skill validator
+PASS after linking the new manifest template. Mirroring and repository sync are
+completed below. No test suites were added or run in this turn; this change is a
+workflow/rule/template update. Runtime enforcement that a future generated testbench
+is correct remains the responsibility of design review, qualification and the
+existing source-bound verification flow.

@@ -178,3 +178,23 @@ records, not signatures. The self-tests execute a synthetic Python producer, not
 **VI:** Cần cấu hình adapter tool/model đã qualification trước; không kèm simulator
 hay parser chung cho mọi tool. Hash và receipt là record để audit, không phải chữ
 ký số. Self-test thực thi producer Python giả lập, không verification RTL.
+
+
+## Reusable testcase and environment generators / Script sinh tái sử dụng
+
+**EN:** When creating an environment for reuse, retain generator script(s) for
+approved testcase generation and applicable reusable environment components.
+They consume reviewed requirements/scenario matrices and protocol/model contracts,
+store generated tests and components under sim/, record input/output hashes and
+commands in env/generation_manifest.json, and support clean-copy regeneration or
+a reviewed diff. Protect existing output from silent overwrite. Generation success
+does not qualify the resulting tests/components; review them before execution.
+
+**VI:** Khi tạo môi trường để tái sử dụng, phải lưu script sinh testcase đã duyệt
+và các component môi trường phù hợp. Script dùng requirements/scenario matrix cùng
+protocol/model contract đã review; lưu test/component được sinh trong sim/, ghi hash
+đầu vào/đầu ra và lệnh trong env/generation_manifest.json, hỗ trợ sinh lại trên bản
+sao sạch hoặc review diff, và chặn ghi đè âm thầm. Sinh thành công không đồng nghĩa
+test/component đã qualification; cần review trước khi chạy.
+
+See [R-276 and generator workflow](reference/vlsit_sim_workspace.md).

@@ -17,7 +17,7 @@ The rules are grouped by verification level and by cross-cutting concern. The ru
 | Block | R-160–R-169 | A verification block, and every block inside a SoC |
 | SoC | R-180–R-189 | A SoC or system verification environment |
 | Test design and reporting | R-250–R-259 | Every run that selects, designs or reports tests |
-| Scalable verification | R-260-R-275 | Every run, with profile-specific applicability |
+| Scalable verification | R-260-R-276 | Every run, with profile-specific applicability |
 | Coverage | R-200–R-207 | Every run that plans, measures or closes coverage |
 | Regression | R-215–R-222 | Every run that selects, executes or reports regression tests |
 | AI | R-230–R-239 | Every run that uses an AI model for any verification artifact |
@@ -524,7 +524,7 @@ MUST apply data classification, model-version pinning, license review and prompt
 - Why: unclassified data, a silently upgraded model and an injected instruction can each invalidate the result or leak the design.
 - Check: the AI governance checklist is part of the run record and names the data class, model version, license decision and prompt-injection review.
 
-## Scalable verification rules (R-260-R-275)
+## Scalable verification rules (R-260-R-276)
 
 ### R-260 Complete requirement inventory
 MUST reconcile the approved in-scope inventory, including protocol clauses, with the vplan in both directions. Represent out-of-scope items in the reviewed scope record; never silently remove them from the specification.
@@ -605,3 +605,9 @@ MUST retain actual setup/build/compile/simulation/coverage commands, argv, worki
 MUST deliver a detailed bilingual sim/README.md and state the exact replay case/configuration/seed/observable scope. Never accept handwritten cold_replay=pass. Require a fresh snapshot-bound build and simulation, actual successful command receipts, new build/result artifacts, completed checked cases, matching tool versions and an explicit comparison with a registered original execution of the same baseline before claiming replay success. Qualify result producers; report unavailable replay as not_run and failures as fail. Keep package integrity, executed replay, measured closure and human sign-off separate.
 - Why: stale logs, exit code zero, unchecked results or one smoke case cannot prove campaign reproducibility.
 - Check: execute/replay use retained helper/runner, fresh run IDs and isolated variables; check reconciles receipts, case scope and exact normalized results. The self-tests cover missing history/dependencies, false replay metadata and actual subprocess success/failure. Hashes/receipts do not authenticate an untrusted producer or prove exhaustive hardware correctness.
+
+
+### R-276 Reusable verification generators
+MUST when creating a reusable simulation environment, provide retained project generator script(s) that generate specification/vplan-linked testcases and the applicable reusable environment components from reviewed configuration/templates. Include the testcase generator and environment-component generator functions, whether in one script or separate scripts. Store generators, source configuration, templates, generated outputs, exact regeneration commands and a generation manifest under sim/; generation must be deterministic for fixed inputs, refuse silent overwrite, and support an explicit check/diff or regeneration review. Generated code/data require normal review and qualification before execution or closure.
+- Why: hand-authored one-off tests and environment code are difficult to reproduce, extend or reuse consistently.
+- Check: the dependency export includes generator scripts/configuration/templates/outputs; the manifest binds generator version/hash, input hashes, command, output paths/hashes and linked requirement/scenario IDs. Re-running on a clean copy produces the recorded output set or a reviewed diff; reviewers confirm tests and components implement the approved contract.

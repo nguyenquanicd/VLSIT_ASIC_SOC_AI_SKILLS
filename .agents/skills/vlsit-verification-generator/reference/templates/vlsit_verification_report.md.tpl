@@ -241,3 +241,18 @@ Record the approved contract and inventory digests, complete scenario matrix and
 List any missing input, unavailable dependency or legacy-layout exception explicitly.
 Package integrity does not establish simulation success, measured closure or cold-replay success.
 No automatic cleanup is permitted after report generation (R-272 to R-275).
+
+
+## 18. Reusable testcase and environment generation (R-276)
+
+| Item | Retained path / status / evidence |
+|---|---|
+| Testcase generator | <script, version/source hash, command, input requirements/scenario IDs, output paths/hashes> |
+| Environment-component generator | <script, version/source hash, contract/config/template inputs and generated components> |
+| Generation manifest and logs | <env/generation_manifest.json; run log path/hash> |
+| Reproduction check | <clean-copy generation or diff command/result> |
+| Review and qualification | <reviewer, generated testcase/component review, qualification evidence> |
+| Overwrite protection | <behavior and approved update procedure> |
+
+Report any missing generator, untraceable case, changed output, or unreviewed generated
+component. Generation status is not test execution, component qualification or closure.

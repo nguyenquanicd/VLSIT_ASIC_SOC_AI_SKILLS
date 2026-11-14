@@ -1,6 +1,6 @@
 # Retained simulation packages and executed replay
 
-Read for R-272 to R-275. A testbench (TB) surrounds the design under test (DUT).
+Read for R-272 to R-276. A testbench (TB) surrounds the design under test (DUT).
 A Bus Functional Model (BFM) produces interface transactions. Preserve all inputs,
 all registered run outputs and all baseline snapshots used by the campaign.
 
@@ -24,6 +24,9 @@ sim/
   models/                     independent model sources/build settings
   tests/                      cases, vectors, seeds and regression lists
   scripts/                    actual project runner plus copied package helper
+    generators/                reusable testcase/environment generation scripts
+  env/generated/              generated reusable verification components
+  tests/generated/            generated requirement-linked testcase sources/data
   runs/<run_id>/              fresh build/reports, exact commands, logs and receipt
   coverage/                   merged campaign results; retained and hashed
   snapshots/<baseline_id>/    all retained package files plus snapshot manifest
@@ -203,6 +206,40 @@ in the catalog. check grants PACKAGE_INTEGRITY only; execute prints
 EXECUTION_COMPLETED: CHECKED; replay prints REPLAY_EXECUTED: MATCH only after actual
 fresh execution and comparison. All return 2 on invalid/failed operations. Neither
 execution nor replay grants source-bound coverage closure or human sign-off.
+
+## Reusable testcase and environment generators (R-276)
+
+When creating a reusable environment, retain project-owned generator scripts under
+sim/scripts/generators/. Provide generator functions for both testcases and the
+applicable environment components; one script may implement both. Use reviewed,
+versioned configuration/templates in sim/env/configs or sim/tests/configs. Generate
+only the components required by the design and verification contract: for example
+BFMs/drivers, monitors, predictors/scoreboards, assertions and coverage collectors.
+Prefer a qualified existing implementation when it fits; generator output is not
+qualified merely because generation succeeded.
+
+Testcase generation consumes approved requirements, vplan/scenario matrix,
+configuration and seeds. Every generated case retains requirement/scenario IDs,
+expected behavior, checks/oracles and relevant parameters. The environment
+component generator consumes reviewed protocol/interface and model contracts.
+Keep generated components under sim/env/generated/ and cases/data under
+sim/tests/generated/. Preserve generator source, templates, configs and output as
+package inputs and include them in env/build_inputs.json.
+
+Start from reference/templates/vlsit_sim_generator_manifest.json.tpl. Record env/generation_manifest.json with schema version, generator name/version or
+source hash, exact argv and working directory, config/template/input hashes,
+linked requirement/scenario IDs, generated output paths and hashes, generation time,
+and reviewer/status. Retain the generator command and output log. Generators must
+be deterministic for identical inputs and must refuse to overwrite existing output
+unless an explicit reviewed update path is used. Provide a check/diff mode or a
+clean-copy regeneration procedure. Review diffs and test each generated testcase
+and component against its approved contract before execution. Generation does not
+replace G0 approval, code review, model qualification or source-bound closure.
+
+For an existing project without generator scripts, preserve its environment and
+record the gap. Add generators when extending or packaging it for reuse; never claim
+reusable generation until both testcase and applicable component generation can be
+reproduced from retained inputs.
 
 ## Handoff, tests and limits
 

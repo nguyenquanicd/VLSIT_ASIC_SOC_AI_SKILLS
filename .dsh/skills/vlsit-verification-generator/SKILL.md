@@ -55,7 +55,7 @@ Scan the specification for gaps and ambiguities. Stop and ask about every gap th
 
 ### 4b. Create and retain the simulation workspace
 
-Read [reference/vlsit_sim_workspace.md](reference/vlsit_sim_workspace.md) before creating simulation files. Use a standalone sim/ folder beside the original RTL, preserve every replay input and baseline snapshot, and maintain a detailed bilingual sim/README.md. Record exact commands, working directories, tools, seeds, timeouts and relevant environment variables; preserve secret variable names/provisioning instructions rather than secret values. Use schema 2 init/seal/check with a reviewed dependency export and full retention catalog; equivalent project flows must preserve the same checks. Read the guide before migrating schema 1. Do not clean away environments, testbenches, failed runs or evidence after reporting.
+Read [reference/vlsit_sim_workspace.md](reference/vlsit_sim_workspace.md) before creating simulation files. Use a standalone sim/ folder beside the original RTL, preserve every replay input and baseline snapshot, and maintain a detailed bilingual sim/README.md. Record exact commands, working directories, tools, seeds, timeouts and relevant environment variables; preserve secret variable names/provisioning instructions rather than secret values. Use schema 2 init/seal/check with a reviewed dependency export and full retention catalog; equivalent project flows must preserve the same checks. Read the guide before migrating schema 1. When building an environment for reuse, create retained generator scripts for approved testcases and applicable environment components, with reviewed templates/configuration, generation manifest and repeatable commands (R-276). Preserve generated outputs and generator inputs together. Do not clean away environments, testbenches, failed runs or evidence after reporting.
 
 ### 5. Build and check the verification plan
 
@@ -109,7 +109,7 @@ Default return code 0 means source-bound evidence meets the reviewed contract wi
 
 Check the result against every applicable rule ID. Run the checks that name a script, and inspect the rest by hand. Write one report, `sim/docs/verification_report.md`, from `reference/templates/vlsit_verification_report.md.tpl` (R-259). It contains the rule-ID table, the test results, coverage per metric, exclusions, waivers, protocol deviations, VIP changes, the force report, bug and fix records, AI provenance and residual risk. Every exception has a reason. Say plainly what was not checked and what residual risk remains. Never report a gate as approved unless a named human approved it.
 
-Before handoff, seal and check the retained workspace, complete sim/README.md and the report retention table, and use execute/replay for actual subprocess execution and comparison in a fresh directory when tools are available. Handwritten cold_replay=pass is rejected; replay receipts must bind the reviewed case scope to the retained baseline and original execution. Preserve every environment/testbench source and failed/passing run. Report package integrity, actual simulation, closure and cold-replay outcomes separately; unavailable replay remains not_run with a reason (R-272 to R-275).
+Before handoff, seal and check the retained workspace, verify generator inputs/outputs and the testcase-to-requirement/scenario trace, complete sim/README.md and the report retention table, and use execute/replay for actual subprocess execution and comparison in a fresh directory when tools are available. Handwritten cold_replay=pass is rejected; replay receipts must bind the reviewed case scope to the retained baseline and original execution. Preserve every environment/testbench source and failed/passing run. Report package integrity, actual simulation, closure and cold-replay outcomes separately; unavailable replay remains not_run with a reason (R-272 to R-276).
 
 ## Reference
 
@@ -166,7 +166,10 @@ sim/
   models/                   retained C/C++/Python model code and build settings
   dut/                      frozen DUT sources/includes required for the verified baseline
   tests/                    test cases, sequences, vectors, seeds and regression list
-  scripts/                  portable project runner/build entrypoints and package checker
+  scripts/                  portable runner, package checker and reusable generators
+    generators/             testcase and environment-component generation scripts
+  env/generated/            generated reusable BFM/monitor/checker/model/coverage sources
+  tests/generated/          generated requirement-linked testcases and scenario data
   runs/<run_id>/             commands, input references, logs, receipts, waves and results
   coverage/                 merged campaign coverage and exclusions
   snapshots/<baseline_id>/  retained immutable replay inputs and integrity manifest

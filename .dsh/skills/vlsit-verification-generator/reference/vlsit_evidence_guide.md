@@ -160,6 +160,6 @@ Manifest PASS means metadata/files/hashes validate; it does not change a recorde
 
 An artifact manifest remains a storage/integrity record, even for a failed simulation. Source-bound closure separately requires an approved contract/scenario matrix, actual compiled source hashes, qualified producers/models/checkers, exact run receipts, reconciled vplan status and recomputed bin unions. MET_WITH_WAIVERS has default exit 3; use the JSON verdict in CI. See vlsit_closure_contract.md for schema and trust boundaries.
 
-## Retained simulation package (R-272 to R-275)
+## Retained simulation package (R-272 to R-276)
 
 Use vlsit_sim_workspace.md. Run bundles live under sim/runs; the complete environment/testbench and immutable baseline inputs are retained separately under sim/. Keep exact argument lists, working directories, relevant environment records and tool-version evidence alongside source-bound receipts. A storage manifest alone is not proof of a successful cold replay.
