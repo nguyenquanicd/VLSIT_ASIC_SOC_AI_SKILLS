@@ -493,7 +493,7 @@ Confirm before accepting an RTL handoff:
 
 ## 13. Checker identifiers and aliases
 
-`vlsit_rtl_check.py` reports a small number of identifiers that are not rules of this document. They are kept because delivered logs cite them; each maps to a rule above or marks an exemption. A report quotes the canonical ID; the legacy identifier remains in the tool output for one release.
+`vlsit_rtl_check.py` reports a small number of identifiers that are not rules of this document. Each maps to a rule above or marks an exemption. Findings use canonical rule IDs where available. The checker does not emit aliases that collide with permanent skill rule IDs.
 
 | Checker ID | Reported meaning | Canonical rule or status |
 |---|---|---|
@@ -504,8 +504,4 @@ Confirm before accepting an RTL handoff:
 | R-036 | The `always_ff` of an FSM current state holds that register only | ENM-06 |
 | R-038 | No `default_nettype directive | TYP-03, P5 |
 | R-040 | Output of an APB-CSR-Generator older than 2.0 (warning) | Exemption |
-| R-049 | Every declared dimension is written MSB:LSB | TYP-07 |
-| R-050 | Value expressions use `&`, `\|`, `^`, `~` | COM-09 |
-| R-051 | `&&`, `\|\|`, `!` only in conditions | COM-10 |
-| R-052 | Procedural nesting of at most four levels | COM-11 |
 | CHK-11 | Tapeout readiness checklist of section 11 | Manual, section 11 |
