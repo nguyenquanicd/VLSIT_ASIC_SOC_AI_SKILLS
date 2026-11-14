@@ -8,7 +8,7 @@
 
 - VLSIT_ASIC_IP_Design_Specification_Template.md — cấu trúc đặc tả IP / IP specification structure.
 - VLSIT_CSR_Specification_Template.xlsx — register map và field definitions / bản đồ thanh ghi và định nghĩa field.
-- VLSIT_RTL_Design_Rule.md — coding rules cho RTL ASIC / ASIC RTL coding rules.
+- VLSIT_RTL_Design_Rule.md — bộ quy tắc RTL v2 đầy đủ, đồng bộ với `vlsit-rtl-generator` / the complete v2 RTL coding rules, synchronized with `vlsit-rtl-generator`.
 
 **VI:** CSR RTL được sinh bằng công cụ riêng APB-CSR-Generator; kiểm tra RTL đầu ra theo rule trước khi dùng.
 

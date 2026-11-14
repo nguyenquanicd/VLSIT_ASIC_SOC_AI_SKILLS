@@ -1,6 +1,6 @@
 # Skills Consolidation Review
 
-**Review date:** 2026-11-14  
+**Review date:** 2026-11-14
 **Repositories:** DeepSeek skill library (#1), shared Codex/Claude skill library (#2), RTL autoflow project (#3)
 
 ## Scope
@@ -21,6 +21,9 @@
 | I-06 | Several older skill copies contained personal machine paths or fixed LibreOffice locations. | Consolidated the portable copies, replaced fixed utility lookup with environment-based discovery, and scanned all three skill trees in #1 and #2. No personal absolute-path reference remains in the scanned skill content. |
 | I-07 | The RTL-generator skill README in #3 described the generator as RV32IM-only, while the workflow is generic. The #3 common README also described prohibited constructs only through P1–P30. | Corrected the flow skill README to describe generic IP RTL generation and updated the #3 common README to include P31–P33 and their canonical rules. |
 | I-08 | The DOCX skill rule file contained duplicate R-017 headings. A few similarity-check warnings also needed human review. | Removed the duplicate R-017 section. Reviewed the remaining seven similarity pairs; they cover distinct adjacent duties, recorded below, and are not duplicate rules. |
+
+| I-09 | The microspec template described its bundled RTL rule file as mandatory, but it was a reduced and stale copy: 66 of 78 canonical IDs were present, with 12 missing (`COM-09/10/11`, `ENM-06`, `FIL-04/05/06`, `NAM-09`, `PAR-04`, `SCP-03`, `TYP-06/07`). Four shared rules also differed (`COM-06`, `HIE-03`, `PAR-01`, `PAR-03`). | Replaced it with the exact canonical v2 rule file from the RTL-generator skill and clarified the bilingual template README. Mirrored the change across all three skill trees in both #1 and #2. |
+| I-10 | The user-level DSH install had 18 skill directories but only 394 of 400 canonical files. The pre-sync audit found 99 differing common files and six missing README files (105 stale paths total), with no user-only files. | Created a 394-file backup outside the repositories, then synchronized the canonical 400-file tree. Added six missing files and updated the stale copies; verified all 400 SHA-256 hashes and all 18 skill directories. |
 
 ## Consolidation decisions
 
@@ -45,6 +48,7 @@ No other #3 skill was changed.
 
 - All 18 skills have a per-skill README. In each of #1 and #2, `vlsit_skillkit.py mirror --check` passed for 18/18 skills; `.claude`, `.agents`, and `.dsh` copies are byte-identical within each repository.
 - The common README and all three skill trees are byte-identical between #1 and #2. The consolidation report is also copied to both repositories to preserve that synchronization.
+- The user-level DSH installation was verified byte-identical to #2 `.dsh/skills` after synchronization: 400 files across 18 skills. The sync updated 100 common files (the 99 pre-existing content differences plus the microspec README updated during this repair) and added the six missing README files; the pre-sync backup contains 394 files.
 - A static local-link check passed for the common README, consolidation report, and all 18 per-skill READMEs in each repository (20 files per repository). Relative links inside bundled upstream examples were outside this README-link check.
 - Python syntax parsing passed for 10 helper/checker scripts used or changed during the consolidation. No script test suite, HDL simulation, lint, synthesis, network download, or full autoflow was run.
 - `vlsit_skillkit.py validate` passed 11/18 skills. Seven skills remain flagged because their documented optional third-party packages are not on the validator's explicit package-approval allowlist: `openpyxl` (five skills), `python-docx`, PyMuPDF (`fitz`), and Pillow (`PIL`) in the document-conversion skills. No package approval was inferred and no package was installed.
