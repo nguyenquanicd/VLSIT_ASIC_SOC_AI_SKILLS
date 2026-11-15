@@ -12,6 +12,7 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 ## A. General
 
 - RSC-001 (MUST): Write plans, reports, and chat summaries in precise scientific and engineering English, and distinguish verified results, source-based reasoning, assumptions, and validation limits. Bilingual content is allowed only in README files and documents designated as user guidelines.
+- RSC-002 (MUST): Modify the existing RTL in place as the only permitted implementation method and never deliver a from-scratch design, a wholesale module rewrite, a regenerated file, or a replacement architecture, even when the new specification restates the complete function. This rule outranks every other rule of this skill.
 
 ## B. Inputs and clarification
 
@@ -29,11 +30,33 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 - RSC-022 (MUST NOT): Run tests, simulation, synthesis, or other executable checks, or edit RTL, during analysis.
 - RSC-023 (MUST): Preserve the user's existing changes. Never use an unrelated snapshot or output folder as the baseline.
 - RSC-024 (MUST): Capture a task-start baseline snapshot of the RTL tree before the first RTL edit (see `scripts/vlsit_rtl_change_metrics.py`), so edits can be isolated from pre-existing changes (RSC-062).
+- RSC-025 (MUST): Record the coding conventions that the existing RTL actually uses — naming, file and module layout, header, reset and clock-enable style, FSM encoding, comment and indentation style — as a style profile with one representative module and its `file:line` before planning a change.
 
-## D. Plan and approval gate
+## D. Specification rewrite
+
+The specification is the contract of the change, not a new design. Rewrite it in the template of `vlsit-asic-ip-microspec` and express every new behavior as a delta on the behavior read from the RTL.
+
+- RSC-100 (MUST): Rewrite the specification as `VLSIT_<DESIGN_FUNCTION>_HDS.md` with the front matter and all 22 sections of the VLSIT template used by `vlsit-asic-ip-microspec`, in the template order and with the same section titles.
+- RSC-101 (MUST): Describe the existing RTL as the baseline in sections 1, 5, 6, 7, 8, 10 and 14, with the module hierarchy, ports, parameters, clock and reset domains, FSM and coding conventions taken from the source and cited as `file:line`.
+- RSC-102 (MUST): Write every new requirement as a delta `REQ-<AREA>-<NNN>` that names the behavior it preserves and the behavior it adds, gives a verification method, and appears in the traceability table of section 19.
+- RSC-103 (MUST): Reconcile the old specification with the RTL: keep an old statement only when the RTL matches it, mark an outdated statement as revised, and route a behavioral difference to the defect report of section E.
+- RSC-104 (MUST): Define every software-visible register and field only in the CSR workbook, and let sections 11.2 to 11.4 cite those workbook names alone, with all numeric register data left to the workbook.
+- RSC-105 (MUST): State in section 14 the preserved interfaces and behavior, the modules and files the change may touch, the change budget in percent of the baseline RTL code lines agreed with the user, and the coding conventions the change must keep.
+- RSC-106 (MUST NOT): Write a requirement, feature or architecture that treats the IP as a new design, asks for the RTL to be generated or rewritten from the beginning, renames existing modules, ports, parameters or registers, or replaces the current coding and naming conventions.
+
+## E. Pre-existing defect report
+
+A pre-existing defect is reported, never fixed silently. The user confirms each one before it enters the specification or the plan.
+
+- RSC-120 (MUST): Record every suspected pre-existing defect as `BUG-<NNN>` with the RTL `file:line`, the observed behavior, the required behavior, the evidence, and a status of `CONFIRMED`, `REJECTED` or `PENDING` before the implementation plan is written.
+- RSC-121 (MUST): Ask the user to confirm or reject every reported defect in one gate message and record the decision date and the user's reason for a rejection; no defect changes the specification, the plan or the RTL before that decision.
+- RSC-122 (MUST): Add each confirmed defect to the rewritten specification as a corrective requirement with its own `REQ-<AREA>-<NNN>` identifier and verification method, and record a rejected defect only in the review document with its reason.
+- RSC-123 (MUST NOT): Correct, mask or hide a pre-existing defect inside an approved feature change; a confirmed defect becomes its own approved change set with its own tests.
+
+## F. Plan and approval gate
 
 - RSC-030 (MUST): Before editing RTL, write the review document `rtl_change_review.md` in scientific English. Save it where the user specifies, otherwise in the project root containing the RTL directory. If the location is ambiguous or not writable, ask. Never silently overwrite an existing report; use a numbered filename or ask.
-- RSC-031 (MUST): The plan contains: (1) design and input summary with analysis limits, (2) requirement comparison with current RTL behavior and source evidence, (3) affected-module/file map with change and reason, (4) design choices, (5) minimal-change rationale including excluded related code, (6) open questions, assumptions, conflicts, compatibility risks, (7) proposed validation with commands when discoverable and expected evidence, (8) an approval status such as "Awaiting user sign-off." Structure per `reference/vlsit_review_template.md`.
+- RSC-031 (MUST): The plan contains: (1) design and input summary with analysis limits, (2) the rewritten specification path and version, (3) requirement comparison with current RTL behavior and source evidence, (4) the defect table with every BUG-<NNN> status and decision, (5) affected-module/file map with change and reason, (6) design choices, (7) minimal-change rationale including excluded related code and the style profile, (8) the CSR delta with the free-address evidence, (9) open questions, assumptions, conflicts, compatibility risks, (10) proposed validation with commands when discoverable and expected evidence, (11) the change budget, (12) the CSR INFO file path, and (13) an approval status such as "Awaiting user sign-off." Structure per `reference/vlsit_review_template.md`.
 - RSC-032 (MUST): Present at most three materially different viable strategies, ranked, with one recommended and a comparison of functional coverage, change size, interface/backward compatibility, complexity, and risk. If only one sound approach exists, present one.
 - RSC-033 (MUST): Each finding, rationale, and table row is independently understandable. Do not claim a check has run in the plan.
 - RSC-034 (MUST): Summarize the plan in chat and ask for APPROVE, REVISE, or STOP, naming the plan version: "Do you approve plan version N, including the listed RTL files, proposed behavior, and validation commands? Reply APPROVE, REVISE, or STOP." The initial feature request is not approval.
@@ -41,15 +64,26 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 - RSC-036 (MUST): On REVISE, update the plan and present the new version, then wait. On STOP or no approval, make no RTL change and mark the review document not approved.
 - RSC-037 (MUST): Approval covers only the listed files, behaviors, strategy, and checks. A necessary change outside that scope stops work, updates the plan, and requires fresh approval.
 
-## E. Implementation
+## G. Implementation
 
-- RSC-040 (MUST): Make the smallest safe set of RTL changes that fully implements the approved behavior, following existing architecture, naming, reset, handshake, register, and coding patterns. No unrelated cleanup, redesign, renaming, formatting churn, or broad refactoring.
+- RSC-040 (MUST): Make the smallest safe set of RTL changes that fully implements the approved behavior, following existing architecture, naming, reset, handshake, register, and coding patterns, and state every related code region deliberately left unchanged. No unrelated cleanup, redesign, renaming, formatting churn, or broad refactoring.
 - RSC-041 (MUST): Minimality MUST NOT compromise correctness, timing/interface contracts, reset behavior, parameterized configurations, or maintainability. If a tiny patch would be fragile or incomplete, use the smallest robust approach and explain why.
 - RSC-042 (MUST NOT): Invent unspecified behavior. If new evidence changes the planned solution, return to the approval gate.
 - RSC-043 (MUST): Modify only approved RTL files and explicitly approved supporting files. MUST NOT edit either specification unless separately requested.
-- RSC-044 (MUST): Preserve the RTL source language and existing comment style when modifying existing RTL, and write every new functional comment in precise scientific English.
+- RSC-044 (MUST): Preserve the RTL source language, comment style, file header layout, indentation and local coding conventions of the existing files, write every new functional comment in precise scientific English, and when the current RTL differs from the VLSIT design rule, follow the current RTL and record the deviation.
+- RSC-048 (MUST): Stop and return to the approval gate when the smallest correct change needs a file outside the approved list, a new module, a register change not approved under section H, or a change above the agreed budget.
 
-## F. Validation and report
+## H. CSR change policy
+
+An existing register map is a software contract. Add to it; do not rewrite it.
+
+- RSC-130 (MUST): Keep every existing register, field, offset, access type and reset value unchanged, and obtain explicit user approval before any unavoidable change to them.
+- RSC-131 (MUST): Place every new register at an address that the current map leaves reserved or unused, keep 4-byte alignment, and record the chosen offset and the free-range evidence in the plan and in section 11.1 of the specification.
+- RSC-132 (MUST): Extend an existing register only through a reserved field of that register, keeping every existing field at its bit position and access type.
+- RSC-133 (MUST): Maintain the register contract as the CSR JSON description, the workbook filled by `vlsit_csr_tool.py` of `vlsit-asic-ip-microspec`, and the CSR INFO file, with the workbook as the single source of field definitions.
+- RSC-134 (MUST): Increment the minor field of the read-only version register when the change adds, removes or modifies a register or field, and state the new version in section 11.1.
+
+## I. Validation and report
 
 - RSC-050 (MUST): Run only validation commands listed and approved in the plan or separately requested. Do not claim lint, compile, simulation, synthesis, or formal success unless that exact check ran and its result was inspected.
 - RSC-051 (MUST): Update `rtl_change_review.md` with the final report: requirement-to-code traceability, changed files with concise summaries, actual checks and results, remaining risks or unimplemented items, and a clear completion status.
@@ -57,8 +91,11 @@ Precedence: this `rule.md` overrides `SKILL.md`, and `SKILL.md` overrides the re
 - RSC-061 (MUST): State total baseline lines, added lines, deleted lines, changed-file list, and percentage. Exclude Markdown reports, comment-only changes, blank lines, generated logs, tests, and unrelated or pre-existing edits from the numerator.
 - RSC-062 (MUST): Compare against the captured task-start files, not blindly against HEAD when the tree was already dirty. If an exact task-specific comparison is impossible, report the percentage as unavailable with the reason. Never estimate or fabricate it.
 - RSC-063 (MUST): The final response gives the review/report link and a concise summary of approved behavior, files changed, implementation status, percentage with formula counts, executed checks and results, and outstanding risks.
+- RSC-150 (MUST): Generate the CSR INFO file with `scripts/vlsit_csr_info.py info` from the CSR JSON description, in the `debug.json` layout of APB-CSR-Generator with its `Table - Configuration` and `Table - Register Definition` entries, and name it `<IP>_CSR_info.json`.
+- RSC-151 (MUST): Check the CSR INFO file with `scripts/vlsit_csr_info.py check` and the register delta with `scripts/vlsit_csr_info.py diff` against the baseline map, and deliver both results with the review document.
+- RSC-152 (MUST): Report the register delta in section 8 of the review document with one row for every added register and its free address, one row for the unchanged register set, and one row for every approved modification with its approval date.
 
-## G. Self-improvement
+## J. Self-improvement
 
 - RSC-090 (MUST): When a deterministic, repeatable operation is needed or performed manually a second time, or the model judges it will recur across runs, create a script for it in `scripts/` unless an equivalent script exists. Each Python script needs a header docstring (purpose, usage, inputs, outputs, exit codes) and English messages. The bundled `vlsit_find_python.ps1` and `.sh` helpers are the sole non-Python exception and must document equivalent usage and exit behavior. Python helpers use only the standard library (a third-party package or another language needs explicit user approval, except `openpyxl` for `vlsit_analyze_excel.py`, RSC-097), and no network access or file writes outside user-approved paths.
 - RSC-091 (MUST): Test a new script on a real input before registering it. If it cannot be run in the current environment, register it as untested and say so in the report. Register every script in `scripts/README.md` (name, purpose, status).

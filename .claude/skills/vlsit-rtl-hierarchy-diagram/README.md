@@ -23,7 +23,7 @@ Lần theo thiết kế RTL hiện có từ module top tới các module con, th
 
 - Map module instances and parent-child relationships by hierarchy depth. / Liệt kê instance và quan hệ cha-con theo từng cấp hierarchy.
 - Trace important interfaces and functional paths such as AXI/APB, handshakes, interrupts, and data/control links. / Lần theo interface và đường chức năng như AXI/APB, handshake, interrupt, data/control.
-- Add a concise module-function/interface panel to each page; use black-and-white styling and 18 pt text. / Thêm khung ngắn mô tả chức năng/interface của module trên mỗi trang; dùng hai màu đen trắng và chữ 18 pt.
+- Deliver one two-tab draw.io file: `BLOCK_DIAGRAM` contains the hierarchy diagram only; `BLOCK_INFORMATION` contains the block-function table, interface table and symbol/connector legend. Use black-and-white styling and 18 pt text. / Bàn giao một file draw.io có hai tab: `BLOCK_DIAGRAM` chỉ chứa sơ đồ phân cấp; `BLOCK_INFORMATION` chứa bảng chức năng block, bảng interface và chú giải ký hiệu/đường nối. Dùng hai màu đen trắng và chữ 18 pt.
 - Use only the bundled VLSIT library for blocks, logic symbols, text, and connectors; check their provenance before delivery. / Chỉ dùng thư viện VLSIT đi kèm cho block, ký hiệu logic, chữ và đường nối; kiểm nguồn gốc ký hiệu trước khi bàn giao.
 
 ## Required symbol library / Thư viện ký hiệu bắt buộc
@@ -44,7 +44,7 @@ Xem [vlsit_library_usage.md](reference/vlsit_library_usage.md) để chọn và 
 
 ## Input and output / Đầu vào và đầu ra
 
-An explicit RTL source-directory path is required. The default deliverable is a multi-page vlsit_rtl_hierarchy.drawio file. The skill analyzes RTL but does not modify it.
+An explicit RTL source-directory path is required. The default deliverable is a vlsit_rtl_hierarchy.drawio file with exactly two tabs: `BLOCK_DIAGRAM` and `BLOCK_INFORMATION`. The skill analyzes RTL but does not modify it.
 
 Bắt buộc cung cấp đường dẫn thư mục RTL cụ thể. Kết quả mặc định là file vlsit_rtl_hierarchy.drawio nhiều trang. Skill phân tích RTL nhưng không sửa mã nguồn.
 

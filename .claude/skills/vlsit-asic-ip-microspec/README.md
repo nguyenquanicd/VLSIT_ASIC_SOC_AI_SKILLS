@@ -31,6 +31,7 @@
 - `VLSIT_<DESIGN_FUNCTION>_HDS.md` — authoritative specification / đặc tả nguồn.
 - CSR workbook when the IP has software-visible registers; offset `0x0` is the read-only version register / CSR workbook nếu IP có register phần mềm nhìn thấy được; offset `0x0` là version register chỉ đọc.
 - Figure sources plus SVGs: draw.io block/FSM diagrams and JSON specs, WaveJSON waveform sources / file nguồn hình và SVG: sơ đồ draw.io block/FSM kèm JSON, waveform WaveJSON.
+- The block diagram draw.io source has two tabs: `BLOCK_DIAGRAM` for the diagram only and `BLOCK_INFORMATION` for block functions, interfaces and the symbol legend. The specification embeds only the diagram tab / File draw.io sơ đồ khối có hai tab: `BLOCK_DIAGRAM` chỉ chứa sơ đồ và `BLOCK_INFORMATION` chứa chức năng block, interface và chú giải ký hiệu. Đặc tả chỉ nhúng hình từ tab sơ đồ.
 - Optional DOCX and/or PDF exports selected by the user / xuất DOCX/PDF tuỳ chọn theo lựa chọn của người dùng.
 
 ## Requirements / Yêu cầu

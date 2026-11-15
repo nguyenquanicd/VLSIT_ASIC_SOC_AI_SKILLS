@@ -229,17 +229,17 @@ MUST draw each waveform with WaveDrom from an adjacent WaveJSON `.json` file, re
 - Check: `scripts/vlsit_waveform_svg.py check <WaveJSON>` prints PASS for every WaveJSON; manual - any legacy exemption meets its date and plan conditions.
 
 ### R-018 draw.io first
-MUST draw the block diagram of section 5.2 as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from sections 5, 6 and 14.2 of the specification; LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.
-- Why: the user chose draw.io with the VLSIT library as the standard form, and one JSON file makes the diagram repeatable and traceable to the specification.
-- Check: `scripts/vlsit_spec_diagram.py check` and `build` print PASS; manual - the `.drawio` file and the diagram spec JSON are beside the image.
+MUST draw the block diagram of section 5.2 as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from sections 5, 6 and 14.2 of the specification; the draw.io file MUST contain exactly two tabs in this order: `BLOCK_DIAGRAM` and `BLOCK_INFORMATION`. `BLOCK_DIAGRAM` contains only the diagram; `BLOCK_INFORMATION` contains the block-function table, interface table and symbol legend. LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.
+- Why: the editable source carries review information without crowding the figure embedded in the specification.
+- Check: `scripts/vlsit_spec_diagram.py check` and `build` print PASS; manual - the `.drawio` contains exactly the two named tabs in order and each tab has only its assigned content.
 
 ### R-019 Library only
-MUST build every shape of a draw.io diagram as a clone of the VLSIT library `reference/drawio/VLSIT_DRAWIO_LIB_V1.drawio.xml` (blocks and frames entry 32, text entry 0, connectors entry 1, IO pads entry 5), the only exception being the two native description tables.
+MUST build every shape of a draw.io diagram as a clone of the VLSIT library `reference/drawio/VLSIT_DRAWIO_LIB_V1.drawio.xml` (blocks and frames entry 32, text entry 0, connectors entry 1, IO pads entry 5), the only exception being the two native description tables on `BLOCK_INFORMATION`.
 - Why: the user fixed that library as the only symbol source, and the script keeps the provenance of every shape.
 - Check: `scripts/vlsit_library_symbols.py validate --diagram FILE` prints PASS (run by `vlsit_spec_diagram.py build`).
 
 ### R-020 draw.io style
-MUST follow `reference/drawio/vlsit_diagram_rules.md` (the drawing rules of the skill vlsit-rtl-hierarchy-diagram adapted to the specification) in every draw.io diagram: black and white only, 18 pt text, two-line block labels, the top module as an enclosing frame, one connector per interface with a mnemonic of at most 5 upper-case characters, straight boundary stubs, the two native tables below the diagram, and no grid.
+MUST follow `reference/drawio/vlsit_diagram_rules.md` (the drawing rules of the skill vlsit-rtl-hierarchy-diagram adapted to the specification) in every draw.io diagram: black and white only, 18 pt text, two-line block labels, the top module as an enclosing frame, one connector per interface with a mnemonic of at most 5 upper-case characters, straight boundary stubs, no grid; keep the diagram alone on `BLOCK_DIAGRAM`, and put the two native tables and symbol legend on `BLOCK_INFORMATION`.
 - Why: the approved look and rules of the hierarchy-diagram skill give uniform, reviewable diagrams across IP.
 - Check: `scripts/vlsit_drawio_geometry_check.py` reports no finding (run by `vlsit_spec_diagram.py build`); manual - compare with `reference/drawio/VLSIT_daigram_reference.drawio`.
 
@@ -249,12 +249,12 @@ MUST run `vlsit_spec_diagram.py build` and fix every finding of the library vali
 - Check: the last `build` run prints PASS.
 
 ### R-028 Image in the specification
-MUST export the diagram to SVG with `scripts/vlsit_drawio_to_svg.py` (run by `build`) and insert it into section 5.2 with `vlsit_spec_diagram.py insert`, which also names the `.drawio` source in the caption.
-- Why: a Markdown specification cannot embed a draw.io file, so the SVG shows the diagram and the source stays editable.
-- Check: section 5.2 links an existing `.svg` and the same-stem `.drawio` exists.
+MUST export only the `BLOCK_DIAGRAM` tab to SVG with `scripts/vlsit_drawio_to_svg.py` (run by `build`) and insert only that SVG into section 5.2 with `vlsit_spec_diagram.py insert`, which also names the two-tab `.drawio` source in the caption. `BLOCK_INFORMATION` MUST remain available in the editable `.drawio` but MUST NOT be embedded as the section 5.2 figure.
+- Why: the specification figure should communicate the architecture directly, while the editable draw.io retains supporting tables and symbols on a separate tab.
+- Check: section 5.2 links an SVG rendered from `BLOCK_DIAGRAM`; the same-stem `.drawio` has both tabs, and no `BLOCK_INFORMATION` image is inserted.
 
 ### R-029 Diagram traceable to the specification
-MUST take every block from the hierarchy of section 14.2, every interface from sections 6 and 6.3, and write the function text of the tables in design terms without signal names; when the design changes, update the specification first and redraw.
+MUST take every block from the hierarchy of section 14.2 and every interface from sections 6 and 6.3. Put function/interface descriptions, source references and the symbol legend on `BLOCK_INFORMATION`, not on the diagram tab; write function text in design terms without signal names. When the design changes, update the specification first and redraw.
 - Why: a diagram that disagrees with the specification misleads RTL and verification.
 - Check: `vlsit_spec_diagram.py check` reports an interface that is drawn but not in the table or the reverse; manual - the blocks match section 14.2.
 

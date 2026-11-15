@@ -1,6 +1,6 @@
 ---
 name: vlsit-rtl-hierarchy-diagram
-description: Analyze existing Verilog or SystemVerilog RTL to trace module hierarchy, functional relationships, and protocol interfaces, then create a source-grounded multi-page draw.io diagram using only the bundled VLSIT symbol library. Use when asked to inspect or map a design from its top module to its submodules.
+description: Analyze existing Verilog or SystemVerilog RTL to trace module hierarchy, functional relationships, and protocol interfaces, then create a source-grounded two-tab draw.io file with a diagram-only tab and a block-information tab using only the bundled VLSIT symbol library. Use when asked to inspect or map a design from its top module to its submodules.
 compatibility: Python 3.8 or later; offline, using the standard library for RTL analysis and draw.io generation. openpyxl is optional for Excel or CSV input. No packages are installed without user approval.
 ---
 
@@ -32,6 +32,10 @@ Precedence: `rule.md` overrides this file, and this file overrides the reference
 | 8 | Validate and report: library validator, geometry check, preview when possible. | RHD-060..063 | `python scripts/vlsit_library_symbols.py validate --diagram FILE`, `python scripts/vlsit_drawio_geometry_check.py FILE --allow-shared-start` |
 | 9 | Improve: add scripts, refine reference files, log in `reference/vlsit_improvement_log.md`, ask the user about proposed interface groups and rule changes. | RHD-078, 090..096 | |
 | 10 | Rule audit: check the deliverables against every applicable RHD rule ID, record evidence and mark PASS, FAIL, NOT RUN, or NOT APPLICABLE. | All applicable RHD rules | |
+
+## Two-tab draw.io output
+
+The delivered file has exactly two tabs, ordered `BLOCK_DIAGRAM` then `BLOCK_INFORMATION`. Put the full selected block diagram in the first tab. Put the block-function table, interface table, and symbol/connector legend in the second tab. Keep descriptions and tables off the diagram tab. Use the information tab to explain the block and connector symbols, as in the bundled reference. Do not make a separate page per hierarchy depth.
 
 ## Folder map
 

@@ -5,10 +5,11 @@
 """Generate the frame-style block diagram (draw.io, library symbols only) from a JSON spec.
 
 Purpose : turns the analysis tables (blocks, interfaces, external pins, clock/reset net, descriptions) into
-          vlsit_rtl_hierarchy.drawio: page 01_LEVEL_1 (the top
+          vlsit_rtl_hierarchy.drawio: tab BLOCK_DIAGRAM (the top
           module as an enclosing frame, its blocks packed in a grid, interface connectors routed with an A*
           router under the bend and crossing limits, straight boundary stubs, IO pad symbols, a distribution
-          tree for clock/reset, labels placed next to their own line, and native description tables).
+          tree for clock/reset, labels placed next to their own line; tab BLOCK_INFORMATION holds the native
+          block-function and interface tables plus the symbol/connector legend).
           Implements RHD-040..059, 079, 086..089, 097..102 so that the model does not redraw by hand.
 Usage   : python vlsit_drawio_frame_diagram.py SPEC.json OUT_DIR [--gap-h N] [--gap-v N] [--seed N] [--svg]
           Parameters can also be given as environment variables GAPH, GAPV, SEED (the command line wins);
@@ -253,7 +254,7 @@ class Generator:
     # ---------------------------------------------------------------- layout
     def build_level1(self):
         spec = self.spec
-        p = Page("01_LEVEL_1", 0, 0)
+        p = Page("BLOCK_DIAGRAM", 0, 0)
         self.p = p
         blocks = spec["blocks"]
         ncol = max(b["col"] for b in blocks) + 1
@@ -272,7 +273,7 @@ class Generator:
         self.fxr = snap(colx[-1] + colw[-1] / 2 + self.margin)
         self.fyb = snap(rowy[-1] + self.bh / 2 + self.margin)
         self.fw, self.fh = self.fxr - self.fx, self.fyb - self.fy
-        p.w, p.h = self.fxr + 250, self.fyb + 2300
+        p.w, p.h = self.fxr + 250, self.fyb + 250
         top = spec["top"]
         p.block("FRAME", self.fx + self.fw / 2, self.fy + self.fh / 2, self.fw, self.fh,
                 "", kind="frame")
@@ -798,8 +799,9 @@ class Generator:
         for b in self.spec["blocks"]:
             rows.append([b["row_name"], b["function"], b["source"], ", ".join(mn.get(b["key"], []))])
         ids = [c["id"] for c in self.conns] + [e["id"] for e in self.spec["externals"]]
-        self.tables_and_legend(p, self.fyb + 330, 1, ids, rows)
-        pages = [p]
+        info = Page("BLOCK_INFORMATION", 2300, 0)
+        self.tables_and_legend(info, 100, 1, ids, rows)
+        pages = [p, info]
         os.makedirs(outdir, exist_ok=True)
         with open(os.path.join(outdir, "vlsit_rtl_hierarchy.drawio"), "w", encoding="utf-8") as fh:
             fh.write(self.emit(pages))

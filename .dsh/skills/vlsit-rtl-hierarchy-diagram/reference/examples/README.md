@@ -4,7 +4,7 @@
 |---|---|
 | `vlsit_can_level1_spec.json` | Spec of the CAN controller (8051 host configuration), level 1: blocks, connectors, boundary pins, clock tree, tables. Input of `scripts/vlsit_drawio_frame_diagram.py`; schema in `reference/vlsit_diagram_spec.md`. |
 | `vlsit_can_level1_params.txt` | Parameter sets for `scripts/vlsit_layout_search.py` (gaps, seeds, side variants). |
-| `vlsit_rtl_analysis.md`, `vlsit_rtl_hierarchy.drawio` | Final report and diagram of the same CAN level-1 run (output of the spec above with the current skill: frame style, one page `01_LEVEL_1`). Format example only. |
+| `vlsit_rtl_analysis.md`, `vlsit_rtl_hierarchy.drawio` | Historical CAN level-1 report and diagram. The draw.io file shows the earlier one-tab layout and is retained only as a record; current output has exactly `BLOCK_DIAGRAM` and `BLOCK_INFORMATION` tabs. |
 
 Run from the skill folder:
 

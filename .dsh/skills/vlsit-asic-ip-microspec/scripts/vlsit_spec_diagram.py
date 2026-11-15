@@ -9,21 +9,21 @@
 
 Purpose : one command chain for the draw.io block diagram (rules R-018 to R-020, R-027 to R-029). The diagram is a
           frame page of the skill vlsit-rtl-hierarchy-diagram: the top module as an enclosing frame, its
-          children as blocks, one connector per interface with a mnemonic, straight boundary stubs, IO pads,
-          clock and reset distribution trees, and the two native tables (Block Functions & Interfaces, Interface
-          Table). Only the VLSIT library is used. The diagram is described by a JSON file (the "diagram spec")
+          children as blocks, one connector per interface with a mnemonic, straight boundary stubs, IO pads and
+          clock/reset distribution trees on BLOCK_DIAGRAM; BLOCK_INFORMATION contains only the two native
+          tables and legend. Only the VLSIT library is used. The diagram is described by a JSON file (the "diagram spec")
           that the assistant fills from sections 5, 6 and 14.2 of the specification.
 Actions :
   template                       print a starter diagram spec (JSON)
   from-spec SPEC.md --top M      draft a diagram spec from the hierarchy table of section 14.2 (blocks only;
                                  the interfaces and externals are filled by hand); writes JSON to --out or stdout
   check DIAGRAM.json             validate the fields, mnemonics and cross references; exit 1 on errors
-  build DIAGRAM.json --out-dir D draw D/<out_name>.drawio, validate it against the library, run the geometry
-                                 check, write D/<out_name>.svg (and .png when PyMuPDF is present); exit 1 on findings
+  build DIAGRAM.json --out-dir D draw a two-tab D/<out_name>.drawio, validate both pages, run the geometry
+                                 check, write D/<out_name>.svg from BLOCK_DIAGRAM only (and .png when PyMuPDF is present); exit 1 on findings
   insert SPEC.md --figure F.svg --source F.drawio [--caption TEXT]
                                  replace the body of "### 5.2 Block diagram" with the figure and its caption
 Input   : diagram spec JSON, schema of reference/drawio/vlsit_diagram_spec.md; fields page_name, out_name and
-          table_suffix are optional. "library_sha256" may be omitted: the SHA-256 of the bundled library is used.
+          table_suffix are optional. "library_sha256" may be omitted: the SHA-256 of the bundled library is used. The Markdown insert always uses BLOCK_DIAGRAM only.
 Output  : files named above; messages in English.
 Exit    : 0 success, 1 findings or errors, 2 usage error.
 Only the Python standard library is used (PyMuPDF only for the optional PNG).
@@ -255,6 +255,11 @@ def action_build(a):
         (out_dir / (Path(name).stem + "_generator_report.txt")).write_text(
             (Path(tmp) / "generator_report.txt").read_text(encoding="utf-8"), encoding="utf-8")
     status = 0
+    import xml.etree.ElementTree as ET
+    pages = [(d.get("name"), d.get("id")) for d in ET.parse(drawio).getroot().findall("diagram")]
+    if [name for name, _ in pages] != ["BLOCK_DIAGRAM", "BLOCK_INFORMATION"]:
+        print(f"ERROR: expected two tabs BLOCK_DIAGRAM, BLOCK_INFORMATION; found {pages}")
+        return 1
     rc, msg = run([LIBCHK, "validate", "--diagram", drawio])
     print(msg)
     status |= rc != 0
@@ -264,7 +269,7 @@ def action_build(a):
     sys.path.insert(0, str(HERE))
     import vlsit_drawio_to_svg as to_svg
     svg = drawio.with_suffix(".svg")
-    argv = [str(drawio), "--out", str(svg), "--force"]
+    argv = [str(drawio), "--out", str(svg), "--page", "BLOCK_DIAGRAM", "--force"]
     if a.png:
         argv += ["--png", str(drawio.with_suffix(".png"))]
     sys.argv = ["vlsit_drawio_to_svg.py"] + argv

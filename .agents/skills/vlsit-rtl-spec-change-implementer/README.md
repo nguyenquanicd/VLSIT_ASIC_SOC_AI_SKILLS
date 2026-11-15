@@ -12,21 +12,23 @@
 <!-- VLSIT_TERMINOLOGY_END -->
 ## Purpose / Mục đích
 
-Analyze existing RTL against a new feature request and optional old specification; propose minimal changes, wait for sign-off, then implement the approved plan.
+Analyze existing RTL with its specification and register map, rewrite the specification as a delta on the current behavior, report pre-existing defects for confirmation, propose a minimal change, wait for sign-off, then modify the existing RTL in place and generate the CSR INFO file.
 
-Phân tích RTL hiện có theo yêu cầu tính năng mới và specification cũ nếu có; đề xuất thay đổi tối thiểu, chờ ký duyệt, rồi triển khai kế hoạch đã được chấp thuận.
+Phân tích RTL hiện có cùng specification và bản đồ thanh ghi, viết lại specification dưới dạng phần bổ sung so với hành vi hiện tại, báo cáo lỗi sẵn có để người dùng xác nhận, đề xuất thay đổi tối thiểu, chờ ký duyệt, rồi sửa trực tiếp RTL hiện có và tạo file CSR INFO.
 
 ## Functions / Chức năng
 
-- Map requirements to current RTL behavior and affected modules/files. / Đối chiếu yêu cầu với hành vi RTL hiện tại và xác định module/file bị ảnh hưởng.
-- Document why each edit is needed, unresolved questions, and up to three viable approaches when there are meaningful alternatives. / Ghi rõ lý do từng thay đổi, câu hỏi còn mở và tối đa ba phương án nếu có lựa chọn đáng kể.
-- Stop at a review gate using an English technical plan before editing RTL. After approval, make only approved changes and report the diff-based RTL code-change percentage. / Dừng tại cổng duyệt kế hoạch kỹ thuật tiếng Anh trước khi sửa RTL. Sau khi duyệt, chỉ sửa phần đã chấp thuận và báo cáo tỷ lệ code RTL thay đổi dựa trên diff.
+- Rewrite the specification in the VLSIT template of `vlsit-asic-ip-microspec`, describing the existing IP as the baseline and the new feature as a delta requirement. / Viết lại specification theo template VLSIT của `vlsit-asic-ip-microspec`, mô tả IP hiện có là nền và tính năng mới là yêu cầu bổ sung.
+- Map requirements to current RTL behavior and affected modules/files, and keep the local coding style. / Đối chiếu yêu cầu với hành vi RTL hiện tại và xác định module/file bị ảnh hưởng, giữ nguyên phong cách code hiện có.
+- List every pre-existing defect as `BUG-<NNN>` and wait for the user's confirmation before it changes the specification or the RTL. / Liệt kê mọi lỗi sẵn có dưới dạng `BUG-<NNN>` và chờ người dùng xác nhận trước khi lỗi đó thay đổi specification hoặc RTL.
+- Keep every existing register unchanged; place new registers at free addresses and generate the CSR INFO file in the APB-CSR-Generator layout. / Giữ nguyên mọi thanh ghi hiện có; đặt thanh ghi mới vào địa chỉ trống và tạo file CSR INFO theo định dạng APB-CSR-Generator.
+- Stop at a review gate using an English technical plan before editing RTL. After approval, modify only approved existing files and report the diff-based RTL code-change percentage. / Dừng tại cổng duyệt kế hoạch kỹ thuật tiếng Anh trước khi sửa RTL. Sau khi duyệt, chỉ sửa các file hiện có đã chấp thuận và báo cáo tỷ lệ code RTL thay đổi dựa trên diff.
 
 ## Inputs and output / Đầu vào và đầu ra
 
-The RTL directory is required. The old specification is optional. Provide a new specification file or describe the requested feature in the prompt. The skill creates rtl_change_review.md and updates it with implementation results.
+The RTL directory is required. The old specification, the new feature description, and the CSR workbook or JSON description are requested when missing. The skill creates `VLSIT_<DESIGN_FUNCTION>_HDS.md`, `regs.json`, `<IP>_CSR.xlsx`, `<IP>_CSR_info.json`, `csr_delta.json`, and `rtl_change_review.md` with the plan and the implementation results.
 
-Bắt buộc có thư mục RTL. Specification cũ là tùy chọn. Cung cấp file specification mới hoặc mô tả tính năng trong prompt. Skill tạo rtl_change_review.md và cập nhật file này với kết quả triển khai.
+Bắt buộc có thư mục RTL. Specification cũ, mô tả tính năng mới, và workbook hoặc JSON của CSR sẽ được hỏi khi thiếu. Skill tạo `VLSIT_<DESIGN_FUNCTION>_HDS.md`, `regs.json`, `<IP>_CSR.xlsx`, `<IP>_CSR_info.json`, `csr_delta.json`, và `rtl_change_review.md` chứa kế hoạch cùng kết quả triển khai.
 
 ## Use / Cách gọi
 
