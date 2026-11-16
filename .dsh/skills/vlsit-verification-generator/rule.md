@@ -89,9 +89,9 @@ MUST record the simulator, reference models, operating system, compile/run optio
 - Check: the run manifest identifies every dependency and its version or hash.
 
 ### R-112 One evidence bundle per run
-MUST save one evidence bundle per run with logs, coverage, waveforms, reports and hashes.
-- Why: scattered artifacts cannot be audited as one result, and a missing hash lets a file change after review.
-- Check: `scripts/vlsit_verify_evidence.py check` verifies the bundle layout and hashes.
+MUST save one evidence bundle per run with logs, assertions, applicable coverage/reports, `resource_usage.json` and hashes. Apply the waveform capture policy in R-278 and record its status and scope, or the reason no waveform was captured.
+- Why: per-run evidence must remain auditable while avoiding large, low-value waveform dumps.
+- Check: `scripts/vlsit_verify_evidence.py check` verifies listed files and hashes; manual - `resource_usage.json` records measured or explicitly unavailable resource data, and waveform status follows R-278.
 
 ### R-113 Human gates
 MUST stop at gates G0 to G6 and obtain a named human approval before continuing.
@@ -582,7 +582,7 @@ MUST distinguish plan/artifact validation, measured closure, conditional closure
 - Check: machine-readable closure verdicts, explicit waiver approval artifacts and regression tests enforce the distinction.
 
 ### R-271 Bounded regression complexity
-MUST define compile reuse, simulation/runtime budgets, deterministic seeds, failure replay and stimulus reduction. Prefer one harness and shared transaction APIs; introduce UVM/PSS or extra model dependencies only when justified by project needs and available tools.
+MUST define compile reuse, simulation/runtime budgets, deterministic seeds, failure replay, stimulus reduction and resource limits under R-277 to R-280. Prefer one harness and shared transaction APIs; introduce UVM/PSS or extra model dependencies only when justified by project needs and available tools.
 - Why: Infrastructure and unconstrained cross products can cost more than the verification they enable.
 - Check: The plan records environment size, tiers, retained-test rationale and measured coverage per runtime.
 
@@ -611,3 +611,23 @@ MUST deliver a detailed bilingual sim/README.md and state the exact replay case/
 MUST when creating a reusable simulation environment, provide retained project generator script(s) that generate specification/vplan-linked testcases and the applicable reusable environment components from reviewed configuration/templates. Include the testcase generator and environment-component generator functions, whether in one script or separate scripts. Store generators, source configuration, templates, generated outputs, exact regeneration commands and a generation manifest under sim/; generation must be deterministic for fixed inputs, refuse silent overwrite, and support an explicit check/diff or regeneration review. Generated code/data require normal review and qualification before execution or closure.
 - Why: hand-authored one-off tests and environment code are difficult to reproduce, extend or reuse consistently.
 - Check: the dependency export includes generator scripts/configuration/templates/outputs; the manifest binds generator version/hash, input hashes, command, output paths/hashes and linked requirement/scenario IDs. Re-running on a clean copy produces the recorded output set or a reviewed diff; reviewers confirm tests and components implement the approved contract.
+
+### R-277 RAM budget and bounded concurrency
+MUST define a reviewed campaign resource budget in `sim/env/resource_budget.json` before simulation, including observed host RAM, reserved RAM headroom, a simulation RAM budget or explicit `not_measured` reason, and maximum concurrent jobs. Default to one concurrent simulation job; increase concurrency only when measured peak memory for the relevant job class shows that the selected count fits the reviewed RAM budget and headroom. If one-job peak memory is unknown, use a bounded pilot under an available limit or pause for a reviewed alternative. Stream or batch large vectors/model data instead of loading unbounded datasets into memory. Record per-run peak RAM and its measurement method in `resource_usage.json`; mark unavailable measurements explicitly and never present estimates as measured values.
+- Why: evidence-based concurrency and bounded data handling prevent simulation workers or large model inputs from exhausting host memory.
+- Check: the reviewed resource budget and each run's `resource_usage.json` are present and hashed; the job limit follows measured peak memory, or defaults to one when peak memory is unavailable.
+
+### R-278 Tiered waveform capture
+MUST define a reviewed waveform capture policy in `sim/env/resource_budget.json`, avoid full-chip/full-duration dumps by default, and capture only the signals and time windows required by a planned verification or diagnostic need. When failure diagnosis needs more waveform detail, preserve the original run and use a new run with the same configuration and seed for targeted capture. Record waveform status, scope, time window and any omitted-capture reason in `resource_usage.json`, then include and hash that file in the evidence manifest.
+- Why: broad waveforms can dominate storage and slow simulation without adding useful evidence to ordinary passing runs.
+- Check: each run records `captured` or `not_captured`, its reason and scope; failures that require waveform analysis have a targeted waveform attached to the new run, while the original run remains intact.
+
+### R-279 Disk budget and run admission
+MUST define the observed free disk, a reviewed minimum-free-space stop threshold and a conservative per-run output estimate with its basis in `sim/env/resource_budget.json`. Before each run, ensure the expected outputs of all admitted concurrent jobs fit above the threshold; if output size cannot be credibly estimated, first perform a bounded pilot under a reviewed size limit or pause for a reviewed alternative. Record free disk before/after, expected output bytes and actual run output size in `resource_usage.json`. If a safe free-space measurement cannot be obtained, mark it `not_measured`, disclose the limitation and pause the campaign until a reviewed alternative is available.
+- Why: a preflight disk gate prevents a regression from exhausting the workspace and corrupting evidence or unrelated work.
+- Check: each launched run has measured free disk and a credible output estimate; the run plan shows the aggregate expected output for concurrent jobs fits above the threshold. If safe free-space measurement is unavailable, no run launches until a reviewed alternative is in place.
+
+### R-280 Lossless evidence storage
+MUST preserve the exact contents of retained RTL, testbench, environment, logs, coverage, snapshots, runs and evidence. Lossless compression is allowed only when the decompressed bytes match the original SHA-256 and the run manifest/retention catalog are updated and checked; deleting or overwriting retained artifacts to meet a resource limit is prohibited.
+- Why: space savings must not erase the replay basis or audit history.
+- Check: compressed artifacts have original/archive hashes and a successful round-trip result; manifests/catalogs validate and all original bytes remain recoverable.

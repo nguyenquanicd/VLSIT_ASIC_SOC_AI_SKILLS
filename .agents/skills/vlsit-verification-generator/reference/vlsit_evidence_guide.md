@@ -16,6 +16,7 @@ sim/runs/ev_<level>_<artifact>_<run>/
   compile.log
   sim.log
   assertions.csv
+  resource_usage.json
   coverage/
     functional.xml
     code.xml
@@ -79,7 +80,7 @@ The script checks that the manifest lists at least these paths. A path is matche
 | Block | a coverage XML under `coverage/`; `mutation/report.md` is a warning if absent |
 | SoC | a coverage XML under `coverage/`; `mutation/report.md` is a warning if absent |
 
-A formal run adds `formal/report.md`. A waveform is required when the test fails or when the review needs a time window; the manifest lists it.
+A formal run adds `formal/report.md`. `resource_usage.json` is required for every run (R-277 to R-280) and the evidence manifest lists/hashes it. A waveform is required when failure diagnosis or a reviewed verification need requires a time window; otherwise the run records `not_captured` and why in `resource_usage.json`. Prefer a named signal scope and time window over a full-chip/full-duration dump.
 
 ## 4. Hashing
 

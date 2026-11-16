@@ -100,6 +100,23 @@ VI: Link verification report, run directory, package baseline và closure result
 Nêu riêng compile, simulation, closure và cold replay. Gói toàn vẹn không tự chứng
 minh các bước này đã đạt.
 
+## Resource budget and usage / Ngân sách và mức dùng tài nguyên
+
+EN: Link `env/resource_budget.json` and summarize the reviewed RAM headroom,
+simulation concurrency, disk stop threshold and waveform policy. Link each run's
+`resource_usage.json` with measured peak RAM, free disk before/after, output size,
+waveform scope/status and any compression round-trip hashes. Mark unavailable
+measurements as `not_measured` with a reason. Stop starting new jobs before a disk
+threshold is crossed; preserve existing runs/evidence. Do not claim resource limits
+were enforced when the available tools only report estimates.
+
+VI: Link `env/resource_budget.json`, nêu RAM dự phòng, số job đồng thời, ngưỡng dừng
+theo dung lượng ổ đĩa và chính sách waveform đã review. Link `resource_usage.json`
+của mỗi run với peak RAM, dung lượng trống trước/sau, kích thước output, trạng thái/
+phạm vi waveform và hash kiểm tra giải nén nếu có. Đánh dấu `not_measured` cùng lý
+do khi không đo được. Dừng khởi chạy run mới trước khi chạm ngưỡng ổ đĩa; giữ các
+run/evidence hiện có. Không tuyên bố đã enforce nếu tool chỉ đưa ra ước lượng.
+
 ## Troubleshooting / Xử lý lỗi
 
 __FILL_COMMON_FAILURES_LOG_LOCATIONS_AND_RECOVERY__

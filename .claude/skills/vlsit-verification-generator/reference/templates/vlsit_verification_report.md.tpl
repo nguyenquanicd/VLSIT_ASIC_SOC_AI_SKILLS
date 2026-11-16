@@ -237,10 +237,14 @@ Record the approved contract and inventory digests, complete scenario matrix and
 | Cold replay | <pass/fail/not_run; registered original/fresh run IDs, generated receipts, measured versions and comparison or blocking reason> |
 | Replay scope | <exact cases, configurations, seeds, checked observables and excluded campaign portions> |
 | Failed and successful run retention | <run IDs, retained outputs and archive location> |
+| Campaign resource budget | <resource_budget.json; RAM headroom/limit; job concurrency; disk stop threshold; reviewer> |
+| Per-run resource usage | <resource_usage.json per run; peak RAM, disk before/after, output bytes; measurement status/reason> |
+| Waveform capture policy | <capture/no-capture reason, signal scope and time window per applicable run> |
+| Lossless compression | <artifact, original/archive hashes, round-trip check, updated manifest/catalog> |
 
 List any missing input, unavailable dependency or legacy-layout exception explicitly.
 Package integrity does not establish simulation success, measured closure or cold-replay success.
-No automatic cleanup is permitted after report generation (R-272 to R-275).
+No automatic cleanup is permitted after report generation (R-272 to R-280).
 
 
 ## 18. Reusable testcase and environment generation (R-276)

@@ -38,6 +38,7 @@
 | Apply CPU, PCIe/UCIe, bus/NoC, NPU/TPU/VPU and codec profiles to the supported architecture. | Dùng profile theo kiến trúc và tính năng thực tế được hỗ trợ. |
 | Select scenarios by coverage gain, runtime and fault-detection diversity; retain bug regressions. | Chọn scenario theo coverage tăng thêm, thời gian và khả năng phát hiện lỗi; giữ test cho bug cũ. |
 | Check every obligation/configuration, metric target, property activity, baseline hash and waiver. | Kiểm từng nghĩa vụ/cấu hình, mục tiêu coverage, hoạt động property, hash baseline và waiver. |
+| Bound simulation concurrency by measured RAM; use scoped waveform capture, monitor disk headroom and losslessly compress large evidence without deleting retained runs. | Giới hạn số job theo peak RAM đo được; capture waveform có chọn lọc, theo dõi dung lượng và nén lossless evidence lớn mà không xóa run đã lưu. |
 
 ## Inputs and outputs / Đầu vào và đầu ra
 
@@ -198,3 +199,9 @@ sao sạch hoặc review diff, và chặn ghi đè âm thầm. Sinh thành công
 test/component đã qualification; cần review trước khi chạy.
 
 See [R-276 and generator workflow](reference/vlsit_sim_workspace.md).
+
+## Resource-efficient runs / Tối ưu tài nguyên
+
+**EN:** Review a per-campaign RAM/disk budget before simulation. Run one job by default and raise concurrency only with measured memory headroom. Avoid full-chip/full-duration waveforms unless a test or review needs them; use targeted windows and preserve a failed run before a targeted rerun. Record every run's resource metrics and capture status. Lossless compression is permitted only with a verified round-trip hash and updated catalog. Never remove retained environments, testbenches, runs or evidence to meet a storage limit.
+
+**VI:** Review ngân sách RAM/ổ đĩa trước khi chạy. Mặc định chạy một job; chỉ tăng song song khi số đo chứng minh đủ RAM dự phòng. Không dump waveform toàn chip/toàn thời lượng nếu test hoặc review không cần; dùng phạm vi tín hiệu/thời gian cụ thể và giữ run lỗi trước khi chạy lại để debug. Ghi số liệu tài nguyên và trạng thái capture của từng run. Chỉ nén lossless khi đã xác minh hash giải nén và cập nhật catalog. Không xóa environment, testbench, run hay evidence đã lưu để đạt giới hạn dung lượng.

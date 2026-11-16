@@ -1,6 +1,6 @@
 # Retained simulation packages and executed replay
 
-Read for R-272 to R-276. A testbench (TB) surrounds the design under test (DUT).
+Read for R-272 to R-280. A testbench (TB) surrounds the design under test (DUT).
 A Bus Functional Model (BFM) produces interface transactions. Preserve all inputs,
 all registered run outputs and all baseline snapshots used by the campaign.
 
@@ -19,6 +19,7 @@ sim/
     replay_manifest.json      schema 2 configuration, instructions and execution plan
     workspace_manifest.json   selected package baseline
     retention_catalog.json    all registered baselines and run inventories
+    resource_budget.json      reviewed RAM, disk, concurrency and waveform policy
   tb/                         simulation top and fixtures
   dut/                        verified RTL and includes
   models/                     independent model sources/build settings
@@ -27,7 +28,7 @@ sim/
     generators/                reusable testcase/environment generation scripts
   env/generated/              generated reusable verification components
   tests/generated/            generated requirement-linked testcase sources/data
-  runs/<run_id>/              fresh build/reports, exact commands, logs and receipt
+  runs/<run_id>/              fresh build/reports, exact commands, logs, resource_usage.json and receipt
   coverage/                   merged campaign results; retained and hashed
   snapshots/<baseline_id>/    all retained package files plus snapshot manifest
 ```
@@ -36,6 +37,48 @@ Create sim outside the original RTL tree; do not modify the original design.
 Map an existing layout explicitly rather than moving or deleting user files.
 Legacy verification/00_plan, 91_coverage and 92_evidence map to sim/docs/00_plan,
 sim/coverage and sim/runs. Preserve original receipts when migrating.
+
+## RAM, disk and waveform budgets (R-277 to R-280)
+
+Before the first simulation, complete `env/resource_budget.json` from
+`templates/vlsit_resource_budget.json.tpl` and obtain the campaign resource review.
+Record the host RAM and free disk at measurement time, the RAM headroom reserved
+for the operating system and other work, the maximum simulation concurrency, the
+disk stop threshold and the planned waveform/compression policy. Use limits chosen
+for the machine and project; this skill does not impose one universal byte quota.
+If RAM usage cannot be measured, use a bounded pilot under an available limit or
+pause for a reviewed alternative. If free disk cannot be measured safely, pause the
+campaign. Mark any unavailable measurement `not_measured` with its reason; never
+substitute an estimate as a measured value.
+
+Use one simulation job by default. Raise concurrency only after measuring peak
+memory for the same simulation job class and showing that all concurrent jobs plus
+the reviewed host headroom fit the RAM budget. When peak memory is unknown, remain
+serial. Stream vectors and model records or process them in bounded batches rather
+than holding a full large workload in memory.
+
+Estimate each run's output conservatively using a prior measured run, a bounded
+pilot or a reviewed tool estimate. Before launching one or more concurrent jobs,
+ensure their expected total output fits above the disk stop threshold. If no
+credible estimate exists, run only a bounded pilot with an explicit size limit or
+pause for review. Before and after each run, capture free disk, expected output and
+actual run output size in
+`runs/<run_id>/resource_usage.json` using
+`templates/vlsit_resource_usage.json.tpl`. The evidence manifest hashes this file
+with the other run artifacts. Do not launch the next run if the reviewed disk
+threshold would be crossed. Preserve all existing runs and evidence; request more
+space or an approved archive destination instead of deleting anything.
+
+Do not enable a full-chip, full-duration waveform dump by default. Capture only
+planned signals and time windows needed by the test or review. If a failed run needs
+more detail, keep the original run and launch a new targeted-capture run with the
+same configuration and seed. Record `captured` or `not_captured`, the scope, window
+and reason in `resource_usage.json`; do not imply that a missing waveform exists.
+Losslessly compress large artifacts only when available tools support it; verify
+the decompressed bytes against the original SHA-256 and update the evidence
+manifest and retention catalog before treating the archive as the retained copy.
+The original bytes must remain recoverable, and no retained run/evidence may be
+deleted or overwritten to meet the budget.
 
 Snapshot inventory now includes root build files, arbitrary project input folders
 and merged coverage, not only a fixed list of source folders. Only runs, snapshots,
