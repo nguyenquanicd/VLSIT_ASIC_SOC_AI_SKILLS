@@ -2,6 +2,23 @@
 
 This is the single verification report (R-259). It must be complete on its own: a reviewer reads this file and sees the whole verification state without opening another report. Link evidence bundles as attachments, but repeat every result, exception and reason here.
 
+## 0. Summary
+
+Write this section last. Every number here repeats a number from a later section.
+
+| Verdict | Result | Section |
+|---|---|---|
+| Overall status | <closed / conditionally closed / open / not assessed> | 15 |
+| Tests | <n pass, n fail, n error, n timeout, n not run> of <n> runs, <n> seeds | 4 |
+| Open failures | <n> (<n> DUT, <n> testbench, <n> specification, <n> environment or tool, <n> not yet classified) | 4.4 |
+| Bugs | <n found, n fixed, n open> | 11 |
+| Functional coverage | <covered/total, %> against target <%> | 5 |
+| Code coverage | line <%>, branch <%>, toggle <%>, FSM <%> | 5 |
+| Assertions | <n proven or active and non-vacuous> of <n> | 5 |
+| Mutation or injected bugs | <killed/total, %> against target <%> | 5 |
+| Reviews | <n agree, n disagree, n needs-info open> | 4.5 |
+| Not checked | <items, or none> | 13 |
+
 ## 1. Identification
 
 | Field | Value |
@@ -39,6 +56,12 @@ Status is `pass`, `fail`, `waived` or `not applicable`. Every `fail` and `waived
 
 | Rule | Statement (short) | Status | Evidence or reason |
 |---|---|---|---|
+| R-240 | Method allocated per obligation | <status> | <section 19.1> |
+| R-241 | All applicable checkers on in every test | <status> | <section 19.2> |
+| R-242 | Failure-mode list mapped to obligations | <status> | <plan document section 4> |
+| R-243 | No oracle change without triage and approval | <status> | <section 19.3> |
+| R-244 | Every result row reviewed | <status> | <sections 4, 4.4 and 4.5> |
+| R-245 | Plan document consistent with the vplan | <status> | <plan path and check result> |
 | R-250 | Combined-function tests | <status> | <test IDs and vplan rows> |
 | R-251 | Constrained-random stimulus | <status> | <constraint files and clauses> |
 | R-252 | Coverage-efficient tests | <status> | <coverage section> |
@@ -53,11 +76,11 @@ Status is `pass`, `fail`, `waived` or `not applicable`. Every `fail` and `waived
 
 ## 4. Test results
 
-One row per test run. A test with several seeds has one row per seed.
+One row per test run. A test with several seeds has one row per seed. Status is `pass`, `fail`, `error` (the run did not complete), `timeout`, `not_run` or `blocked`; a status other than `pass` names its cause and a row in section 4.4. The review columns follow R-244: the reviewer is an engineer or an AI agent with its model version; an AI review is advisory.
 
-| Test ID | Level | Type | Vplan requirement | Seed | Result | Property activity / failures | Evidence bundle | Notes |
-|---|---|---|---|---|---|---|---|---|
-| <t_...> | <level> | <test_type> | <REQ-...> | <seed> | <pass/fail> | <n>/<n> | <ev_...> | <flaky, quarantined, ...> |
+| Test ID | Purpose: what the test proves | Functions / requirements | Type | Seed | Status | Cause (when not pass) | Property activity / failures | Evidence bundle | Reviewer | Review verdict | Feedback / author response |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| <t_...> | <one sentence> | <function+function; REQ-...> | <test_type> | <seed> | <pass / fail / error / timeout / not_run / blocked> | <short cause and FA-ID, or "-"> | <n>/<n> | <ev_...> | <name, or agent+model> | <agree / disagree / needs-info> | <comment> / <response> |
 
 ### 4.1 Combined tests
 
@@ -77,7 +100,30 @@ One row per test run. A test with several seeds has one row per seed.
 |---|---|---|---|---|
 | <t_...> | <symptom> | <BUG-...> | <open/fixed/quarantined> | <YYYY-MM-DD or "n/a"> |
 
+### 4.4 Failure analysis
+
+One row per distinct failure signature. The category follows R-218. An AI hypothesis cites log lines, waveform times or assertion IDs and stays a hypothesis until a human confirms it (R-238).
+
+| FA ID | Tests and seeds | Symptom (log line, time, assertion) | Category | Root cause | Hypothesis source | Evidence cited | Action and owner | Bug ID | Status | Reviewer | Review verdict | Feedback / author response |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| FA-001 | <t_... seed n> | <first error line and time> | <DUT / testbench / specification / environment or tool / known issue / unclassified> | <confirmed cause, or "open"> | <engineer / agent+model> | <log:line, wave time, a_...> | <fix, new test, waiver request; owner> | <BUG-... or none> | <open / confirmed / fixed / closed> | <name or agent+model> | <agree / disagree / needs-info> | <comment> / <response> |
+
+### 4.5 Review and feedback log
+
+Discussion that does not fit a table cell. An open `disagree` or `needs-info` blocks the gate that uses the row (R-244).
+
+| Review ID | Row (test or FA ID) | Reviewer and type | Date | Comment | Author response | Resolution | Closed |
+|---|---|---|---|---|---|---|---|
+| RV-001 | <t_... / FA-...> | <name, engineer / agent+model, advisory> | <YYYY-MM-DD> | <comment> | <response> | <changed X / no change because Y> | <yes / no> |
+
 ## 5. Coverage
+
+### 5.0 Coverage summary by feature
+
+| Feature | Requirements | Obligations met / total | Functional bins hit / total | Assertions active or proven / total | Mutants killed / total | Status |
+|---|---|---|---|---|---|---|
+| <feature> | <REQ-...> | <n>/<n> | <n>/<n> | <n>/<n> | <n>/<n> | <met / missed / not measured> |
+| **Total** | <n> | <n>/<n> | <n>/<n> | <n>/<n> | <n>/<n> | <met / missed> |
 
 Report each metric separately, never one average. Give the value, the goal and the closure status.
 
@@ -88,6 +134,7 @@ Report each metric separately, never one average. Give the value, the goal and t
 | Code: branch | <n>/<n> | <%> | <%> | <met/missed> | <coverage/code.xml> |
 | Code: toggle | <n>/<n> | <%> | <%> | <met/missed> | <coverage/code.xml> |
 | Assertion | <n>/<n> | <%> | <%> | <met/missed> | <assertions.csv> |
+| Mutation or injected bugs | <killed>/<n> | <%> | <%> | <met/missed> | <mutation/report.md> |
 | <project metric> | <n>/<n> | <%> | <%> | <met/missed> | <source> |
 
 ### 5.1 Coverage-efficient tests
@@ -260,3 +307,32 @@ No automatic cleanup is permitted after report generation (R-272 to R-280).
 
 Report any missing generator, untraceable case, changed output, or unreviewed generated
 component. Generation status is not test execution, component qualification or closure.
+
+
+## 19. Strategy records (R-240 to R-245)
+
+### 19.1 Method allocation
+
+| Method | Obligations | Proven or passing | Open |
+|---|---|---|---|
+| formal | <n> | <n> | <n> |
+| simulation | <n> | <n> | <n> |
+| formal+simulation | <n> | <n> | <n> |
+| emulation | <n> | <n> | <n> |
+| review | <n> | <n> | <n> |
+
+### 19.2 Disabled checkers (R-241)
+
+| Checker | Tests or configurations where disabled | Reason | Owner | Approver |
+|---|---|---|---|---|
+| <chk_... / a_...> | <scope> | <reason> | <name> | <name> |
+
+When none is disabled, write "None: every applicable checker ran in every test."
+
+### 19.3 Oracle changes after a failure (R-243)
+
+| Change | Checker, bin, constraint, exclusion or waiver | Failing run that preceded it | Triage record | Approver | Re-run evidence |
+|---|---|---|---|---|---|
+| <description> | <ID> | <run ID> | <FA-...> | <name> | <ev_...> |
+
+When none was made, write "None."

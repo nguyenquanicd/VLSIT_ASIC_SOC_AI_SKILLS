@@ -15,7 +15,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from vlsit_verify_closure import assess, canonical, digest, DIMENSIONS, QUAL_EXPECTED
-from vlsit_verify_plan import REQUIRED_COLUMNS, plan_stats
+from vlsit_verify_plan import REQUIRED_COLUMNS, check_plan, plan_stats
 
 
 class ClosureTests(unittest.TestCase):
@@ -295,6 +295,33 @@ class ClosureTests(unittest.TestCase):
         result=subprocess.run(cmd,capture_output=True,text=True,encoding='utf-8');self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         result=subprocess.run([sys.executable,str(script),'check',str(run/'manifest.json')],capture_output=True,text=True,encoding='utf-8')
         self.assertEqual(result.returncode,0,result.stdout+result.stderr);self.assertIn('artifact validation only',result.stdout)
+
+
+class MethodColumnTests(unittest.TestCase):
+    """R-240: the optional method column of the vplan."""
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.index = self.root/'requirements.txt'; self.index.write_text('REQ-1\n', encoding='utf-8')
+        self.plan = self.root/'vplan.csv'
+    def run_check(self, method, test_type='directed'):
+        row = dict(req_id='REQ-1',level='block',feature='f',scenario='s',stimulus='st',checker='chk',
+                   coverage_bin='cg',test='t_x',test_type=test_type,method=method,priority='high',
+                   status='planned',evidence='',owner='o')
+        with self.plan.open('w',newline='',encoding='utf-8') as fh:
+            w=csv.DictWriter(fh,fieldnames=list(row));w.writeheader();w.writerow(row)
+        out=io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc=check_plan(self.plan,None,str(self.index),None,datetime.date(2026,11,14))
+        return rc,out.getvalue()
+    def test_valid_method(self):
+        self.assertEqual(self.run_check('formal+simulation')[0],0)
+    def test_unknown_method(self):
+        rc,out=self.run_check('guess');self.assertEqual(rc,1);self.assertIn("method 'guess'",out)
+    def test_empty_method_warns(self):
+        rc,out=self.run_check('');self.assertEqual(rc,0);self.assertIn('R-240',out)
+    def test_formal_test_needs_formal_method(self):
+        rc,out=self.run_check('simulation','formal');self.assertEqual(rc,1);self.assertIn('test_type formal',out)
 
 
 def load_json(p):return json.loads(p.read_text(encoding='utf-8-sig'))

@@ -25,6 +25,8 @@ When instructions differ, `rule.md` wins over this file, and this file wins over
 
 Read [rule.md](rule.md) completely before doing anything else. Every rule in it is mandatory. Then run the rule slice for the selected level; do not read the whole rule book on every turn.
 
+Read [reference/vlsit_verification_strategy.md](reference/vlsit_verification_strategy.md) next. It states the principles (the AI produces, the tools judge, a human approves), the order of work, the method for each kind of logic and how the weight changes from logic inside a block to an IP block and a SoC. The steps below follow that order: plan and failure modes, method allocation, environment, oracles qualified before stimulus, formal, stimulus, regression, triage, closure, reviewed report.
+
 ### 2. Find Python
 
 Every script in `scripts/` is Python 3 and uses only the standard library. Locate a working Python before running any of them:
@@ -59,7 +61,7 @@ Read [reference/vlsit_sim_workspace.md](reference/vlsit_sim_workspace.md) before
 
 ### 5. Build and check the verification plan
 
-Write the vplan from `reference/templates/vlsit_vplan.csv.tpl`. Every row links a requirement or protocol clause to a scenario, a test, a checker or assertion, a coverage bin and an evidence item. Fill `test_type` and, for a combined test, `combines`, so R-250 to R-253 are visible in the plan. Plan combined tests that exercise several functions together, constrained-random tests bounded by the specification and protocol, coverage-efficient tests that add unique bins, and fault-injection tests for every safety mechanism and error path. Run:
+Write the plan in two files that stay consistent (R-245): the readable plan document from `reference/templates/vlsit_verification_plan.md.tpl` (scope, features and methods, failure-mode list, environment architecture with its block diagram and component and checker tables, test plan, formal plan, coverage model, closure criteria, risks) and the machine-readable vplan from `reference/templates/vlsit_vplan.csv.tpl`. Write the failure-mode list per feature first (R-242), then allocate a method to every obligation (R-240). Every vplan row links a requirement or protocol clause to a scenario, a test, a checker or assertion, a coverage bin and an evidence item. Fill `test_type`, `method`, `failure_mode` and, for a combined test, `combines`, so R-240, R-242 and R-250 to R-253 are visible in the plan. Plan combined tests that exercise several functions together, constrained-random tests bounded by the specification and protocol, coverage-efficient tests that add unique bins, and fault-injection tests for every safety mechanism and error path. Run:
 
 ```sh
 <python> "<skill folder>/scripts/vlsit_verify_plan.py" check <vplan.csv> --spec-index <requirements.txt>
@@ -78,7 +80,7 @@ Follow the selected profile in `reference/vlsit_level_profiles.md`:
 | Block | Block vplan, topology review, reference-model notes | Environment, virtual sequences, scoreboard, assertions, regression |
 | SoC | Use-case plan, memory map, boot flow, firmware ABI | System environment, CPU and firmware, system scoreboard, use-case tests |
 
-Use an existing qualified VIP instead of writing a new one when it supports the required protocol, role and configuration (R-254). When no VIP fits, report the gap and the proposed scope to the user before creating or updating one (R-256).
+Build and qualify the oracles (reference model, scoreboards, assertions) with known answers and injected faults before writing the stimulus campaign, and keep every applicable checker enabled in every test (R-241). Use an existing qualified VIP instead of writing a new one when it supports the required protocol, role and configuration (R-254). When no VIP fits, report the gap and the proposed scope to the user before creating or updating one (R-256).
 
 For no-VIP projects, build one harness with BFM, passive monitor, independent predictor/scoreboard, assertions and coverage. Start with batch vectors from C/C++ or Python; select transaction streaming or existing simulator bindings only when feedback requires them. Follow the architecture profiles and model qualification in reference/vlsit_large_ip_verification.md. Missing generic UVM templates do not block a non-UVM local harness. Full VIP release still requires the applicable qualification rules.
 
@@ -95,7 +97,7 @@ Before invoking `vlsit_verify_evidence.py manifest`, create the run's `resource_
 
 ### 8. Run and close measured obligations
 
-Execute approved smoke, boundary, interaction, error/recovery and retained regression scenarios under the reviewed RAM/disk budgets. Save commands, seeds, timeouts, baselines, resource measurements and raw results. Use scoped waveform capture only when required; preserve the original run if a targeted debug rerun is needed. Qualify the model/scoreboard with known answers and representative faults. Use schema v2 source-bound receipts from qualified producers. Export actual compiled inputs, re-hash every build dependency, freeze the scenario matrix/bin catalogs and obtain the existing G0 review for the hashed contract/inventory. Qualify C/C++/Python models and scoreboards with recorded evidence. Normalize receipts into observations without changing payloads; universal vendor parsers are not bundled. Iterate measured coverage gaps under a runtime budget, retaining historical bug and checker tests even with no new bins.
+Run the formal obligations first and feed proven-unreachable bins to the exclusion review and reachable traces to directed tests. Execute approved smoke, boundary, interaction, error/recovery and retained regression scenarios under the reviewed RAM/disk budgets. Triage every failure before changing any checker, expected value, bin, constraint, exclusion or waiver (R-243). Save commands, seeds, timeouts, baselines, resource measurements and raw results. Use scoped waveform capture only when required; preserve the original run if a targeted debug rerun is needed. Qualify the model/scoreboard with known answers and representative faults. Use schema v2 source-bound receipts from qualified producers. Export actual compiled inputs, re-hash every build dependency, freeze the scenario matrix/bin catalogs and obtain the existing G0 review for the hashed contract/inventory. Qualify C/C++/Python models and scoreboards with recorded evidence. Normalize receipts into observations without changing payloads; universal vendor parsers are not bundled. Iterate measured coverage gaps under a runtime budget, retaining historical bug and checker tests even with no new bins.
 
 Read [reference/vlsit_closure_contract.md](reference/vlsit_closure_contract.md). Give every vplan row a unique obligation_id, configuration and dimension, reconciling the frozen matrix and receipt evidence IDs. Passing closure requires passing vplan rows; preserve superseded failed runs and bug/fix history. Run:
 
@@ -107,7 +109,7 @@ Default return code 0 means source-bound evidence meets the reviewed contract wi
 
 ### 9. Verify against the rules and report
 
-Check the result against every applicable rule ID. Run the checks that name a script, and inspect the rest by hand. Write one report, `sim/docs/verification_report.md`, from `reference/templates/vlsit_verification_report.md.tpl` (R-259). It contains the rule-ID table, the test results, coverage per metric, exclusions, waivers, protocol deviations, VIP changes, the force report, bug and fix records, AI provenance and residual risk. Every exception has a reason. Say plainly what was not checked and what residual risk remains. Never report a gate as approved unless a named human approved it.
+Check the result against every applicable rule ID. Run the checks that name a script, and inspect the rest by hand. Write one report, `sim/docs/verification_report.md`, from `reference/templates/vlsit_verification_report.md.tpl` (R-259). It opens with a summary table and contains the rule-ID table, the test results with the purpose and the cause of every non-passing status, the failure analysis by category with cited evidence, the coverage summary by feature and per metric including mutation, exclusions, waivers, protocol deviations, VIP changes, the force report, bug and fix records, AI provenance, the strategy records and residual risk. Every test-result and failure-analysis row has review columns filled by an engineer or by an independent AI agent named with its model version (R-244); an AI review is advisory, and an open `disagree` or `needs-info` blocks the gate. Every exception has a reason. Say plainly what was not checked and what residual risk remains. Never report a gate as approved unless a named human approved it.
 
 Before handoff, seal and check the retained workspace, verify generator inputs/outputs and the testcase-to-requirement/scenario trace, complete sim/README.md and the report retention table, and use execute/replay for actual subprocess execution and comparison in a fresh directory when tools are available. Handwritten cold_replay=pass is rejected; replay receipts must bind the reviewed case scope to the retained baseline and original execution. Preserve every environment/testbench source and failed/passing run. Report package integrity, actual simulation, resource use, closure and cold-replay outcomes separately; unavailable replay or resource measurements remain not_run/not_measured with a reason (R-272 to R-280).
 
@@ -117,6 +119,8 @@ Read a file only when the step needs it.
 
 | File | Read it when |
 |---|---|
+| [reference/vlsit_verification_strategy.md](reference/vlsit_verification_strategy.md) | Every run: principles, order of work, method allocation, logic/IP/SoC application, dense tests, corner-case techniques, AI pitfalls |
+| `reference/templates/vlsit_verification_plan.md.tpl` | Writing the readable plan document with the environment architecture and the test plan |
 | [reference/vlsit_sim_workspace.md](reference/vlsit_sim_workspace.md) | Standalone simulation structure, RAM/disk budgets, waveform capture, retained inputs, exact commands/environment and replay handoff |
 | [reference/vlsit_large_ip_verification.md](reference/vlsit_large_ip_verification.md) | Large IP/no-VIP workflow, C/C++/Python models and efficient scenario selection |
 | [reference/vlsit_closure_contract.md](reference/vlsit_closure_contract.md) | Normalized results, contract schemas, integrity limits and closure checks |

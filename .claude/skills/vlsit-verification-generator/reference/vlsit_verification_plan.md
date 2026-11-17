@@ -31,7 +31,7 @@ Every edge is checkable:
 
 ## 3. CSV schema
 
-The machine-readable plan is a UTF-8 CSV file with a header row. Columns:
+The machine-readable plan is a UTF-8 CSV file with a header row. The readable plan document `templates/vlsit_verification_plan.md.tpl` (R-245) carries the strategy, the environment architecture, the test plan, the failure-mode list and the closure criteria, and must stay consistent with this file. Columns:
 
 | Column | Meaning | Required | Allowed values or format |
 |---|---|---|---|
@@ -46,6 +46,8 @@ The machine-readable plan is a UTF-8 CSV file with a header row. Columns:
 | `test` | Test ID or IDs that implement the scenario | Yes | `t_...`; several IDs separated by `;` |
 | `test_type` | Kind of test | Yes for new plans | `directed`, `constrained_random`, `combined`, `fault_injection`, `formal`, `stress`, `use_case`, `boot`, `compliance`, `regression` |
 | `combines` | Functions combined in one test | Yes when `test_type` is `combined` | At least two function names separated by `+` or `;` |
+| `method` | Verification method of the obligation (R-240) | Yes for new plans | `formal`, `simulation`, `formal+simulation`, `emulation`, `review` |
+| `failure_mode` | Failure-mode IDs from the plan document that the row covers (R-242) | Yes for new plans when the row covers a failure mode | `FM-...`; several IDs separated by `;` |
 | `priority` | Planning priority | Yes | `high`, `medium`, `low` |
 | `status` | Implementation status | Yes | `planned`, `implemented`, `passing`, `failing`, `blocked`, `waived` |
 | `evidence` | Evidence bundle ID or IDs | Yes when `status` is `passing` | `ev_...`; several IDs separated by `;` |
@@ -88,12 +90,13 @@ REQ-SOC-001,soc,Boot,Boot from ROM and enumerate peripherals,CPU reset; fetch bo
 4. **Checker or assertion:** each row has at least one of them.
 5. **Coverage or assertion:** each row has a coverage bin or an assertion.
 6. **Test type:** a present `test_type` must be valid; an empty `test_type` is a `WARN` because R-250 to R-253 depend on it. A `combined` row must name at least two functions in `combines`, otherwise it is an `ERROR`.
-7. **Evidence:** every `passing` row has an evidence ID, and the bundle exists under `--evidence-root` when that option is given.
-8. **Waivers:** every `waived` row has all four waiver fields and a future expiry.
-9. **Duplicates:** the same test ID is not used twice for the same requirement.
-10. **Orphans:** with `--scan-root`, identifiers of the form `t_...`, `cg_...` and `a_...` found in source files are compared with the plan; an identifier missing from the plan is a `WARN`.
-11. **Inventory completeness:** --spec-index is mandatory and includes protocol clauses. Unknown IDs and inventory IDs absent from the plan are errors.
-12. **Reverse implementation links:** with --scan-root, plan IDs not found in sources are warnings; review generated/runtime IDs explicitly.
+7. **Method:** a present `method` uses the allowed values; an empty `method` is a `WARN` (R-240); a `formal` test needs a method that includes `formal`. A plan without the column gets an `INFO`.
+8. **Evidence:** every `passing` row has an evidence ID, and the bundle exists under `--evidence-root` when that option is given.
+9. **Waivers:** every `waived` row has all four waiver fields and a future expiry.
+10. **Duplicates:** the same test ID is not used twice for the same requirement.
+11. **Orphans:** with `--scan-root`, identifiers of the form `t_...`, `cg_...` and `a_...` found in source files are compared with the plan; an identifier missing from the plan is a `WARN`.
+12. **Inventory completeness:** --spec-index is mandatory and includes protocol clauses. Unknown IDs and inventory IDs absent from the plan are errors.
+13. **Reverse implementation links:** with --scan-root, plan IDs not found in sources are warnings; review generated/runtime IDs explicitly.
 
 Exit codes: 0 when there is no `ERROR`, 1 when there is at least one `ERROR`, 2 for bad input such as a missing file or a missing column.
 
@@ -122,6 +125,9 @@ Exit codes: 0 when there is no `ERROR`, 1 when there is at least one `ERROR`, 2 
 - Evidence IDs resolve to bundles.
 - Waivers have an owner, a reason and an expiry.
 - The plan states what is out of scope and why.
+- Every row has a method with a reason in the plan document, and control logic with a bounded state space uses formal (R-240).
+- Every failure mode of the plan document maps to a row or a reasoned not-applicable entry (R-242).
+- The plan document and this CSV list the same tests and obligations (R-245).
 
 ## 9. Measured obligations and applicability
 

@@ -150,11 +150,14 @@ A static review of the testbench finds every `force` and `release` and compares 
 
 Deliver one file, `sim/docs/verification_report.md`, built from `templates/vlsit_verification_report.md.tpl`. It contains:
 
+- Summary: one table with the overall status, test counts, open failures, bugs, coverage per metric, mutation and open reviews.
 - Identification: project, artifact, version, level, specification revision, protocol revision, tools, date.
 - Scope: what is verified and what is not.
 - Rule-ID table: every rule in scope, its status and the evidence.
-- Test results: every test, seed, result and evidence bundle.
-- Coverage: each metric and value, never one average.
+- Test results: every test with its purpose, functions, seed, status, the cause of every non-passing status and the evidence bundle.
+- Failure analysis: one row per failure signature with its category (R-218), cited evidence, root cause, action and bug ID.
+- Review columns and review log: every test-result and failure-analysis row reviewed by an engineer or an independent AI agent (R-244).
+- Coverage: a summary by feature, then each metric and value including mutation, never one average.
 - Exclusions: the table from section 8.
 - Waivers: every waiver with owner, reason and expiry.
 - Protocol deviations: the table from section 6.

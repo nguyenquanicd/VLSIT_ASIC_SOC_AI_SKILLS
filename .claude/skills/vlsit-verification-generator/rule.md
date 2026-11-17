@@ -17,7 +17,8 @@ The rules are grouped by verification level and by cross-cutting concern. The ru
 | Block | R-160–R-169 | A verification block, and every block inside a SoC |
 | SoC | R-180–R-189 | A SoC or system verification environment |
 | Test design and reporting | R-250–R-259 | Every run that selects, designs or reports tests |
-| Scalable verification | R-260-R-276 | Every run, with profile-specific applicability |
+| Verification strategy | R-240–R-245 | Every run that plans, implements, runs, reviews or reports verification |
+| Scalable verification | R-260–R-280 | Every run, with profile-specific applicability |
 | Coverage | R-200–R-207 | Every run that plans, measures or closes coverage |
 | Regression | R-215–R-222 | Every run that selects, executes or reports regression tests |
 | AI | R-230–R-239 | Every run that uses an AI model for any verification artifact |
@@ -524,7 +525,41 @@ MUST apply data classification, model-version pinning, license review and prompt
 - Why: unclassified data, a silently upgraded model and an injected instruction can each invalidate the result or leak the design.
 - Check: the AI governance checklist is part of the run record and names the data class, model version, license decision and prompt-injection review.
 
-## Scalable verification rules (R-260-R-276)
+## Verification strategy rules (R-240–R-245)
+
+These rules fix the order and the method of the work. The principles behind them and the ordered workflow are explained in `reference/vlsit_verification_strategy.md`.
+
+### R-240 Method allocation per obligation
+MUST assign each vplan obligation a verification method (`formal`, `simulation`, `formal+simulation`, `emulation` or `review`) with a one-line reason, using formal first for control logic with a bounded state space and simulation for data paths, long sequences, performance and system use cases.
+- Why: a control-logic corner case that random simulation may never reach is exhaustive for a formal engine, while a long data-path scenario is cheaper and more convincing in simulation.
+- Check: `scripts/vlsit_verify_plan.py check` validates the `method` column vocabulary; manual - the plan document states the reason for each method choice.
+
+### R-241 Always-on checkers
+MUST run every test with every checker, assertion and scoreboard that applies to the active configuration enabled; a disabled checker is recorded with its scope, reason, owner and approver.
+- Why: a checker that is enabled only in its own test lets every other test pass while it violates that rule, and a test checks many functions only when all of their checkers watch it.
+- Check: manual - the environment configuration enables all applicable checkers by default, and the verification report lists every disabled checker with its record.
+
+### R-242 Failure-mode list
+MUST derive a failure-mode list from the specification for each feature and map every failure mode to a scenario, a checker and a coverage bin or a reasoned not-applicable entry.
+- Why: corner-case bugs live in the ways a feature can fail, and a list that is written down can be reviewed for omissions, while random stimulus only reaches them by chance.
+- Check: manual - every row of the failure-mode table in the plan document names a vplan obligation, or a reason and an approver for not applicable.
+
+### R-243 No verdict tampering
+MUST NOT change a checker, expected value, assertion, coverage bin, constraint, exclusion or waiver to turn a failing or missing result into a passing one unless a triage record classifies the failure as a testbench or specification fault and a named human approves the change.
+- Why: weakening the oracle is the cheapest way for a person or an AI agent to make a regression green, and it hides exactly the bug the oracle was built to find.
+- Check: manual - every oracle change made after the first failing run of the affected test links a triage record (R-218) and an approval, and the verification report lists it.
+
+### R-244 Reviewed report rows
+MUST give every test result and every failure-analysis row of the verification report a review record with the reviewer identity (engineer name, or AI agent and model version), a verdict (`agree`, `disagree` or `needs-info`), a comment and the author's response.
+- Why: a second reader catches wrong verdicts and weak root-cause claims, and recording the exchange keeps the disagreement and its resolution auditable.
+- Check: manual - no review cell is empty; a review by an AI agent is labelled as advisory and never replaces the human approval of R-113 and R-230; an open `disagree` or `needs-info` blocks the gate that uses the row.
+
+### R-245 Verification plan document
+MUST write the verification plan document from `reference/templates/vlsit_verification_plan.md.tpl` beside the machine-readable vplan, with the scope, the feature-to-requirement map, the method allocation, the environment architecture, the test plan, the coverage model, the failure-mode list, the closure criteria and the risks, and keep the two consistent.
+- Why: the CSV holds the traceability that scripts check, but a reviewer approves strategy, architecture and closure criteria only from a readable document.
+- Check: manual - every test and obligation in the document exists in the vplan and the reverse, and gate G0 records the approval of both.
+
+## Scalable verification rules (R-260–R-280)
 
 ### R-260 Complete requirement inventory
 MUST reconcile the approved in-scope inventory, including protocol clauses, with the vplan in both directions. Represent out-of-scope items in the reviewed scope record; never silently remove them from the specification.

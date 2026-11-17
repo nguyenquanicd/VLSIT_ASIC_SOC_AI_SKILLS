@@ -29,7 +29,7 @@ REQUIRED_COLUMNS = [
     "req_id", "level", "feature", "scenario", "stimulus", "checker",
     "coverage_bin", "test", "priority", "status", "evidence", "owner",
 ]
-OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "notes", "obligation_id", "configuration", "dimension"]
+OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "method", "failure_mode", "notes", "obligation_id", "configuration", "dimension"]
 ALLOWED_LEVELS = {"component", "vip", "block", "soc"}
 ALLOWED_PRIORITIES = {"high", "medium", "low"}
 ALLOWED_STATUSES = {"planned", "implemented", "passing", "failing", "blocked", "waived"}
@@ -37,6 +37,7 @@ ALLOWED_TEST_TYPES = {
     "directed", "constrained_random", "combined", "fault_injection",
     "formal", "stress", "use_case", "boot", "compliance", "regression",
 }
+ALLOWED_METHODS = {"formal", "simulation", "formal+simulation", "emulation", "review"}
 WAIVER_FIELDS = ("waiver", "waiver_owner", "waiver_expiry", "reason")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 IDENTIFIER_RE = re.compile(r"\b(t_[A-Za-z0-9_]+|cg_[A-Za-z0-9_]+|a_[A-Za-z0-9_]+)\b")
@@ -96,6 +97,8 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
     for name in columns:
         if name not in REQUIRED_COLUMNS and name not in OPTIONAL_COLUMNS:
             add("INFO", "-", "column '%s' is not part of the documented schema" % name)
+    if "method" not in columns:
+        add("INFO", "-", "method column is absent; R-240 method allocation is manual")
     if "test_type" not in columns:
         add("INFO", "-", "test_type column is absent; R-250 to R-253 are manual")
 
@@ -161,6 +164,14 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
             functions = {item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()}
             if len(functions) < 2:
                 add("ERROR", line, "combined test must name at least two functions in combines")
+
+        method = row.get("method", "")
+        if "method" in columns and not method:
+            add("WARN", line, "method is empty; record formal, simulation, formal+simulation, emulation or review (R-240)")
+        if method and method not in ALLOWED_METHODS:
+            add("ERROR", line, "method '%s' is not one of %s" % (method, ", ".join(sorted(ALLOWED_METHODS))))
+        if test_type == "formal" and method and "formal" not in method:
+            add("ERROR", line, "test_type formal needs a method that includes formal (R-240)")
 
         if not row.get("checker") and not row.get("assertion"):
             add("ERROR", line, "row has neither a checker nor an assertion")
