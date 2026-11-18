@@ -12,23 +12,25 @@
 <!-- VLSIT_TERMINOLOGY_END -->
 ## Purpose / Mục đích
 
-Analyze existing RTL with its specification and register map, rewrite the specification as a delta on the current behavior, report pre-existing defects for confirmation, propose a minimal change, wait for sign-off, then modify the existing RTL in place and generate the CSR INFO file.
+Analyze an existing RTL IP top-down (hierarchy, instance counts, function of each instance through its interfaces, signals, CSR map, block diagrams, basic software sequence) in one Markdown report, plan the smallest possible modification for sign-off, then modify the RTL in place, write the CSR Excel workbook and verify the change with lint and before/after tests. The specification is optional.
 
-Phân tích RTL hiện có cùng specification và bản đồ thanh ghi, viết lại specification dưới dạng phần bổ sung so với hành vi hiện tại, báo cáo lỗi sẵn có để người dùng xác nhận, đề xuất thay đổi tối thiểu, chờ ký duyệt, rồi sửa trực tiếp RTL hiện có và tạo file CSR INFO.
+Phân tích IP RTL có sẵn từ TOP xuống (hierarchy, số instance, chức năng từng instance qua interface, tín hiệu, bản đồ thanh ghi CSR, block diagram, software sequence cơ bản) trong một báo cáo Markdown duy nhất, đề xuất thay đổi nhỏ nhất, chờ ký duyệt, rồi sửa trực tiếp RTL, ghi file Excel CSR và kiểm chứng bằng lint cùng test trước/sau. Specification là tùy chọn.
 
 ## Functions / Chức năng
 
-- Rewrite the specification in the VLSIT template of `vlsit-asic-ip-microspec`, describing the existing IP as the baseline and the new feature as a delta requirement. / Viết lại specification theo template VLSIT của `vlsit-asic-ip-microspec`, mô tả IP hiện có là nền và tính năng mới là yêu cầu bổ sung.
-- Map requirements to current RTL behavior and affected modules/files, and keep the local coding style. / Đối chiếu yêu cầu với hành vi RTL hiện tại và xác định module/file bị ảnh hưởng, giữ nguyên phong cách code hiện có.
-- List every pre-existing defect as `BUG-<NNN>` and wait for the user's confirmation before it changes the specification or the RTL. / Liệt kê mọi lỗi sẵn có dưới dạng `BUG-<NNN>` và chờ người dùng xác nhận trước khi lỗi đó thay đổi specification hoặc RTL.
-- Keep every existing register unchanged; place new registers at free addresses and generate the CSR INFO file in the APB-CSR-Generator layout. / Giữ nguyên mọi thanh ghi hiện có; đặt thanh ghi mới vào địa chỉ trống và tạo file CSR INFO theo định dạng APB-CSR-Generator.
-- Stop at a review gate using an English technical plan before editing RTL. After approval, modify only approved existing files and report the diff-based RTL code-change percentage. / Dừng tại cổng duyệt kế hoạch kỹ thuật tiếng Anh trước khi sửa RTL. Sau khi duyệt, chỉ sửa các file hiện có đã chấp thuận và báo cáo tỷ lệ code RTL thay đổi dựa trên diff.
+- Scan the hierarchy from the top: the number of instances of every module under each parent and in total, ports, parameters and net-level connections. / Quét hierarchy từ TOP: số instance của mỗi module dưới từng parent và tổng cộng, port, parameter và kết nối theo net.
+- Explain each instance through its relation to the other instances and list every signal with direction, width, domain, kind and function. / Giải thích từng instance qua quan hệ với các instance khác và liệt kê mọi tín hiệu với hướng, độ rộng, domain, loại và chức năng.
+- Document the CSR map (offset, field, bits, access, reset) and write it to an Excel workbook in the APB-CSR-Generator format when the IP has software-visible registers. / Ghi bản đồ CSR (offset, field, bit, access, reset) và xuất workbook Excel theo định dạng APB-CSR-Generator khi IP có thanh ghi cho software.
+- Draw block diagrams for the top and for level 1 and level 2 in Mermaid (white, black, purple) and in draw.io. / Vẽ block diagram cho TOP, level 1 và level 2 bằng Mermaid (trắng, đen, tím) và draw.io.
+- Write a basic software configuration sequence with values and order. / Viết software sequence cấu hình cơ bản với giá trị và thứ tự.
+- Analyze the modification method in the same report (at most three ranked strategies, software-flow impact, no new module unless unavoidable) and stop at one approval gate. / Phân tích phương pháp sửa trong cùng báo cáo (tối đa ba phương án xếp hạng, tác động lên software flow, không thêm module nếu không cần) và dừng tại một cổng duyệt.
+- After approval, modify only the approved existing files in their own format and naming, report the diff-based RTL change percentage, lint the change against the baseline and run `basic` and `feature` tests on both versions. / Sau khi duyệt, chỉ sửa các file hiện có đã chấp thuận theo đúng format và naming sẵn có, báo cáo tỷ lệ thay đổi RTL, lint so với baseline và chạy test `basic` và `feature` trên cả hai phiên bản.
 
 ## Inputs and output / Đầu vào và đầu ra
 
-The RTL directory is required. The old specification, the new feature description, and the CSR workbook or JSON description are requested when missing. The skill creates `VLSIT_<DESIGN_FUNCTION>_HDS.md`, `regs.json`, `<IP>_CSR.xlsx`, `<IP>_CSR_info.json`, `csr_delta.json`, and `rtl_change_review.md` with the plan and the implementation results.
+The RTL directory and the requested change are required. The specification and the CSR workbook are optional and requested only when they help. The skill creates `rtl_ip_report.md` (analysis, modification analysis, gate and results), the CSR workbook when registers exist, and a verification directory with tests and logs outside the RTL tree.
 
-Bắt buộc có thư mục RTL. Specification cũ, mô tả tính năng mới, và workbook hoặc JSON của CSR sẽ được hỏi khi thiếu. Skill tạo `VLSIT_<DESIGN_FUNCTION>_HDS.md`, `regs.json`, `<IP>_CSR.xlsx`, `<IP>_CSR_info.json`, `csr_delta.json`, và `rtl_change_review.md` chứa kế hoạch cùng kết quả triển khai.
+Bắt buộc có thư mục RTL và yêu cầu thay đổi. Specification và workbook CSR là tùy chọn. Skill tạo `rtl_ip_report.md` (phân tích, phân tích sửa đổi, cổng duyệt và kết quả), workbook CSR khi có thanh ghi, và thư mục verification chứa test và log nằm ngoài cây RTL.
 
 ## Use / Cách gọi
 
