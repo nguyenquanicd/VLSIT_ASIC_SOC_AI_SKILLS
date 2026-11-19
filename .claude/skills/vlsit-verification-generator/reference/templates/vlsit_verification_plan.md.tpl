@@ -92,6 +92,18 @@ One row per test. A combined test names every function it exercises; every test 
 |---|---|---|---|---|---|---|---|---|---|---|
 | <t_...> | <directed / constrained_random / combined / fault_injection / formal / stress / use_case / boot / compliance> | <one or two sentences> | <function+function; REQ-...> | <setup -> action -> check> | <ranges, distribution, clause> | <FM-...> | <cg_...> | <simulation / formal> | <smoke / nightly / full> | <high / medium / low> |
 
+### 6.1a Functional verification matrix (R-246)
+
+Paste the output of `<python> scripts/vlsit_verify_plan.py matrix sim/docs/00_plan/vplan.csv` here (or link `sim/docs/00_plan/functional_matrix.md`). Combined tests run first; a function with no combined test has a `combine_na=<reason>` note in the vplan.
+
+| Test | Kind | Test type | Priority | Functions exercised | Count | Requirements |
+|---|---|---|---|---|---:|---|
+| <t_...> | <combined / single> | <test type> | <priority> | <function; function> | <n> | <REQ-...> |
+
+| Function | Combined tests | Single-function tests | Status |
+|---|---|---|---|
+| <function> | <t_...> | <t_...> | <combined covered / no combination: reason / NO COMBINED TEST> |
+
 ### 6.2 Regression tiers
 
 | Tier | Tests | Seeds | Timeout per test | Pass criterion |

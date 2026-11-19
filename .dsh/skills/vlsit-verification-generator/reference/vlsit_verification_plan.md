@@ -58,6 +58,8 @@ A row is valid when it has a test, a checker or assertion, and either a coverage
 
 `test_type` drives the test design rules R-250 to R-253. A `combined` row must name at least two functions in `combines`; a `constrained_random` row records its constraints and their specification or protocol source; a `fault_injection` row names the fault and the expected error response. Use `directed` for a single targeted scenario and `use_case`, `boot`, `compliance`, `stress`, `formal` or `regression` for the other test families.
 
+The functional verification matrix (R-246) is derived from the `feature`, `combines`, `test`, `test_type`, `priority` and `req_id` columns: `vlsit_verify_plan.py matrix` writes a test-to-function table and a function-to-test table, and `check` warns (`WARN`, R-246) for a `combines` item that is not the feature of any row and for a function that has no combined test and no `combine_na=<reason>` entry in `notes`.
+
 ## 4. Waiver convention
 
 A waived row keeps its traceability fields and puts the waiver metadata in `notes` in this form:
@@ -94,6 +96,7 @@ REQ-SOC-001,soc,Boot,Boot from ROM and enumerate peripherals,CPU reset; fetch bo
 8. **Evidence:** every `passing` row has an evidence ID, and the bundle exists under `--evidence-root` when that option is given.
 9. **Waivers:** every `waived` row has all four waiver fields and a future expiry.
 10. **Duplicates:** the same test ID is not used twice for the same requirement.
+14. **Functional verification matrix (R-246):** a `combines` item that is not the feature of any row is a `WARN`, and so is a function that has no combined test and no `combine_na=<reason>` in `notes`.
 11. **Orphans:** with `--scan-root`, identifiers of the form `t_...`, `cg_...` and `a_...` found in source files are compared with the plan; an identifier missing from the plan is a `WARN`.
 12. **Inventory completeness:** --spec-index is mandatory and includes protocol clauses. Unknown IDs and inventory IDs absent from the plan are errors.
 13. **Reverse implementation links:** with --scan-root, plan IDs not found in sources are warnings; review generated/runtime IDs explicitly.

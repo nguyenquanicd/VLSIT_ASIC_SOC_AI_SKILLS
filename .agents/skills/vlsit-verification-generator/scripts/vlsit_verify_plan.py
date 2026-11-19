@@ -11,6 +11,9 @@ Actions:
   check   validate the schema, vocabulary, traceability edges, evidence links
           and waiver fields of a vplan CSV.
   export  write the plan as a Markdown table or JSON.
+  matrix  write the functional verification matrix (R-246): per test the
+          functions it exercises, per function the tests that exercise it,
+          combined tests first.
   stats   print inventory/status counts; never grants measured closure.
 
 Standard library only (Python 3.8 or later). Exit codes: 0 success, 1 findings,
@@ -247,6 +250,9 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
             if missing.startswith("a_"):
                 add("WARN", "-", "assertion '%s' appears in source but not in the vplan" % missing)
 
+    for level, line, message in matrix_findings(rows):
+        add(level, line, message)
+
     for finding in findings:
         print(finding)
     print("ROWS: %d, ERRORS: %d, FINDINGS: %d" % (len(rows), errors, len(findings)))
@@ -254,6 +260,105 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
         print("RESULT: FAIL")
         return 1
     print("RESULT: PASS (plan validation only; verification closure is not established)")
+    return 0
+
+
+def norm_function(name):
+    return re.sub(r"[\s_]+", " ", name.strip().lower())
+
+
+def matrix_model(rows):
+    """Return (tests, functions): tests maps a test ID to its record, functions maps a normalized name to its record."""
+    tests = OrderedDict()
+    functions = OrderedDict()
+
+    def function(name):
+        key = norm_function(name)
+        return functions.setdefault(key, {"name": name.strip(), "single": [], "combined": [], "na": ""})
+
+    for row in rows:
+        feature = row.get("feature", "").strip()
+        combined = row.get("test_type", "") == "combined"
+        extra = [item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()]
+        names = []
+        for name in ([feature] if feature else []) + extra:
+            if norm_function(name) not in [norm_function(n) for n in names]:
+                names.append(name)
+        reason = re.search(r"(?i)\bcombine_na\s*=\s*([^;]+)", row.get("notes", "") or "")
+        if feature and reason:
+            function(feature)["na"] = reason.group(1).strip()
+        for test in split_ids(row.get("test", "")):
+            record = tests.setdefault(test, {"type": set(), "priority": set(), "functions": [], "reqs": [], "combined": False})
+            record["type"].add(row.get("test_type", "") or "-")
+            record["priority"].add(row.get("priority", "") or "-")
+            if row.get("req_id") and row["req_id"] not in record["reqs"]:
+                record["reqs"].append(row["req_id"])
+            record["combined"] = record["combined"] or combined
+            for name in names:
+                if norm_function(name) not in [norm_function(n) for n in record["functions"]]:
+                    record["functions"].append(name)
+    for test, record in tests.items():
+        kind = "combined" if record["combined"] else "single"
+        for name in record["functions"]:
+            bucket = function(name)[kind]
+            if test not in bucket:
+                bucket.append(test)
+    return tests, functions
+
+
+def matrix_findings(rows):
+    """R-246 findings: a combines item that is not a function of the plan, a function with no combined test and no reason."""
+    tests, functions = matrix_model(rows)
+    findings = []
+    features = {norm_function(row["feature"]) for row in rows if row.get("feature")}
+    for row in rows:
+        if row.get("test_type") == "combined":
+            for name in re.split(r"[+;]", row.get("combines", "")):
+                if name.strip() and norm_function(name) not in features:
+                    findings.append(("WARN", row.get("_line", "-"), "combines item '%s' is not the feature of any vplan row; add a row for it or correct the name (R-246)" % name.strip()))
+    if len(functions) >= 2:
+        for key, record in functions.items():
+            if not record["combined"] and not record["na"]:
+                findings.append(("WARN", "-", "function '%s' is exercised only by single-function tests; plan a combined test or record 'combine_na=<reason>' in notes (R-246)" % record["name"]))
+    return findings
+
+
+def matrix_text(rows):
+    tests, functions = matrix_model(rows)
+    order = sorted(tests.items(), key=lambda item: (not item[1]["combined"], {"high": 0, "medium": 1, "low": 2}.get(sorted(item[1]["priority"])[0], 3), item[0]))
+    lines = ["## Test to function matrix", "",
+             "| Test | Kind | Test type | Priority | Functions exercised | Count | Requirements |",
+             "|---|---|---|---|---|---:|---|"]
+    for test, record in order:
+        lines.append("| %s | %s | %s | %s | %s | %d | %s |" % (
+            test, "combined" if record["combined"] else "single", ", ".join(sorted(record["type"])),
+            ", ".join(sorted(record["priority"])), "; ".join(record["functions"]), len(record["functions"]), "; ".join(record["reqs"])))
+    lines += ["", "## Function to test matrix", "",
+              "| Function | Combined tests | Single-function tests | Status |", "|---|---|---|---|"]
+    for record in functions.values():
+        if record["combined"]:
+            status = "combined covered"
+        elif record["na"]:
+            status = "no combination: " + record["na"]
+        else:
+            status = "NO COMBINED TEST"
+        lines.append("| %s | %s | %s | %s |" % (record["name"], "; ".join(record["combined"]) or "-", "; ".join(record["single"]) or "-", status))
+    return "\n".join(lines) + "\n"
+
+
+def matrix_plan(path, output, force):
+    _columns, rows = read_rows(path)
+    text = matrix_text(rows)
+    if output:
+        target = Path(output)
+        if target.exists() and not force:
+            raise PlanError("output exists: %s (pass --force to overwrite)" % target)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with open(str(target), "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text)
+        print("WROTE: %s" % target)
+    else:
+        sys.stdout.write(text)
     return 0
 
 
@@ -330,6 +435,11 @@ def main(argv=None):
     p_export.add_argument("--output", help="output file (default: stdout)")
     p_export.add_argument("--force", action="store_true", help="overwrite an existing output file")
 
+    p_matrix = sub.add_parser("matrix", help="write the functional verification matrix (R-246)")
+    p_matrix.add_argument("vplan", help="path to vplan.csv")
+    p_matrix.add_argument("--output", help="output Markdown file (default: stdout)")
+    p_matrix.add_argument("--force", action="store_true", help="overwrite an existing output file")
+
     p_stats = sub.add_parser("stats", help="print plan statistics")
     p_stats.add_argument("vplan", help="path to vplan.csv")
     p_stats.add_argument("--spec-index", required=True, help="approved in-scope inventory, one ID per line")
@@ -348,6 +458,8 @@ def main(argv=None):
             return check_plan(Path(args.vplan), args.evidence_root, args.spec_index, args.scan_root, today)
         if args.action == "export":
             return export_plan(Path(args.vplan), args.output, args.format, args.force)
+        if args.action == "matrix":
+            return matrix_plan(Path(args.vplan), args.output, args.force)
         return plan_stats(Path(args.vplan), args.evidence_root, args.spec_index)
     except (PlanError, OSError, ValueError) as error:
         print("ERROR %s" % error)

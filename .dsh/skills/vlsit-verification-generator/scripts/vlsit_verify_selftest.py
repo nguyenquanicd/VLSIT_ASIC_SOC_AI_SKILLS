@@ -15,7 +15,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from vlsit_verify_closure import assess, canonical, digest, DIMENSIONS, QUAL_EXPECTED
-from vlsit_verify_plan import REQUIRED_COLUMNS, check_plan, plan_stats
+from vlsit_verify_plan import REQUIRED_COLUMNS, check_plan, plan_stats, matrix_findings, matrix_text
 
 
 class ClosureTests(unittest.TestCase):
@@ -326,5 +326,24 @@ class MethodColumnTests(unittest.TestCase):
 
 def load_json(p):return json.loads(p.read_text(encoding='utf-8-sig'))
 
+
+class FunctionalMatrixTests(unittest.TestCase):
+    """R-246: the functional verification matrix and the combine-first warnings."""
+    def row(self,feature,test,test_type='directed',combines='',notes='',priority='high'):
+        return dict(req_id='REQ-'+test,feature=feature,test=test,test_type=test_type,combines=combines,notes=notes,priority=priority,_line='2')
+    def test_matrix_lists_combined_tests_first_and_flags_single_only_functions(self):
+        rows=[self.row('write','t_wr'),self.row('error','t_err'),self.row('read','t_rd'),
+              self.row('write','t_wr_err','combined','write+error')]
+        text=matrix_text(rows)
+        self.assertLess(text.index('t_wr_err'),text.index('t_rd'))
+        self.assertIn('| read | - | t_rd | NO COMBINED TEST |',text)
+        self.assertIn('| write | t_wr_err | t_wr | combined covered |',text)
+        self.assertTrue(any('read' in m and 'R-246' in m for _l,_n,m in matrix_findings(rows)))
+    def test_combine_na_reason_and_unknown_combines_item(self):
+        rows=[self.row('write','t_wr'),self.row('read','t_rd',notes='combine_na=no legal combination'),
+              self.row('write','t_x','combined','write+ghost')]
+        messages=[m for _l,_n,m in matrix_findings(rows)]
+        self.assertFalse(any("'read'" in m for m in messages))
+        self.assertTrue(any("'ghost'" in m for m in messages))
 
 if __name__=='__main__':unittest.main()

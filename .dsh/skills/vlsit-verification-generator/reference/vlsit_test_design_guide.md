@@ -20,6 +20,16 @@ Rules for a combined test:
 
 Example: an APB component with a write path, a read path and an error path. A directed write test, a directed read test and an error test each pass, but a combined test that issues a read immediately after an erroring write checks that the error state does not leak into the next transfer. The vplan row uses `test_type=combined` and `combines=read_after_error+error_response`, and the test is still one `t_...` ID.
 
+### Functional verification matrix and combine-first order (R-246)
+
+Record which functions every test combines in the functional verification matrix. Generate it from the vplan, never by hand:
+
+```sh
+<python> "<skill folder>/scripts/vlsit_verify_plan.py" matrix sim/docs/00_plan/vplan.csv --output sim/docs/00_plan/functional_matrix.md --force
+```
+
+The first table has one row per test (combined tests first) with the functions it exercises and their requirements. The second table has one row per function with its combined tests and its single-function tests; the status `NO COMBINED TEST` means the function is only tested alone. Fix it with a combined test, or write `combine_na=<reason>` in the `notes` of the vplan row when no legal combination exists (for example, the specification forbids concurrent use). Order the testlist so that the combined tests run first; keep single-function directed tests for bring-up, for debug resolution and for the functions that have no legal combination.
+
 ## 2. Constrained-random stimulus (R-251)
 
 Declare domains from the contract. Full-width random payload data is legal when the complete domain is legal. Keep negative traffic in scenarios with explicit violated rules and expected error/recovery checks; do not constrain away specified error paths.

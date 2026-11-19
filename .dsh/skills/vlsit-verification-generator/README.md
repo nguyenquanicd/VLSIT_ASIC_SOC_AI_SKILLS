@@ -39,6 +39,7 @@
 | Follow one ordered strategy: failure-mode list, method per obligation (formal first for bounded control logic), qualified oracles before stimulus, all checkers on in every test, no oracle change without triage. | Theo một trình tự thống nhất: liệt kê failure mode, chọn phương pháp cho từng obligation (formal trước cho logic điều khiển có không gian trạng thái nhỏ), qualify oracle trước khi viết stimulus, bật mọi checker trong mọi test, không sửa oracle khi chưa triage. |
 | Write a readable plan document (environment architecture, test plan, coverage model, closure criteria) consistent with the CSV vplan. | Viết plan dạng tài liệu (kiến trúc môi trường, test plan, coverage model, tiêu chí closure) nhất quán với vplan CSV. |
 | Report each test with its purpose, status and cause, a failure analysis by category, a coverage summary by feature and review columns for an engineer or an independent AI agent. | Báo cáo từng test với mục đích, trạng thái và nguyên nhân, phân tích lỗi theo loại, bảng tổng hợp coverage theo tính năng và cột review cho engineer hoặc một AI agent độc lập. |
+| Record a functional verification matrix (which features and functions each test combines, which functions are only tested alone) and plan combined tests first (R-246). | Ghi functional verification matrix (mỗi test combine những feature/function nào, function nào mới chỉ có test đơn lẻ) và ưu tiên lập, chạy combined test trước (R-246). |
 | Select scenarios by coverage gain, runtime and fault-detection diversity; retain bug regressions. | Chọn scenario theo coverage tăng thêm, thời gian và khả năng phát hiện lỗi; giữ test cho bug cũ. |
 | Check every obligation/configuration, metric target, property activity, baseline hash and waiver. | Kiểm từng nghĩa vụ/cấu hình, mục tiêu coverage, hoạt động property, hash baseline và waiver. |
 | Bound simulation concurrency by measured RAM; use scoped waveform capture, monitor disk headroom and losslessly compress large evidence without deleting retained runs. | Giới hạn số job theo peak RAM đo được; capture waveform có chọn lọc, theo dõi dung lượng và nén lossless evidence lớn mà không xóa run đã lưu. |
@@ -76,6 +77,7 @@ Run from the skill folder / Chạy từ thư mục skill:
 
 ```sh
 python scripts/vlsit_verify_plan.py check vplan.csv --spec-index requirements.txt
+python scripts/vlsit_verify_plan.py matrix vplan.csv --output functional_matrix.md
 python scripts/vlsit_verify_plan.py stats vplan.csv --spec-index requirements.txt
 python scripts/vlsit_verify_closure.py --vplan vplan.csv --spec-index requirements.txt --contract closure_contract.json --observations closure_observations.json
 python scripts/vlsit_verify_selftest.py
