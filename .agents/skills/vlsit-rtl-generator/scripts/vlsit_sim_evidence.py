@@ -3,7 +3,7 @@
 # File     : vlsit_sim_evidence.py
 # Function : check the waveform evidence folder and the logs of both simulation branches of a testbench
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the simulation evidence of a testbench against the specification (rules R-033 and R-034).
 

@@ -3,7 +3,7 @@
 # File     : vlsit_crosscheck.py
 # Function : compare the specification port and parameter tables with the RTL inventory
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Static specification-to-RTL cross-check.
 

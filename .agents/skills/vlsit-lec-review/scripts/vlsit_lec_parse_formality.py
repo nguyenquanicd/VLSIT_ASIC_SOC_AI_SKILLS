@@ -3,7 +3,7 @@
 # File     : vlsit_lec_parse_formality.py
 # Function : parse a Formality setup Tcl and log into the review models
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse Formality setup and log, classify the risks and keep the failing points (rule R-011 to R-023).
 

@@ -6,7 +6,7 @@ Terminology: Register-Transfer Level (RTL). See the [skill glossary](vlsit_gloss
 
 The drawing uses the symbol library `reference/drawio/VLSIT_DRAWIO_LIB_LOGIC.xml`. It
 is the VLSIT library `VLSIT_DRAWIO_LIB_V1.drawio.xml` of `vlsit-asic-ip-microspec`
-(SHA-256 `D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6`, 39
+(SHA-256 `15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C`, 39
 entries) plus three entries this skill adds: the inverter, the 2:1 multiplexer and the
 adder. No other gate shape is drawn (rule R-014).
 

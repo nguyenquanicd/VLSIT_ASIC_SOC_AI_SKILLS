@@ -3,7 +3,7 @@
 # File     : vlsit_library_symbols.py
 # Function : inspect, clone and validate symbols of the bundled VLSIT draw.io library
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Inspect, clone, and validate symbols from the bundled VLSIT draw.io library."""
 
@@ -28,7 +28,7 @@ EDITABLE = {
     'labelPosition', 'verticalLabelPosition', 'spacing', 'spacingTop',
     'spacingBottom', 'spacingLeft', 'spacingRight', 'entryX', 'entryY',
     'entryDx', 'entryDy', 'exitX', 'exitY', 'exitDx', 'exitDy',
-    'entryPerimeter', 'exitPerimeter', 'jumpStyle', 'jumpSize',
+    'entryPerimeter', 'exitPerimeter', 'jumpStyle', 'jumpSize', 'labelBackgroundColor',
 }
 BLACK = {'black', '#000000', '#000'}
 WHITE = {'white', '#ffffff', '#fff'}

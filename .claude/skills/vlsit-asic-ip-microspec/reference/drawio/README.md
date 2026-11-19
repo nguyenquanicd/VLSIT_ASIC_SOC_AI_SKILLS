@@ -4,7 +4,7 @@ Guidance only; the mandatory requirements are in [rule.md](../../rule.md) (R-019
 
 | File | Role |
 |---|---|
-| `VLSIT_DRAWIO_LIB_V1.drawio.xml` | The only symbol source. An mxlibrary of 39 templates, SHA-256 D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6. It is an exact copy of the file supplied by the user; do not edit it |
+| `VLSIT_DRAWIO_LIB_V1.drawio.xml` | The only symbol source. An mxlibrary of 39 templates, SHA-256 15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C. It is an exact copy of the file supplied by the user; do not edit it |
 | `VLSIT_daigram_reference.drawio` | The approved look: three pages (Example_1 and two logic-detail pages) with a CRM subsystem drawn as nested frames, compact blocks, protocol names (APB4, AHB-Lite, AXI4) on the arrows, and gate-level detail pages |
 
 ## Entries used by `vlsit_block_diagram.py drawio`

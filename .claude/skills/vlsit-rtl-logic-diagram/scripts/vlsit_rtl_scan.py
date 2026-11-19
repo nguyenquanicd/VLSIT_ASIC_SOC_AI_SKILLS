@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_scan.py
 # Function : scan RTL for modules, ports, parameters, instances and always blocks
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Scan comment-free Verilog/SystemVerilog for the structure the skill needs (rule R-006, R-010).
 

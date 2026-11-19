@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_top.py
 # Function : build the top-down connection model of the SoC top
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Strip the comments, then extract the tree, the connections, the fanout and the functions.
 

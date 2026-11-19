@@ -138,6 +138,7 @@ Read a file only when the step needs it.
 | `reference/templates/vlsit_vip_manifest.json.tpl` | Writing a VIP manifest |
 | `reference/templates/vlsit_evidence_manifest.json.tpl` | Writing or reviewing an evidence manifest |
 | `reference/templates/vlsit_ai_provenance.json.tpl` | Writing or reviewing an AI provenance record |
+| `reference/templates/` (`vlsit_closure_*`, `vlsit_model_*`, `vlsit_qualification*`, `vlsit_run_receipt`, `vlsit_scope_matrix`, `vlsit_waiver_record`, `vlsit_resource_*`, `vlsit_sim_*`, `vlsit_build_manifest`) | Step 8 and step 4b: starting the closure, model, receipt, waiver and simulation-workspace files described in `reference/vlsit_closure_contract.md` and `reference/vlsit_sim_workspace.md` |
 
 ## Scripts
 

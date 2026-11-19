@@ -147,8 +147,6 @@ The bridge lets an APB4 manager (for example a peripheral subsystem or a debug p
 | REQ-VER-002 | An APB protocol checker shall be bound at the APB port in every simulation. | REF-001 | All configurations | Simulation log review: TEST-017 |
 | REQ-DFT-001 | The RTL shall be scan-insertable: no latches, no combinational loops and no internal tri-states. | REF-003 section 11 | All configurations | Lint and DFT rule check: TEST-018 |
 
-Suggested ID areas: FUNC, IF, CLK, RESET, REG, PARAM, ERR, PERF, PPA, RTL, VER, DFT, PD, SEC, SAFE, INT.
-
 ## 4. Features and configurations
 
 | Configuration ID | Enabled features | Disabled features | Interfaces / widths | Intended use | Verification target |
@@ -176,7 +174,328 @@ The bridge captures one APB request, presents it as one TL-UL A-channel request,
 
 ![Block diagram of m_apb_tlul_bridge](figures/vlsit_block_diagram.svg)
 
-*Figure 5-1. Source: `figures/vlsit_block_diagram.json`, generated as TikZ (`figures/vlsit_block_diagram.tex`) by `scripts/vlsit_block_diagram.py`. The same description also exports to draw.io with the VLSIT library (`figures/vlsit_block_diagram.drawio`).*
+```json
+{
+  "page_name": "BLOCK_DIAGRAM",
+  "out_name": "vlsit_block_diagram.drawio",
+  "table_suffix": "",
+  "layout": {
+    "gap_h": 100,
+    "gap_v": 90,
+    "margin": 40,
+    "block_h": 60
+  },
+  "top": {
+    "frame_label": [
+      "TOP",
+      "(m_apb_tlul_bridge)"
+    ],
+    "block_label": [
+      "TOP",
+      "(m_apb_tlul_bridge)"
+    ],
+    "block_row": [
+      "TOP (m_apb_tlul_bridge)",
+      "Structural top: interface, parameters, interconnect and instances only.",
+      "Section 14.2"
+    ]
+  },
+  "frame_row": [
+    "TOP (m_apb_tlul_bridge) frame",
+    "Structural top of the APB4 to TL-UL bridge.",
+    "Section 14.2"
+  ],
+  "frame_interfaces": [
+    "APBRQ",
+    "APBRS",
+    "TLA",
+    "TLD",
+    "CRCLK"
+  ],
+  "blocks": [
+    {
+      "key": "CAP",
+      "label": [
+        "u_apb_tlul_cap",
+        "(m_apb_tlul_cap)"
+      ],
+      "width": 220,
+      "row": 0,
+      "col": 0,
+      "row_name": "u_apb_tlul_cap (m_apb_tlul_cap)",
+      "function": "Captures the APB request (address, direction, strobes, write data) in the setup phase.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "AGEN",
+      "label": [
+        "u_apb_tlul_agen",
+        "(m_apb_tlul_agen)"
+      ],
+      "width": 220,
+      "row": 0,
+      "col": 1,
+      "row_name": "u_apb_tlul_agen (m_apb_tlul_agen)",
+      "function": "Builds the TL-UL A-channel request and decodes the byte strobe into opcode, size and mask.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "FSM",
+      "label": [
+        "u_apb_tlul_fsm",
+        "(m_apb_tlul_fsm)"
+      ],
+      "width": 220,
+      "row": 1,
+      "col": 0,
+      "row_name": "u_apb_tlul_fsm (m_apb_tlul_fsm)",
+      "function": "Sequences one transfer through IDLE, SEND, WAIT, RESP and DRAIN; runs the optional timeout counter.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "RCHK",
+      "label": [
+        "u_apb_tlul_rchk",
+        "(m_apb_tlul_rchk)"
+      ],
+      "width": 220,
+      "row": 2,
+      "col": 2,
+      "row_name": "u_apb_tlul_rchk (m_apb_tlul_rchk)",
+      "function": "Checks the TL-UL D-channel response (opcode, size, source, error) and captures read data.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "RSP",
+      "label": [
+        "u_apb_tlul_rsp",
+        "(m_apb_tlul_rsp)"
+      ],
+      "width": 220,
+      "row": 2,
+      "col": 0,
+      "row_name": "u_apb_tlul_rsp (m_apb_tlul_rsp)",
+      "function": "Holds read data and error status and presents the APB completion.",
+      "source": "Section 14.2"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "RQ",
+      "src": "CAP",
+      "src_side": "R",
+      "dst": "AGEN",
+      "dst_side": "L"
+    },
+    {
+      "id": "ST",
+      "src": "CAP",
+      "src_side": "B",
+      "dst": "FSM",
+      "dst_side": "T"
+    },
+    {
+      "id": "GO",
+      "src": "FSM",
+      "src_side": "R",
+      "dst": "AGEN",
+      "dst_side": "B"
+    },
+    {
+      "id": "RC",
+      "src": "RCHK",
+      "src_side": "T",
+      "dst": "FSM",
+      "dst_side": "R"
+    },
+    {
+      "id": "CP",
+      "src": "FSM",
+      "src_side": "B",
+      "dst": "RSP",
+      "dst_side": "T"
+    },
+    {
+      "id": "RS",
+      "src": "RCHK",
+      "src_side": "L",
+      "dst": "RSP",
+      "dst_side": "R"
+    }
+  ],
+  "externals": [
+    {
+      "id": "APBRQ",
+      "block": "CAP",
+      "side": "L",
+      "dir": "in",
+      "pos": 0,
+      "text": [
+        "APBRQ",
+        "i_apb_p*"
+      ]
+    },
+    {
+      "id": "APBRS",
+      "block": "RSP",
+      "side": "L",
+      "dir": "out",
+      "pos": 0,
+      "text": [
+        "APBRS",
+        "o_apb_p*"
+      ]
+    },
+    {
+      "id": "TLA",
+      "block": "AGEN",
+      "side": "R",
+      "dir": "out",
+      "pos": 0,
+      "text": [
+        "TLA",
+        "o_tl_a_*"
+      ]
+    },
+    {
+      "id": "TLD",
+      "block": "RCHK",
+      "side": "R",
+      "dir": "in",
+      "pos": 0,
+      "text": [
+        "TLD",
+        "i_tl_d_*"
+      ]
+    },
+    {
+      "id": "CRCLK",
+      "block": "CAP",
+      "side": "L",
+      "dir": "in",
+      "pos": 1,
+      "text": [
+        "CRCLK",
+        "i_clk_apb, i_rst_n_apb"
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "entry": "CRCLK",
+      "sinks": [
+        {
+          "id": "CK1",
+          "block": "AGEN",
+          "side": "T",
+          "pos": 0
+        },
+        {
+          "id": "CK2",
+          "block": "FSM",
+          "side": "L",
+          "pos": 0
+        },
+        {
+          "id": "CK3",
+          "block": "RCHK",
+          "side": "B",
+          "pos": 0
+        },
+        {
+          "id": "CK4",
+          "block": "RSP",
+          "side": "B",
+          "pos": 0
+        }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "APBRQ",
+      "name": "APB4 request",
+      "category": "handshake",
+      "active": "external -> TOP",
+      "signals": "external -> TOP: i_apb_psel, i_apb_penable, i_apb_pwrite, i_apb_paddr, i_apb_pprot, i_apb_pstrb, i_apb_pwdata"
+    },
+    {
+      "id": "APBRS",
+      "name": "APB4 completion",
+      "category": "handshake",
+      "active": "TOP -> external",
+      "signals": "TOP -> external: o_apb_pready, o_apb_prdata, o_apb_pslverr"
+    },
+    {
+      "id": "TLA",
+      "name": "TL-UL A channel",
+      "category": "handshake",
+      "active": "TOP -> external",
+      "signals": "TOP -> external: o_tl_a_valid, o_tl_a_opcode, o_tl_a_param, o_tl_a_size, o_tl_a_source, o_tl_a_address, o_tl_a_mask, o_tl_a_data, o_tl_a_user; external -> TOP: i_tl_a_ready"
+    },
+    {
+      "id": "TLD",
+      "name": "TL-UL D channel",
+      "category": "handshake",
+      "active": "external -> TOP",
+      "signals": "external -> TOP: i_tl_d_valid, i_tl_d_opcode, i_tl_d_param, i_tl_d_size, i_tl_d_source, i_tl_d_sink, i_tl_d_data, i_tl_d_user, i_tl_d_error; TOP -> external: o_tl_d_ready"
+    },
+    {
+      "id": "RQ",
+      "name": "Captured request",
+      "category": "custom",
+      "active": "u_apb_tlul_cap -> u_apb_tlul_agen",
+      "signals": "reg_addr, reg_wr, reg_strb, reg_wdata"
+    },
+    {
+      "id": "ST",
+      "name": "Request start",
+      "category": "custom",
+      "active": "u_apb_tlul_cap -> u_apb_tlul_fsm",
+      "signals": "request valid"
+    },
+    {
+      "id": "GO",
+      "name": "A-channel control",
+      "category": "custom",
+      "active": "u_apb_tlul_fsm -> u_apb_tlul_agen",
+      "signals": "send enable"
+    },
+    {
+      "id": "RC",
+      "name": "Response event",
+      "category": "custom",
+      "active": "u_apb_tlul_rchk -> u_apb_tlul_fsm",
+      "signals": "response valid, response error"
+    },
+    {
+      "id": "CP",
+      "name": "Completion",
+      "category": "custom",
+      "active": "u_apb_tlul_fsm -> u_apb_tlul_rsp",
+      "signals": "complete pulse"
+    },
+    {
+      "id": "RS",
+      "name": "Response data",
+      "category": "custom",
+      "active": "u_apb_tlul_rchk -> u_apb_tlul_rsp",
+      "signals": "reg_rdata, reg_err"
+    },
+    {
+      "id": "CRCLK",
+      "name": "Clock and reset",
+      "category": "custom",
+      "active": "SoC -> TOP",
+      "signals": "i_clk_apb, i_rst_n_apb"
+    }
+  ],
+  "legend_note": "The enclosing frame is the top module; blocks inside are its instances.",
+  "library_sha256": "15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C"
+}
+```
+
+*Figure 5-1. Block diagram of m_apb_tlul_bridge. Source: `figures/vlsit_block_diagram.drawio` (draw.io, VLSIT library, drawn by `vlsit_spec_diagram.py`).*
 
 ### 5.3 Transaction and dataflow
 
@@ -350,6 +669,84 @@ All hardware data are unsigned 4-state logic vectors. Bit 0 is the least signifi
 
 ### 10.1 Modes and state transitions
 
+<!-- FSM-DIAGRAM:APB-to-TL-UL bridge -->
+![FSM state diagram of APB-to-TL-UL bridge](figures/vlsit_fsm_bridge.svg)
+
+```json
+{
+  "page_name": "FSM_BRIDGE",
+  "out_name": "vlsit_fsm_bridge.drawio",
+  "function": "bridge",
+  "initial": "ENUM_ST_IDLE",
+  "state_pattern": "^ENUM_ST_[A-Z0-9_]+$",
+  "states": [
+    {
+      "name": "ENUM_ST_IDLE"
+    },
+    {
+      "name": "ENUM_ST_SEND"
+    },
+    {
+      "name": "ENUM_ST_WAIT"
+    },
+    {
+      "name": "ENUM_ST_RESP"
+    },
+    {
+      "name": "ENUM_ST_DRAIN"
+    }
+  ],
+  "transitions": [
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_SEND",
+      "label": "psel & valid"
+    },
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_RESP",
+      "label": "psel & !valid"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_WAIT",
+      "label": "a_ready"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_RESP",
+      "label": "a_ready & d_valid"
+    },
+    {
+      "src": "ENUM_ST_WAIT",
+      "dst": "ENUM_ST_RESP",
+      "label": "d_valid | timeout"
+    },
+    {
+      "src": "ENUM_ST_RESP",
+      "dst": "ENUM_ST_IDLE",
+      "label": "next cycle"
+    },
+    {
+      "src": "ENUM_ST_RESP",
+      "dst": "ENUM_ST_DRAIN",
+      "label": "orphan"
+    },
+    {
+      "src": "ENUM_ST_DRAIN",
+      "dst": "ENUM_ST_IDLE",
+      "label": "late resp"
+    }
+  ],
+  "layout": {
+    "margin": 40
+  }
+}
+```
+
+*Figure 10-1. FSM state diagram of APB-to-TL-UL bridge. Source: `figures/vlsit_fsm_bridge.drawio` (draw.io, VLSIT library, generated by `vlsit_fsm_diagram.py`).*
+<!-- /FSM-DIAGRAM:APB-to-TL-UL bridge -->
+
 | Mode/state | Entry condition | Behavior | Exit condition | Outputs / side effects |
 |---|---|---|---|---|
 | ENUM_ST_IDLE | Reset release, RESP completed, or DRAIN completed | Waits for i_apb_psel = 1; captures the request | PSEL high: SEND for a valid TL-UL request, or RESP when no TL-UL request is issued (PSTRB = 4'b0000 or unsupported) | All outputs idle |
@@ -431,14 +828,14 @@ flowchart TD
 
 | No. | Step | Option (M/O) | Interface | CSR | Description |
 |---|---|---|---|---|---|
-| S01 | Present address, direction and control in the APB setup phase | M | APB4 manager drives PSEL, PADDR and PWRITE with PENABLE low | N/A — no software-visible CSR; the bridge is transaction-driven | Starts a bus transfer and gives the bridge its address and operation. |
-| S02 | Select the read or write transaction path | M | APB4 PWRITE selects the operation | N/A — no software-visible CSR; the bridge is transaction-driven | Routes the transfer to the path matching the manager's requested direction. |
-| S03 | Provide write data and a supported byte strobe | O | APB4 manager drives PWDATA and PSTRB for writes | N/A — no software-visible CSR; the bridge is transaction-driven | Supplies write payload only when the selected path is a write. |
-| S04 | Select a read transaction | O | APB4 manager sets PWRITE low; no write payload is sent | N/A — no software-visible CSR; the bridge is transaction-driven | Uses the read path when the selected transfer retrieves data. |
-| S05 | Enter the APB access phase and hold the request until completion | M | APB4 manager asserts PENABLE and holds request controls until PREADY | N/A — no software-visible CSR; the bridge is transaction-driven | Keeps the APB request stable while the bridge obtains a TL-UL response. |
-| S06 | Issue the mapped TL-UL request | M | Bridge drives TL-UL A-channel request and observes A_READY | N/A — no software-visible CSR; the bridge is transaction-driven | Converts the APB request to the configured TL-UL transaction. |
-| S07 | Receive and validate the TL-UL response | M | Bridge accepts TL-UL D-channel response; applies error and timeout rules | N/A — no software-visible CSR; the bridge is transaction-driven | Determines returned data and whether the APB response reports an error. |
-| S08 | Complete the APB transaction | M | APB4 manager samples PREADY, PRDATA and PSLVERR | N/A — no software-visible CSR; the bridge is transaction-driven | Ends the transfer and lets the manager accept read data or handle PSLVERR. |
+| S01 | Present address, direction and control in the APB setup phase | M | APB4 manager drives PSEL, PADDR and PWRITE with PENABLE low | N/A: no software-visible CSR; the bridge is transaction-driven | Starts a bus transfer and gives the bridge its address and operation. |
+| S02 | Select the read or write transaction path | M | APB4 PWRITE selects the operation | N/A: no software-visible CSR; the bridge is transaction-driven | Routes the transfer to the path matching the manager's requested direction. |
+| S03 | Provide write data and a supported byte strobe | O | APB4 manager drives PWDATA and PSTRB for writes | N/A: no software-visible CSR; the bridge is transaction-driven | Supplies write payload only when the selected path is a write. |
+| S04 | Select a read transaction | O | APB4 manager sets PWRITE low; no write payload is sent | N/A: no software-visible CSR; the bridge is transaction-driven | Uses the read path when the selected transfer retrieves data. |
+| S05 | Enter the APB access phase and hold the request until completion | M | APB4 manager asserts PENABLE and holds request controls until PREADY | N/A: no software-visible CSR; the bridge is transaction-driven | Keeps the APB request stable while the bridge obtains a TL-UL response. |
+| S06 | Issue the mapped TL-UL request | M | Bridge drives TL-UL A-channel request and observes A_READY | N/A: no software-visible CSR; the bridge is transaction-driven | Converts the APB request to the configured TL-UL transaction. |
+| S07 | Receive and validate the TL-UL response | M | Bridge accepts TL-UL D-channel response; applies error and timeout rules | N/A: no software-visible CSR; the bridge is transaction-driven | Determines returned data and whether the APB response reports an error. |
+| S08 | Complete the APB transaction | M | APB4 manager samples PREADY, PRDATA and PSLVERR | N/A: no software-visible CSR; the bridge is transaction-driven | Ends the transfer and lets the manager accept read data or handle PSLVERR. |
 
 ### 11.3 CSR connection to the design
 

@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_svg.py
 # Function : draw one SVG figure per CDC synchronisation mechanism
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Write one figure per mechanism used in the report (rule R-018).
 

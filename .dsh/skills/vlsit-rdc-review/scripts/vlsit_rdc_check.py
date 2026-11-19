@@ -3,7 +3,7 @@
 # File     : vlsit_rdc_check.py
 # Function : verify the RDC report, its counts, citations, figures and verdicts
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the delivered report against the rules before it is reported (rule R-026 to R-028, R-031, R-032).
 

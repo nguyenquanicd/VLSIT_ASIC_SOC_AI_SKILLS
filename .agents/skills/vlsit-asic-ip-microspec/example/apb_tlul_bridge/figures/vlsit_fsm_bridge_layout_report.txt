@@ -1,0 +1,11 @@
+FSM: bridge
+STATES: 5, TRANSITIONS: 8
+LAYOUT: flow-tb-snake-3-g200
+CROSSINGS: 2
+LABEL CONFLICTS: 0
+BENDS: 3
+MINIMUM GAP: 140.0 px (minimum 140 px)
+TEXT FIT: PASS (worst fill ratio 0.53)
+DISTRIBUTION: PASS (4 x-centers, 3 y-centers)
+PAGE: 630 x 460 px
+RESULT: PASS

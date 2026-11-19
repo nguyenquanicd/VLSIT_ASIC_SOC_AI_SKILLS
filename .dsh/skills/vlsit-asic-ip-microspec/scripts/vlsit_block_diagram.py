@@ -3,7 +3,7 @@
 # File     : vlsit_block_diagram.py
 # Function : generate a block diagram as LaTeX (TikZ) or draw.io from one JSON description
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Generate a block diagram as LaTeX (TikZ) or draw.io from one JSON description.
 

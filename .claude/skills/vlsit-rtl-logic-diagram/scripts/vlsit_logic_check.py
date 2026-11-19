@@ -3,7 +3,7 @@
 # File     : vlsit_logic_check.py
 # Function : check the delivered logic pages, citations, tables and description
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Verify the deliverables against the rules before reporting (rule R-011, R-015, R-018 to R-023).
 

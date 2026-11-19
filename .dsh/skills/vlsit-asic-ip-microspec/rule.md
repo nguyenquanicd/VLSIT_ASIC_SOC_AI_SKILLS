@@ -224,7 +224,7 @@ MUST keep each generated figure's machine-readable source beside its linked imag
 - Check: `scripts/vlsit_spec_tool.py check` reports a missing source beside a block or FSM image; `scripts/vlsit_waveform_svg.py check` prints PASS for every waveform source; manual - every linked figure has the required adjacent files.
 
 ### R-058 Waveform rendering
-MUST draw each waveform with WaveDrom from an adjacent WaveJSON `.json` file, rendering SVG or PNG and any HTML viewer from that source; convert simulation VCD data to WaveJSON before drawing. A specification written before 2026-10-30 may retain a simulation waveform without WaveJSON only when its plan marks it `R-017 exempt`.
+MUST describe each waveform as an adjacent WaveJSON `.json` file (the WaveDrom format) and render the SVG with `scripts/vlsit_waveform_svg.py` from that file; the interactive WaveDrom viewer, PNG and a screenshot or VCD conversion come from the skill `vlsit-wavedrom-waveform`, which bundles WaveDrom. Convert simulation VCD data to WaveJSON before drawing. A specification written before 2026-10-30 may retain a simulation waveform without WaveJSON only when its plan marks it `R-017 exempt`.
 - Why: WaveJSON gives the waveform a reproducible, editable source and preserves simulation evidence in the same format.
 - Check: `scripts/vlsit_waveform_svg.py check <WaveJSON>` prints PASS for every WaveJSON; manual - any legacy exemption meets its date and plan conditions.
 

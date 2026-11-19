@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function : regression tests for false closure, stale baselines and inflated coverage
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Synthetic checker fixtures only; no hardware or external simulator is verified."""
 import contextlib
 import copy

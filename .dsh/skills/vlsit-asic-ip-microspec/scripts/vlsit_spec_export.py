@@ -3,7 +3,7 @@
 # File     : vlsit_spec_export.py
 # Function : export a VLSIT Markdown specification to DOCX and/or PDF with Pandoc
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Export the authoritative Markdown specification to derived DOCX/PDF files.
 

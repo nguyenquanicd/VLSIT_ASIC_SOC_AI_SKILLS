@@ -3,7 +3,7 @@
 # File     : vlsit_csr_generate.py
 # Function : locate APB-CSR-Generator, run it on a VLSIT CSR workbook, and deliver the CSR RTL with a manifest
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Generate the CSR block (APB4 slave with control and status registers) from a VLSIT CSR workbook.
 

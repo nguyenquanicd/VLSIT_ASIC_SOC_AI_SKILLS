@@ -3,7 +3,7 @@
 # File     : vlsit_test_fsm_diagram.py
 # Function : unit tests for the FSM diagram generator (R-068 to R-071)
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Run: python vlsit_test_fsm_diagram.py   (standard library only; exit 0 when every test passes)."""
 import argparse
@@ -137,7 +137,9 @@ class DrawioAndSvg(unittest.TestCase):
             spec = Path(folder) / "spec.md"
             spec.write_text(text, encoding="utf-8")
             args = argparse.Namespace(spec=str(spec), figure="figures/fsm.svg",
-                                      source="figures/fsm.drawio", function="bridge", caption=None)
+                                      source="figures/fsm.drawio", function="bridge", caption=None,
+                                      json_source=str(Path(folder) / "fsm.json"))
+            Path(args.json_source).write_text("{}", encoding="utf-8")
             self.assertEqual(F.action_insert(args), 0)
             result = spec.read_text(encoding="utf-8")
             self.assertIn("<!-- FSM-DIAGRAM:bridge -->", result)
@@ -163,7 +165,9 @@ class DrawioAndSvg(unittest.TestCase):
             for function in ("bridge", "aux"):
                 args = argparse.Namespace(spec=str(spec), figure="figures/%s.svg" % function,
                                           source="figures/%s.drawio" % function,
-                                          function=function, caption=None)
+                                          function=function, caption=None,
+                                          json_source=str(Path(folder) / ("%s.json" % function)))
+                Path(args.json_source).write_text("{}", encoding="utf-8")
                 self.assertEqual(F.action_insert(args), 0)
             result = spec.read_text(encoding="utf-8")
             self.assertNotIn("<fsm-function>", result)

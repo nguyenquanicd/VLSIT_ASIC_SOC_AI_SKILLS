@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_parse_questa.py
 # Function : normalise a Questa CDC report into the common violation record
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse a Questa CDC report (rule R-020, R-030).
 

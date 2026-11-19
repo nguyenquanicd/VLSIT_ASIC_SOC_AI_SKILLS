@@ -95,7 +95,7 @@ MUST save one evidence bundle per run with logs, assertions, applicable coverage
 - Check: `scripts/vlsit_verify_evidence.py check` verifies listed files and hashes; manual - `resource_usage.json` records measured or explicitly unavailable resource data, and waveform status follows R-278.
 
 ### R-113 Human gates
-MUST stop at gates G0 to G6 and obtain a named human approval before continuing.
+MUST stop at each gate of G0 to G6 that applies to the selected level (reference/vlsit_level_profiles.md section 4) and obtain a named human approval before continuing.
 - Why: each gate covers a decision that a tool cannot make, such as scope, architecture, waivers and residual risk.
 - Check: manual - each gate record in `sim/docs/00_plan/signoff.md` names the approver, the date and the decision.
 
@@ -263,7 +263,7 @@ MUST provide a block reference model or specification-derived predictor for end-
 ### R-165 End-to-end checks
 MUST check data integrity, ordering, response codes, backpressure and error propagation end to end.
 - Why: a block can pass every interface check and still corrupt, reorder or drop data between its interfaces.
-- Check: the test list and the scoreboard coverage name each end-to-end check.
+- Check: the testlist and the scoreboard coverage name each end-to-end check.
 
 ### R-166 Block coverage
 MUST provide block functional and assertion coverage linked to requirements.
@@ -283,7 +283,7 @@ MUST run the block regression suite selected by the testlist and triage every fa
 ### R-169 Block sign-off
 MUST complete the block sign-off checklist and documentation before declaring closure.
 - Why: an informal closure leaves coverage, waivers and open bugs without an accountable decision.
-- Check: manual - gate G4 records the checklist result and the approver.
+- Check: manual - gate G6 (sign-off) records the checklist result and the approver.
 
 ## SoC rules (R-180–R-189)
 
@@ -308,7 +308,7 @@ MUST verify interconnect addressing, ordering, QoS, exclusives, error responses 
 - Check: system tests and assertions cover each interconnect behaviour named by the specification.
 
 ### R-184 System scoreboard
-MUST provide a system scoreboard or golden model for end-to-end data and control checking.
+MUST provide a system scoreboard or independent reference model for end-to-end data and control checking.
 - Why: without a system oracle, a use-case test proves only that the system did not hang.
 - Check: manual - the model review and at least one end-to-end test show that the scoreboard detects an injected fault.
 
@@ -435,7 +435,7 @@ MUST publish a closure report with covered and coverable counts, waivers and res
 
 ### R-215 One testlist
 MUST keep one testlist as the source of regression scope so that tests outside it do not run in sign-off.
-- Why: several test lists drift apart, and a test that runs outside the signed list has no owner or acceptance criterion.
+- Why: several testlists drift apart, and a test that runs outside the signed testlist has no owner or acceptance criterion.
 - Check: manual - compare the testlist with the regression command and the sign-off test set.
 
 ### R-216 Reproducible runs

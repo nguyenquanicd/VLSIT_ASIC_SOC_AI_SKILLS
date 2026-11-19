@@ -3,7 +3,7 @@
 # File     : vlsit_ip_search.py
 # Function : search public RTL repositories for silicon- or FPGA-proven IP and score the evidence
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Search public RTL repositories for IP that is proven on silicon or FPGA, and score the evidence.
 

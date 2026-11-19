@@ -142,6 +142,7 @@ class Router:
 
     def __init__(self):
         self.ho, self.vo, self.blocked, self.attr = set(), set(), set(), set()
+        self.xcost = 60                       # cost of one crossing; raised by rip-up and reroute in the nested generator
 
     def set_blocked(self, rects):
         self.blocked = set()
@@ -204,14 +205,14 @@ class Router:
                 if nd in (0, 2):
                     if (nx, ny) in vo or (nx, ny - 1) in vo:
                         nc += 1
-                        cost += 60
+                        cost += self.xcost
                     for o in (1, 2, 3):
                         if (x, y + o) in ho or (x, y - o) in ho or (x - 1, y + o) in ho or (x - 1, y - o) in ho:
                             cost += 1
                 else:
                     if (nx, ny) in ho or (nx - 1, ny) in ho:
                         nc += 1
-                        cost += 60
+                        cost += self.xcost
                     for o in (1, 2, 3):
                         if (x + o, y) in vo or (x - o, y) in vo or (x + o, y - 1) in vo or (x - o, y - 1) in vo:
                             cost += 1

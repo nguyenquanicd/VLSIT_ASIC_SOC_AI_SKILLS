@@ -3,7 +3,7 @@
 # File     : vlsit_logic_drawio.py
 # Function : write one draw.io page per logic cluster, with gates and citations
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Write the draw.io deliverable from layout.json (rule R-014, R-018, R-019).
 

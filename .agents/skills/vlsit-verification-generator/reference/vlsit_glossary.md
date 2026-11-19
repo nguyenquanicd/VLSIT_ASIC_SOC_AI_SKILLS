@@ -49,10 +49,12 @@ Read before applying this workflow. In generated prose use Full term (ABBR) at f
 | UCIe | Universal Chiplet Interconnect Express | Chiplet interconnect standard family; state revision and layer/PHY scope. |
 | UCIS | Unified Coverage Interoperability Standard | Coverage interchange/access standard; a compatible file does not establish achieved coverage. |
 | UTF-8 | Unicode Transformation Format, 8-bit encoding form | Text encoding used by repository files and script I/O. |
+| testlist | Test list (`testlist.yaml`) | The one list of tests that defines regression scope (R-215); a test outside it does not count toward sign-off. It answers what runs, not what must be true; that is the vplan. |
 | UVM | Universal Verification Methodology | Standard methodology/library for reusable verification components; a BFM or testbench need not use UVM. |
 | VCD | Value Change Dump | Digital waveform interchange format; scope/time window and sampling matter. |
 | VIP | Verification Intellectual Property (Verification IP) | Reusable verification components for a declared protocol/feature scope; qualification, checking and coverage must be stated separately. |
 | VPI | Verilog Procedural Interface | Simulator object/callback interface, commonly used from C. It is not Verification IP. |
+| vplan | Verification plan (CSV) | The machine-readable verification plan: requirement, feature, method, evidence and closure status per row. It is kept consistent with the readable plan document (R-245) and is not a testlist. |
 | VPU | Vector Processing Unit or Video Processing Unit | Ambiguous acronym: select the meaning from the project specification; do not silently choose one. |
 | WLF | Tool-specific waveform log format | Waveform database name used by ModelSim/Questa; use the tool manual for exact file semantics rather than guessing an expansion. |
 | XML | Extensible Markup Language | Markup/data interchange format; preserve namespaces and schemas. |

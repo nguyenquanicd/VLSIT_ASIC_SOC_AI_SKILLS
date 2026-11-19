@@ -3,7 +3,7 @@
 # File     : vlsit_hierarchy.py
 # Function : build and check the hierarchy and interface JSON of a design
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build hierarchy.json from scan.json and check it against the schema (rule R-009, R-010).
 

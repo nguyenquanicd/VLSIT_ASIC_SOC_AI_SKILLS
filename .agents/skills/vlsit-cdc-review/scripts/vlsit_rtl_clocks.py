@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_clocks.py
 # Function : build the clock domain model of an RTL design
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Read the RTL alone and report every clock, its flops, the flop chains and the domains (rule R-010).
 

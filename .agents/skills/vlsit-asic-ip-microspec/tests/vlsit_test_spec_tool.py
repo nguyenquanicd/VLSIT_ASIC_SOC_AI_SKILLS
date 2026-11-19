@@ -3,7 +3,7 @@
 # File     : vlsit_test_spec_tool.py
 # Function : unit tests for the content checks of vlsit_spec_tool.py check (R-005, R-013, R-015, R-031)
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Run: python vlsit_test_spec_tool.py   (standard library only; exit 0 when every test passes)."""
 import sys

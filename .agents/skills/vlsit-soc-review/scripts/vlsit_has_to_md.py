@@ -3,7 +3,7 @@
 # File     : vlsit_has_to_md.py
 # Function : convert a HAS PDF, DOCX or Markdown to Markdown with tables and figures
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Convert the hardware architecture specification without losing its tables or figures (rule R-007).
 

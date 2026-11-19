@@ -3,7 +3,7 @@
 # File     : vlsit_waveform_svg.py
 # Function : render a WaveJSON timing diagram to a static SVG file
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Render a WaveJSON timing diagram to a static SVG file (no browser, no network).
 
@@ -228,6 +228,7 @@ def main():
     r.add_argument("--force", action="store_true")
     c = sub.add_parser("check")
     c.add_argument("wavejson")
+    c.add_argument("--cell", type=int, default=36, help="pixels per cycle (default 36)")
     a = parser.parse_args()
     doc = load(a.wavejson)
     rows = [s for k, s, _ in flatten(doc["signal"]) if k == "signal"]
@@ -235,7 +236,7 @@ def main():
     if bad:
         print("ERROR: signals with a missing wave, or a wave starting with '.': %s" % bad)
         return 1
-    cell = a.cell * int(doc.get("config", {}).get("hscale", 1)) if a.action == "render" else 36
+    cell = a.cell * int(doc.get("config", {}).get("hscale", 1))
     issues = label_issues(doc, cell)
     if a.action == "check":
         for issue in issues:

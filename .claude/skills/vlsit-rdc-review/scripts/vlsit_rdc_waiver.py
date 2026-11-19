@@ -3,7 +3,7 @@
 # File     : vlsit_rdc_waiver.py
 # Function : apply a tool waiver or a CSV waiver to the parsed violations
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Mark each violation waived or active and reject a waiver without a reason (rule R-023).
 

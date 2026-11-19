@@ -3,7 +3,7 @@
 # File     : vlsit_lec_trace.py
 # Function : trace the cone of the first failing compare points on both sides
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build the reference and implementation cones of the first N fails (rule R-024, R-025).
 

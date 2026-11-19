@@ -3,7 +3,7 @@
 # File     : vlsit_protocol_docs.py
 # Function : look up, search and fetch the protocol documents of reference/md_doc and reference/org_doc
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Look up and fetch protocol documents of reference/md_doc and reference/org_doc.
 

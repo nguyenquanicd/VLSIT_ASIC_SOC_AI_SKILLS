@@ -3,7 +3,7 @@
 # File     : vlsit_rdc_mechanism.py
 # Function : assign one reset mechanism to every crossing and collect the evidence
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Classify each crossing into one mechanism of the catalogue (rule R-017, R-019).
 

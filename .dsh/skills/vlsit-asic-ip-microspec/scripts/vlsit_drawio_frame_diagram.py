@@ -3,7 +3,7 @@
 # File     : vlsit_drawio_frame_diagram.py
 # Function : generate the frame-style block diagram (draw.io, library symbols only) from a JSON specification
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Generate the frame-style block diagram (draw.io, library symbols only) from a JSON spec.
 

@@ -25,7 +25,7 @@ Print a starter with `vlsit_fsm_diagram.py template`, then fill it from the stat
 
 ## 2. Symbols and style (R-019, R-068)
 
-The only symbol source is `VLSIT_DRAWIO_LIB_V1.drawio.xml` (SHA-256 D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6). Do not edit the library.
+The only symbol source is `VLSIT_DRAWIO_LIB_V1.drawio.xml` (SHA-256 15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C). Do not edit the library.
 
 | Entry | Use in the FSM diagram |
 |---|---|

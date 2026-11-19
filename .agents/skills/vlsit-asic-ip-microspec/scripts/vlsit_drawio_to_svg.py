@@ -3,7 +3,7 @@
 # File     : vlsit_drawio_to_svg.py
 # Function : render an uncompressed draw.io file made by vlsit_drawio_frame_diagram.py to SVG
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Render an uncompressed .drawio file made by vlsit_drawio_frame_diagram.py to SVG (and optionally PNG).
 
@@ -86,6 +86,24 @@ class Svg:
         self.box(x, y, w, h)
         d = ' stroke-dasharray="8 4"' if dash else ""
         self.parts.append(f'<rect x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}" fill="#FFFFFF" stroke="#000000" stroke-width="{sw}"{d}/>')
+
+    def ellipse(self, x, y, w, h, sw=2):
+        self.box(x, y, w, h)
+        self.parts.append(f'<ellipse cx="{x + w / 2:g}" cy="{y + h / 2:g}" rx="{w / 2:g}" ry="{h / 2:g}" fill="#FFFFFF" stroke="#000000" stroke-width="{sw}"/>')
+
+    def edge_label(self, pts, label):
+        """Edge label on the middle of the longest segment, on a white background (labelBackgroundColor)."""
+        lines = html_lines(label)
+        if not lines:
+            return
+        best = max(range(1, len(pts)), key=lambda i: (pts[i][0] - pts[i - 1][0]) ** 2 + (pts[i][1] - pts[i - 1][1]) ** 2)
+        mx, my = (pts[best - 1][0] + pts[best][0]) / 2, (pts[best - 1][1] + pts[best][1]) / 2
+        width = max(len(ln) for ln, _ in lines) * FONT * 0.55 + 8
+        height = len(lines) * LINE_H
+        x, y = mx - width / 2, my - height / 2
+        self.box(x, y, width, height)
+        self.parts.append(f'<rect x="{x:g}" y="{y:g}" width="{width:g}" height="{height:g}" fill="#FFFFFF" stroke="none"/>')
+        self.text(x, y, width, height, lines)
 
     def text(self, x, y, w, h, lines, align="center", valign="middle", bold_all=False):
         n = len(lines)
@@ -195,7 +213,10 @@ def render_page(page):
             svg.text(x, y, w, h, lines, align=st.get("align", "center"))
             continue
         dashed = st.get("dashed") == "1"
-        svg.rect(x, y, w, h, 2, dashed)
+        if "ellipse" in st:
+            svg.ellipse(x, y, w, h, 2)
+        else:
+            svg.rect(x, y, w, h, 2, dashed)
         if lines:
             svg.text(x, y, w, h, lines, align=st.get("align", "center"), valign=st.get("verticalAlign", "middle"))
     # native tables
@@ -246,6 +267,8 @@ def render_page(page):
                             jumps.setdefault(i - 1, []).append(p)
         svg.polyline(pts, float(st.get("strokeWidth", 2)), jumps, st.get("endArrow", "block") != "none")
         drawn.append(pts)
+        if c.get("value"):
+            svg.edge_label(pts, c.get("value"))
     return svg
 
 

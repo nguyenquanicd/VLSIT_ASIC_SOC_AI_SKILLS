@@ -110,5 +110,8 @@
  },
  "foot": {
   "text": "the device answers 6 cycles after acceptance; the bridge returns PSLVERR at the timeout and discards the late response in DRAIN"
+ },
+ "config": {
+  "hscale": 2
  }
 }

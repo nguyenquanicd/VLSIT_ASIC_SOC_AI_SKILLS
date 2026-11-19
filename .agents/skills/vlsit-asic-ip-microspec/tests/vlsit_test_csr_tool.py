@@ -3,7 +3,7 @@
 # File     : vlsit_test_csr_tool.py
 # Function : unit tests for the naming and description checks of vlsit_csr_tool.py (R-032 to R-034)
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Run: python vlsit_test_csr_tool.py   (standard library only; exit 0 when every test passes)."""
 import copy
@@ -32,57 +32,57 @@ class NamingAndDescription(unittest.TestCase):
 
     def test_register_without_prefix(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["name"] = "ctrl"
+        d["registers"][1]["name"] = "ctrl"
         self.assertTrue(any("must start with the design prefix" in e for e in errors(d)))
 
     def test_field_name_too_long(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["fields"][0]["name"] = "a_field_name_that_is_far_too_long"
+        d["registers"][1]["fields"][0]["name"] = "a_field_name_that_is_far_too_long"
         self.assertTrue(any("limit is 20" in e for e in errors(d)))
 
     def test_upper_case_name(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["fields"][0]["name"] = "En"
+        d["registers"][1]["fields"][0]["name"] = "En"
         self.assertTrue(any("lower-case" in e for e in errors(d)))
 
     def test_register_description_two_lines(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["description"] = "Demo control register. Main meaning here.\nSecond line"
+        d["registers"][1]["description"] = "Demo control register. Main meaning here.\nSecond line"
         self.assertTrue(any("register description" in e for e in errors(d)))
 
     def test_register_description_without_meaning(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["description"] = "Control"
+        d["registers"][1]["description"] = "Control"
         self.assertTrue(any("register description" in e for e in errors(d)))
 
     def test_field_description_missing_values_block(self):
         d = copy.deepcopy(GOOD)
-        f = d["registers"][0]["fields"][0]
+        f = d["registers"][1]["fields"][0]
         lines = f["description"].split("\n")
         f["description"] = "\n".join(lines[:2] + lines[-2:])
         self.assertTrue(any("blank line" in e for e in errors(d)))
 
     def test_value_line_needs_hex_key(self):
         d = copy.deepcopy(GOOD)
-        f = d["registers"][0]["fields"][0]
+        f = d["registers"][1]["fields"][0]
         f["description"] = f["description"].replace("0x1 block enabled.", "1 block enabled.")
         self.assertTrue(any("hexadecimal" in e for e in errors(d)))
 
     def test_value_line_endings(self):
         d = copy.deepcopy(GOOD)
-        f = d["registers"][0]["fields"][0]
+        f = d["registers"][1]["fields"][0]
         f["description"] = f["description"].replace("(reset value);", "(reset value).")
         self.assertTrue(any("must end with ';'" in e for e in errors(d)))
 
     def test_missing_blank_line_before_unit(self):
         d = copy.deepcopy(GOOD)
-        f = d["registers"][0]["fields"][0]
+        f = d["registers"][1]["fields"][0]
         f["description"] = f["description"].replace("\n\nUnit:", "\nUnit:")
         self.assertTrue(any("blank line" in e for e in errors(d)))
 
     def test_field_description_wrong_usage_label(self):
         d = copy.deepcopy(GOOD)
-        f = d["registers"][0]["fields"][0]
+        f = d["registers"][1]["fields"][0]
         f["description"] = f["description"].replace("Usage: ", "Use: ")
         self.assertTrue(any("'Usage: '" in e for e in errors(d)))
 
@@ -101,9 +101,9 @@ class NamingAndDescription(unittest.TestCase):
 
     def test_register_name_30_characters(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["name"] = "demo_" + "x" * 25
+        d["registers"][1]["name"] = "demo_" + "x" * 25
         self.assertTrue(any("fewer than 30" in e for e in errors(d)))
-        d["registers"][0]["name"] = "demo_" + "x" * 24
+        d["registers"][1]["name"] = "demo_" + "x" * 24
         self.assertFalse(any("fewer than 30" in e for e in errors(d)))
 
     def test_workbook_format(self):
@@ -123,7 +123,7 @@ class NamingAndDescription(unittest.TestCase):
             self.assertEqual(len(set(narrow)), 1)
             self.assertAlmostEqual(ws.column_dimensions["G"].width, 5 * narrow[0])
             self.assertFalse(ws["A15"].alignment.wrap_text)
-            self.assertEqual(ws.max_row, 18)   # no styled blank row below the map: the generator reads every row
+            self.assertEqual(ws.max_row, 21)   # no styled blank row below the map: the generator reads every row
             self.assertTrue(ws["G17"].alignment.wrap_text)
             self.assertEqual(ws["G17"].alignment.vertical, "center")
             self.assertEqual(ws["A16"].font.size, 13)
@@ -149,9 +149,9 @@ class NamingAndDescription(unittest.TestCase):
 
     def test_reserved_description_is_fixed(self):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["fields"][-1]["description"] = "Whatever"
+        d["registers"][1]["fields"][-1]["description"] = "Whatever"
         self.assertTrue(any("fixed (R-039)" in e for e in errors(d)))
-        d["registers"][0]["fields"][-1]["description"] = T.RESERVED_DESC
+        d["registers"][1]["fields"][-1]["description"] = T.RESERVED_DESC
         self.assertEqual(errors(d), [])
 
     def test_reserved_needs_no_description(self):
@@ -164,14 +164,14 @@ class GeneratorTwoPointFour(unittest.TestCase):
 
     def with_type(self, typ):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["fields"][0]["type"] = typ
+        d["registers"][1]["fields"][0]["type"] = typ
         return d
 
     def test_new_types_pass_and_have_hardware_ports(self):
         for typ in ("w0c", "w2c", "r2c"):
             d = self.with_type(typ)
             self.assertEqual(errors(d), [], typ)
-            names = [p[0] for p in T.field_ports(d["registers"][0], d["registers"][0]["fields"][0])]
+            names = [p[0] for p in T.field_ports(d["registers"][1], d["registers"][1]["fields"][0])]
             self.assertTrue(any(n.startswith("i_hw_we_") for n in names), typ)
 
     def test_unknown_type_fails(self):
@@ -179,7 +179,7 @@ class GeneratorTwoPointFour(unittest.TestCase):
 
     def repeat(self, **kw):
         d = copy.deepcopy(GOOD)
-        d["registers"][0]["repeat"] = kw
+        d["registers"][1]["repeat"] = kw
         return d
 
     def test_fixed_repeat(self):
@@ -198,7 +198,7 @@ class GeneratorTwoPointFour(unittest.TestCase):
 
     def test_overlap_with_copy(self):
         d = self.repeat(mode="FIXED", count=3, stride="0x4")
-        second = copy.deepcopy(d["registers"][0])
+        second = copy.deepcopy(d["registers"][1])
         second["name"], second["offset"] = "demo_other", "0x8"
         second.pop("repeat")
         d["registers"].append(second)

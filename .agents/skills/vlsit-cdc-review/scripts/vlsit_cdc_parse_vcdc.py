@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_parse_vcdc.py
 # Function : normalise a VC CDC reset report and its .waive file
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse a VC CDC (Synopsys) reset report (rule R-020, R-030).
 

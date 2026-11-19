@@ -3,7 +3,7 @@
 # File     : vlsit_rdc_crosscheck.py
 # Function : reconcile the RTL reset model with the SDC constraint model
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build the crossing table and the RTL-versus-SDC mismatch list (rule R-012, R-014 to R-016).
 

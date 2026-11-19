@@ -3,7 +3,7 @@
 # File     : vlsit_crosscheck_sdc.py
 # Function : compare parsed SDC constraints with the RTL inventory
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Static SDC-to-RTL cross-check.
 

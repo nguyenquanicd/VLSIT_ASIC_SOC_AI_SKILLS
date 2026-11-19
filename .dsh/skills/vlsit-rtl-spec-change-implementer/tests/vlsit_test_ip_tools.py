@@ -3,7 +3,7 @@
 # File     : vlsit_test_ip_tools.py
 # Function : tests for vlsit_rtl_ip_scan.py, vlsit_ip_report_check.py and vlsit_ip_verify.py
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Test the analysis, report-check and verification scripts of vlsit-rtl-spec-change-implementer.
 

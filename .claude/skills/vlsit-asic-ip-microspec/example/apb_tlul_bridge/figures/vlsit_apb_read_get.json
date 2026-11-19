@@ -136,5 +136,8 @@
  },
  "foot": {
   "text": "PSTRB is low for a read (APB4); the read data is registered, then returned with PREADY"
+ },
+ "config": {
+  "hscale": 2
  }
 }

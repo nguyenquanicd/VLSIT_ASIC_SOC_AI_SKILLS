@@ -3,7 +3,7 @@
 # File     : vlsit_sdc_resets.py
 # Function : read the SDC alone and report clocks, groups and reset exceptions
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build the constraint model from the SDC without reading the RTL (rule R-011).
 

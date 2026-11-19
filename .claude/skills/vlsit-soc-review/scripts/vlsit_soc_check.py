@@ -3,7 +3,7 @@
 # File     : vlsit_soc_check.py
 # Function : verify the SoC review report, its findings and its artefacts
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the delivered SoC report against the rules (rule R-005, R-027 to R-031).
 

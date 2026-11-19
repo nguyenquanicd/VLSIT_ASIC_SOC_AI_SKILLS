@@ -3,7 +3,7 @@
 # File     : vlsit_spec_diagram.py
 # Function : draw the block diagram of section 5.2 of a specification as draw.io, check, render and insert it
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Draw the block diagram of section 5.2 of a specification as draw.io, check it, render an SVG and insert it.
 

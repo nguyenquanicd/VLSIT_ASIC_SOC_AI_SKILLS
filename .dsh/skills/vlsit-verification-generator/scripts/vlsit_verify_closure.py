@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function : assess source-bound verification evidence under a reviewed closure contract
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Schema v2 closure checks. Exit 0 met, 1 unmet, 2 invalid, 3 met with waivers.
 
 Approved producers/review records are a trust boundary, not digital signatures.

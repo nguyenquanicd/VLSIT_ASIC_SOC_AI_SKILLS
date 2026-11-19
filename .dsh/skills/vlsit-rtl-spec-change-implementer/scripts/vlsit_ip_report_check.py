@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function: Check the structure and the evidence labels of rtl_ip_report.md against reference/vlsit_report_template.md.
 # Author: VLSI Technology
-# GitHub: https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub: https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Check the single report of the RTL IP modification task (RSC-030, RSC-031, RSC-200..236).
 
 Purpose : verifies that the report has the sections of the template, that the analysis sections hold real content,

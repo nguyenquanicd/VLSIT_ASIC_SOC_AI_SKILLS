@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function : preserve complete simulation packages and execute evidence-bound replay
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Package integrity and recorded execution are separate from hardware closure.
 
 Schema 2; init/seal/check/execute/replay. No tool installation or vendor parser.

@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_crosscheck.py
 # Function : reconcile the RTL clock model with the SDC clock and group model
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build the crossing table and the RTL-versus-SDC mismatch list (rule R-012, R-014 to R-016).
 

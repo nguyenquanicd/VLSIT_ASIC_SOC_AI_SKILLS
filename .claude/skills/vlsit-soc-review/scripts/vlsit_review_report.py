@@ -3,7 +3,7 @@
 # File     : vlsit_review_report.py
 # Function : build and check the final review report with a per-item fix proposal
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Build or check `vlsit_<review>_<YYYY-MM-DD>.md` (rule: named final report with a fix proposal).
 

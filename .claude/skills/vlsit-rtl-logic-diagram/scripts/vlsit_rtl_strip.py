@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_strip.py
 # Function : copy RTL with every comment removed, keeping every line number
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Copy Verilog/SystemVerilog files without comments, line for line (rule R-008).
 

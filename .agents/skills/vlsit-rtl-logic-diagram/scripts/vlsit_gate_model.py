@@ -3,7 +3,7 @@
 # File     : vlsit_gate_model.py
 # Function : derive gates, blocks and clusters from RTL expressions, then lay them out
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Turn the assignments of every module into a gate netlist and lay it out (rule R-012 to R-017).
 

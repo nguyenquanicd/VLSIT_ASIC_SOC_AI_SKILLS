@@ -3,7 +3,7 @@
 # File     : vlsit_csr_tool.py
 # Function : fill, validate and dump the VLSIT CSR specification workbook from a JSON register description
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Fill, check and summarize the VLSIT CSR specification workbook from a JSON register description.
 

@@ -7,12 +7,12 @@ All scripts in this directory support the workflows in `../SKILL.md`. Run Python
 | `vlsit_spec_tool.py` | Initialize, check and query the specification; verify sections, ports, waveform plan, diagram sources, and FSM figures. |
 | `vlsit_spec_diagram.py` | Build and insert VLSIT-library block diagrams and their JSON specification. |
 | `vlsit_fsm_diagram.py` | Check, lay out, build and insert VLSIT-library FSM diagrams and their JSON specification. |
-| `vlsit_waveform_svg.py` | Check WaveJSON label fit and render waveforms to SVG. |
+| `vlsit_waveform_svg.py` | Check WaveJSON label fit (`check`, honours `config.hscale` and `--cell`) and render waveforms to SVG. |
 | `vlsit_csr_tool.py` | Validate CSR JSON, fill/dump workbook sheets and list generated ports. |
 | `vlsit_library_symbols.py` | Catalog, clone and validate shapes against the bundled VLSIT draw.io library. |
 | `vlsit_drawio_frame_diagram.py` | Render a JSON block-diagram layout to draw.io. |
 | `vlsit_drawio_geometry_check.py` | Check diagram geometry, routing and text fit. |
-| `vlsit_drawio_to_svg.py` | Render draw.io diagrams to SVG, optionally PNG. |
+| `vlsit_drawio_to_svg.py` | Render draw.io diagrams to SVG, optionally PNG (blocks, ellipses, connectors with line jumps, transition labels, native tables). |
 | `vlsit_layout_search.py` | Compare candidate block-diagram layouts. |
 | `vlsit_protocol_docs.py` | Inspect and, after approval, retrieve protocol documents. |
 | `vlsit_doc_to_md.py`, `vlsit_pdf_to_md.py` | Convert standards and documents to Markdown for analysis. |

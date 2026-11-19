@@ -3,7 +3,7 @@
 # File     : vlsit_sdc_parse.py
 # Function : parse an SDC constraint file into clocks, groups, exceptions and I/O delays
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse the constraint commands a review needs, with the line of each.
 

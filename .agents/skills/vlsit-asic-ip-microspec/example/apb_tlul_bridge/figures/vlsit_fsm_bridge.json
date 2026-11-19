@@ -1,0 +1,69 @@
+{
+  "page_name": "FSM_BRIDGE",
+  "out_name": "vlsit_fsm_bridge.drawio",
+  "function": "bridge",
+  "initial": "ENUM_ST_IDLE",
+  "state_pattern": "^ENUM_ST_[A-Z0-9_]+$",
+  "states": [
+    {
+      "name": "ENUM_ST_IDLE"
+    },
+    {
+      "name": "ENUM_ST_SEND"
+    },
+    {
+      "name": "ENUM_ST_WAIT"
+    },
+    {
+      "name": "ENUM_ST_RESP"
+    },
+    {
+      "name": "ENUM_ST_DRAIN"
+    }
+  ],
+  "transitions": [
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_SEND",
+      "label": "psel & valid"
+    },
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_RESP",
+      "label": "psel & !valid"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_WAIT",
+      "label": "a_ready"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_RESP",
+      "label": "a_ready & d_valid"
+    },
+    {
+      "src": "ENUM_ST_WAIT",
+      "dst": "ENUM_ST_RESP",
+      "label": "d_valid | timeout"
+    },
+    {
+      "src": "ENUM_ST_RESP",
+      "dst": "ENUM_ST_IDLE",
+      "label": "next cycle"
+    },
+    {
+      "src": "ENUM_ST_RESP",
+      "dst": "ENUM_ST_DRAIN",
+      "label": "orphan"
+    },
+    {
+      "src": "ENUM_ST_DRAIN",
+      "dst": "ENUM_ST_IDLE",
+      "label": "late resp"
+    }
+  ],
+  "layout": {
+    "margin": 40
+  }
+}

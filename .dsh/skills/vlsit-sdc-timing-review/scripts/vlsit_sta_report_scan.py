@@ -3,7 +3,7 @@
 # File     : vlsit_sta_report_scan.py
 # Function : extract violations, warnings and errors from a synthesis or timing report
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Scan a text timing report from any STA or synthesis tool.
 

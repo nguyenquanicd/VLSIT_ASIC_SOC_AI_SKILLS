@@ -3,7 +3,7 @@
 # File     : vlsit_report_check.py
 # Function : check a bilingual SDC review report for structure, findings and the constraint matrix
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the SDC and timing review report and emit findings.json.
 

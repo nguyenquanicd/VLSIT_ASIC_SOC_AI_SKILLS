@@ -1,25 +1,318 @@
 {
-  "title": "m_apb_tlul_bridge block diagram (single clock domain i_clk_apb)",
-  "blocks": [
-    {"id": "io_apb", "label": "APB4\nsubordinate", "x": 0.0, "y": -2.4, "kind": "io"},
-    {"id": "cap", "label": "Request\ncapture", "x": 4.8, "y": 0.0},
-    {"id": "agen", "label": "A-channel\ngenerator", "x": 10.6, "y": 0.0},
-    {"id": "io_tl", "label": "TL-UL\nhost", "x": 15.6, "y": -2.4, "kind": "io"},
-    {"id": "fsm", "label": "Bridge FSM\n(timeout cnt)", "x": 7.7, "y": -2.4},
-    {"id": "rsp", "label": "Response\nregister", "x": 4.8, "y": -4.8},
-    {"id": "rchk", "label": "D-channel\nchecker", "x": 10.6, "y": -4.8}
+  "page_name": "BLOCK_DIAGRAM",
+  "out_name": "vlsit_block_diagram.drawio",
+  "table_suffix": "",
+  "layout": {
+    "gap_h": 100,
+    "gap_v": 90,
+    "margin": 40,
+    "block_h": 60
+  },
+  "top": {
+    "frame_label": [
+      "TOP",
+      "(m_apb_tlul_bridge)"
+    ],
+    "block_label": [
+      "TOP",
+      "(m_apb_tlul_bridge)"
+    ],
+    "block_row": [
+      "TOP (m_apb_tlul_bridge)",
+      "Structural top: interface, parameters, interconnect and instances only.",
+      "Section 14.2"
+    ]
+  },
+  "frame_row": [
+    "TOP (m_apb_tlul_bridge) frame",
+    "Structural top of the APB4 to TL-UL bridge.",
+    "Section 14.2"
   ],
-  "groups": [{"label": "i_clk_apb / i_rst_n_apb", "blocks": ["cap", "agen", "fsm", "rsp", "rchk"]}],
-  "links": [
-    {"from": "io_apb", "to": "cap", "from_side": "north", "to_side": "west", "label": "APB4 request"},
-    {"from": "cap", "to": "agen", "from_side": "east", "to_side": "west", "label": "addr, data, strb"},
-    {"from": "agen", "to": "io_tl", "from_side": "east", "to_side": "north", "label": "A channel"},
-    {"from": "io_tl", "to": "rchk", "from_side": "south", "to_side": "east", "label": "D channel"},
-    {"from": "rchk", "to": "rsp", "from_side": "west", "to_side": "east", "label": "rdata, error"},
-    {"from": "rsp", "to": "io_apb", "from_side": "west", "to_side": "south", "label": "PRDATA, PSLVERR"},
-    {"from": "fsm", "to": "cap", "from_side": "north", "to_side": "south", "style": "ctrl"},
-    {"from": "fsm", "to": "agen", "from_side": "north", "to_side": "south", "style": "ctrl"},
-    {"from": "fsm", "to": "rsp", "from_side": "south", "to_side": "north", "style": "ctrl"},
-    {"from": "fsm", "to": "rchk", "from_side": "south", "to_side": "north", "style": "ctrl"}
-  ]
+  "frame_interfaces": [
+    "APBRQ",
+    "APBRS",
+    "TLA",
+    "TLD",
+    "CRCLK"
+  ],
+  "blocks": [
+    {
+      "key": "CAP",
+      "label": [
+        "u_apb_tlul_cap",
+        "(m_apb_tlul_cap)"
+      ],
+      "width": 220,
+      "row": 0,
+      "col": 0,
+      "row_name": "u_apb_tlul_cap (m_apb_tlul_cap)",
+      "function": "Captures the APB request (address, direction, strobes, write data) in the setup phase.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "AGEN",
+      "label": [
+        "u_apb_tlul_agen",
+        "(m_apb_tlul_agen)"
+      ],
+      "width": 220,
+      "row": 0,
+      "col": 1,
+      "row_name": "u_apb_tlul_agen (m_apb_tlul_agen)",
+      "function": "Builds the TL-UL A-channel request and decodes the byte strobe into opcode, size and mask.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "FSM",
+      "label": [
+        "u_apb_tlul_fsm",
+        "(m_apb_tlul_fsm)"
+      ],
+      "width": 220,
+      "row": 1,
+      "col": 0,
+      "row_name": "u_apb_tlul_fsm (m_apb_tlul_fsm)",
+      "function": "Sequences one transfer through IDLE, SEND, WAIT, RESP and DRAIN; runs the optional timeout counter.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "RCHK",
+      "label": [
+        "u_apb_tlul_rchk",
+        "(m_apb_tlul_rchk)"
+      ],
+      "width": 220,
+      "row": 2,
+      "col": 2,
+      "row_name": "u_apb_tlul_rchk (m_apb_tlul_rchk)",
+      "function": "Checks the TL-UL D-channel response (opcode, size, source, error) and captures read data.",
+      "source": "Section 14.2"
+    },
+    {
+      "key": "RSP",
+      "label": [
+        "u_apb_tlul_rsp",
+        "(m_apb_tlul_rsp)"
+      ],
+      "width": 220,
+      "row": 2,
+      "col": 0,
+      "row_name": "u_apb_tlul_rsp (m_apb_tlul_rsp)",
+      "function": "Holds read data and error status and presents the APB completion.",
+      "source": "Section 14.2"
+    }
+  ],
+  "connectors": [
+    {
+      "id": "RQ",
+      "src": "CAP",
+      "src_side": "R",
+      "dst": "AGEN",
+      "dst_side": "L"
+    },
+    {
+      "id": "ST",
+      "src": "CAP",
+      "src_side": "B",
+      "dst": "FSM",
+      "dst_side": "T"
+    },
+    {
+      "id": "GO",
+      "src": "FSM",
+      "src_side": "R",
+      "dst": "AGEN",
+      "dst_side": "B"
+    },
+    {
+      "id": "RC",
+      "src": "RCHK",
+      "src_side": "T",
+      "dst": "FSM",
+      "dst_side": "R"
+    },
+    {
+      "id": "CP",
+      "src": "FSM",
+      "src_side": "B",
+      "dst": "RSP",
+      "dst_side": "T"
+    },
+    {
+      "id": "RS",
+      "src": "RCHK",
+      "src_side": "L",
+      "dst": "RSP",
+      "dst_side": "R"
+    }
+  ],
+  "externals": [
+    {
+      "id": "APBRQ",
+      "block": "CAP",
+      "side": "L",
+      "dir": "in",
+      "pos": 0,
+      "text": [
+        "APBRQ",
+        "i_apb_p*"
+      ]
+    },
+    {
+      "id": "APBRS",
+      "block": "RSP",
+      "side": "L",
+      "dir": "out",
+      "pos": 0,
+      "text": [
+        "APBRS",
+        "o_apb_p*"
+      ]
+    },
+    {
+      "id": "TLA",
+      "block": "AGEN",
+      "side": "R",
+      "dir": "out",
+      "pos": 0,
+      "text": [
+        "TLA",
+        "o_tl_a_*"
+      ]
+    },
+    {
+      "id": "TLD",
+      "block": "RCHK",
+      "side": "R",
+      "dir": "in",
+      "pos": 0,
+      "text": [
+        "TLD",
+        "i_tl_d_*"
+      ]
+    },
+    {
+      "id": "CRCLK",
+      "block": "CAP",
+      "side": "L",
+      "dir": "in",
+      "pos": 1,
+      "text": [
+        "CRCLK",
+        "i_clk_apb, i_rst_n_apb"
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "entry": "CRCLK",
+      "sinks": [
+        {
+          "id": "CK1",
+          "block": "AGEN",
+          "side": "T",
+          "pos": 0
+        },
+        {
+          "id": "CK2",
+          "block": "FSM",
+          "side": "L",
+          "pos": 0
+        },
+        {
+          "id": "CK3",
+          "block": "RCHK",
+          "side": "B",
+          "pos": 0
+        },
+        {
+          "id": "CK4",
+          "block": "RSP",
+          "side": "B",
+          "pos": 0
+        }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "APBRQ",
+      "name": "APB4 request",
+      "category": "handshake",
+      "active": "external -> TOP",
+      "signals": "external -> TOP: i_apb_psel, i_apb_penable, i_apb_pwrite, i_apb_paddr, i_apb_pprot, i_apb_pstrb, i_apb_pwdata"
+    },
+    {
+      "id": "APBRS",
+      "name": "APB4 completion",
+      "category": "handshake",
+      "active": "TOP -> external",
+      "signals": "TOP -> external: o_apb_pready, o_apb_prdata, o_apb_pslverr"
+    },
+    {
+      "id": "TLA",
+      "name": "TL-UL A channel",
+      "category": "handshake",
+      "active": "TOP -> external",
+      "signals": "TOP -> external: o_tl_a_valid, o_tl_a_opcode, o_tl_a_param, o_tl_a_size, o_tl_a_source, o_tl_a_address, o_tl_a_mask, o_tl_a_data, o_tl_a_user; external -> TOP: i_tl_a_ready"
+    },
+    {
+      "id": "TLD",
+      "name": "TL-UL D channel",
+      "category": "handshake",
+      "active": "external -> TOP",
+      "signals": "external -> TOP: i_tl_d_valid, i_tl_d_opcode, i_tl_d_param, i_tl_d_size, i_tl_d_source, i_tl_d_sink, i_tl_d_data, i_tl_d_user, i_tl_d_error; TOP -> external: o_tl_d_ready"
+    },
+    {
+      "id": "RQ",
+      "name": "Captured request",
+      "category": "custom",
+      "active": "u_apb_tlul_cap -> u_apb_tlul_agen",
+      "signals": "reg_addr, reg_wr, reg_strb, reg_wdata"
+    },
+    {
+      "id": "ST",
+      "name": "Request start",
+      "category": "custom",
+      "active": "u_apb_tlul_cap -> u_apb_tlul_fsm",
+      "signals": "request valid"
+    },
+    {
+      "id": "GO",
+      "name": "A-channel control",
+      "category": "custom",
+      "active": "u_apb_tlul_fsm -> u_apb_tlul_agen",
+      "signals": "send enable"
+    },
+    {
+      "id": "RC",
+      "name": "Response event",
+      "category": "custom",
+      "active": "u_apb_tlul_rchk -> u_apb_tlul_fsm",
+      "signals": "response valid, response error"
+    },
+    {
+      "id": "CP",
+      "name": "Completion",
+      "category": "custom",
+      "active": "u_apb_tlul_fsm -> u_apb_tlul_rsp",
+      "signals": "complete pulse"
+    },
+    {
+      "id": "RS",
+      "name": "Response data",
+      "category": "custom",
+      "active": "u_apb_tlul_rchk -> u_apb_tlul_rsp",
+      "signals": "reg_rdata, reg_err"
+    },
+    {
+      "id": "CRCLK",
+      "name": "Clock and reset",
+      "category": "custom",
+      "active": "SoC -> TOP",
+      "signals": "i_clk_apb, i_rst_n_apb"
+    }
+  ],
+  "legend_note": "The enclosing frame is the top module; blocks inside are its instances.",
+  "library_sha256": "15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C"
 }

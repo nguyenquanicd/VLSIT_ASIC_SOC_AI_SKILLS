@@ -3,7 +3,7 @@
 # File     : vlsit_template_probe.py
 # Function : list the sections, guidance paragraphs, table captions and figure placeholders of a DOCX template
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Probe a VLSIT specification DOCX template without third-party packages.
 

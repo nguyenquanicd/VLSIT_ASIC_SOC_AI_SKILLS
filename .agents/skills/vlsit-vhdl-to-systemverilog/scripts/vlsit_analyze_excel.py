@@ -3,7 +3,7 @@
 # File     : vlsit_analyze_excel.py
 # Function : analyze an Excel or CSV signal list
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicid/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # -------------------------------------------------------------------------
 
 """Compact, read-only Excel/CSV analyzer for AI-assisted workbook updates.

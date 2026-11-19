@@ -3,7 +3,7 @@
 # File     : vlsit_lec_parse_conformal.py
 # Function : parse a Conformal LEC do file and log into the review models
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse Conformal LEC setup and log (rule R-011 to R-023, R-033).
 

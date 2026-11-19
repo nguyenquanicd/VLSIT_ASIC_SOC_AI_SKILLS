@@ -3,7 +3,7 @@
 # File     : vlsit_report_check.py
 # Function : check a bilingual IP review report for structure, evidence labels and findings
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the review report and emit findings.json.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function: Scan Verilog/SystemVerilog RTL top-down: modules, ports, parameters, instances, instance counts, connections, Mermaid block diagrams.
 # Author: VLSI Technology
-# GitHub: https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub: https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Top-down structural scan of an existing RTL tree (read-only).
 
 Purpose : gives the facts that the analysis report needs (RSC-200..203): the module hierarchy from the top,

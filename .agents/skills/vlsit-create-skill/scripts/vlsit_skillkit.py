@@ -3,7 +3,7 @@
 # File     : vlsit_skillkit.py
 # Function : scaffold, validate and mirror skills in the VLSIT house format
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Scaffold, validate and mirror skills in the house format.
 
@@ -47,7 +47,7 @@ TEMPLATE_DIR = SKILL_HOME / "reference" / "templates"
 # Default author and project link written into the header of every generated script (R-043).
 # Change them here once; validate only requires that a header names an author and a GitHub link.
 AUTHOR = "VLSI Technology"
-GITHUB_URL = "https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS"
+GITHUB_URL = "https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS"
 SCRIPT_PREFIX = "vlsit_"
 HEADER_LINES = 40
 FINDER = Path(__file__).resolve().parent / "vlsit_find_python.ps1"

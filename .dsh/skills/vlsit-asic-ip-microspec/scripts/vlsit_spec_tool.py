@@ -3,7 +3,7 @@
 # File     : vlsit_spec_tool.py
 # Function : create, check and edit an ASIC IP design specification written in the VLSIT template
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Create, check and edit an ASIC IP design specification written in the VLSIT template.
 

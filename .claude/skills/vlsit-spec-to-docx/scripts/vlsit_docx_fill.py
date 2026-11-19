@@ -3,7 +3,7 @@
 # File     : vlsit_docx_fill.py
 # Function : fill the VLSIT DOCX template from content.json, keeping the template styles and fields
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Fill a DOCX template from a validated content.json.
 

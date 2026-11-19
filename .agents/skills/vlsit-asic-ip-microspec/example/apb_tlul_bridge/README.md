@@ -5,7 +5,8 @@ A complete output of the skill `vlsit-asic-ip-microspec` for a protocol bridge b
 | File | Content |
 |---|---|
 | `VLSIT_APB_TLUL_BRIDGE_HDS.md` | The specification in the VLSIT template (22 sections, 26 requirements, 18 tests, 7 assertions, 3 coverage items), including a no-CSR APB-to-TL-UL use flow in section 11.2. |
-| `figures/vlsit_block_diagram.json`, `.tex`, `.svg`, `.png`, `.drawio` | The block diagram from one JSON description: TikZ source, rendered image, and the draw.io export that uses the VLSIT library (`vlsit_library_symbols.py validate` reports PASS) |
+| `figures/vlsit_block_diagram_spec.json`, `.drawio`, `.svg` | The block diagram of section 5.2: a draw.io file with the two tabs `BLOCK_DIAGRAM` and `BLOCK_INFORMATION`, built from the VLSIT library by `vlsit_spec_diagram.py` (`vlsit_library_symbols.py validate` passes, geometry check reports 0 findings); the SVG shows the `BLOCK_DIAGRAM` tab only |
+| `figures/vlsit_fsm_bridge.json`, `.drawio`, `.svg` | The FSM state diagram of section 10.1 (five states) built by `vlsit_fsm_diagram.py` |
 | `figures/vlsit_apb_*.json`, `figures/vlsit_apb_*.svg` | Key waveforms of the waveform plan in section 10.3: full write, read, error response, partial write, timeout with drain. Section 6.2 shows the signal-type column |
 | `research/vlsit_reference_ip_log.md` | Reference-IP research with the evidence filter |
 | `vlsit_qa_log.md` | The question style of the skill (simulated answers) |

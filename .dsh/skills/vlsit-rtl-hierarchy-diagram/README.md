@@ -32,7 +32,7 @@ Lần theo thiết kế RTL hiện có từ module top tới các module con, th
 
 [assets/VLSIT_DRAWIO_LIB_V1.drawio.xml](assets/VLSIT_DRAWIO_LIB_V1.drawio.xml) nằm trong skill, gồm 39 template và là nguồn ký hiệu duy nhất. Block module dùng template 32; chữ riêng dùng template 0; đường nối vuông góc dùng template 27. Các template khác chỉ được dùng khi phù hợp RTL thực tế.
 
-The library is preserved byte for byte. SHA-256: D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6. Copy the entire skill folder, including assets, reference, and scripts, when installing.
+The library is preserved byte for byte. SHA-256: 15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C. Copy the entire skill folder, including assets, reference, and scripts, when installing.
 
 Thư viện được giữ nguyên từng byte, có SHA-256 ở trên. Khi cài đặt, chép toàn bộ thư mục skill, gồm assets, reference và scripts.
 

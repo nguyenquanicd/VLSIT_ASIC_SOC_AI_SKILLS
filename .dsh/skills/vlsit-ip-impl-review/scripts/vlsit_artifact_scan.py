@@ -3,7 +3,7 @@
 # File     : vlsit_artifact_scan.py
 # Function : find verification, lint, CDC, RDC, SDC and synthesis artefacts and judge their freshness
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Inventory the evidence artefacts of an IP folder.
 

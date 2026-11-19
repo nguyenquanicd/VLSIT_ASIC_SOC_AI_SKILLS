@@ -3,7 +3,7 @@
 # File     : vlsit_docx_check.py
 # Function : verify the structure of the produced DOCX against the template map
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check a filled DOCX structurally: headings, tables, leftover guidance, empty sections.
 

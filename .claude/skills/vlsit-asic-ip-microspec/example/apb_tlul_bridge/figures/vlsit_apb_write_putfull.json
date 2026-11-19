@@ -139,5 +139,8 @@
  },
  "foot": {
   "text": "access phase T1..T3: 2 wait states; device answers one cycle after acceptance"
+ },
+ "config": {
+  "hscale": 2
  }
 }

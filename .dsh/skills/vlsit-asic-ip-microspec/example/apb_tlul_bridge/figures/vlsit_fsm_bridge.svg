@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="690" height="520" viewBox="10 10 690 520" font-family="Arial, Helvetica, sans-serif" font-size="18">
+<rect x="10" y="10" width="690" height="520" fill="#FFFFFF"/>
+<ellipse cx="355" cy="70" rx="105" ry="30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+<text x="355" y="77" text-anchor="middle">ENUM_ST_IDLE</text>
+<ellipse cx="150" cy="270" rx="105" ry="30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+<text x="150" y="277" text-anchor="middle">ENUM_ST_SEND</text>
+<ellipse cx="145" cy="470" rx="105" ry="30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+<text x="145" y="477" text-anchor="middle">ENUM_ST_WAIT</text>
+<ellipse cx="560" cy="270" rx="105" ry="30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+<text x="560" y="277" text-anchor="middle">ENUM_ST_RESP</text>
+<ellipse cx="560" cy="470" rx="110" ry="30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+<text x="560" y="477" text-anchor="middle">ENUM_ST_DRAIN</text>
+<path d="M 325.489 98.7908 L 179.511 241.209" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="179.511,241.209 183.91,228.534 192.29,237.124" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="189.1" y="159" width="126.8" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="252.5" y="177" text-anchor="middle">psel &amp; valid</text>
+<path d="M 384.511 98.7908 L 447.723 180.021 L 530.489 241.209" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="530.489,241.209 517.273,238.9 524.406,229.251" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="420.756" y="199.615" width="136.7" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="489.106" y="217.615" text-anchor="middle">psel &amp; !valid</text>
+<path d="M 149.25 299.999 L 145.75 440.001" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="145.75,440.001 140.052,427.855 152.048,428.155" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="108.85" y="359" width="77.3" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="147.5" y="377" text-anchor="middle">a_ready</text>
+<path d="M 255 270 L 455 270" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="455,270 443,276 443,264" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="266.85" y="259" width="176.3" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="355" y="277" text-anchor="middle">a_ready &amp; d_valid</text>
+<path d="M 198.547 444.194 L 506.453 295.806" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="506.453,295.806 498.248,306.421 493.038,295.611" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="264.35" y="359" width="176.3" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="352.5" y="377" text-anchor="middle">d_valid | timeout</text>
+<path d="M 530.489 241.209 L 467.277 159.979 L 384.511 98.7908" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="384.511,98.7908 397.727,101.1 390.594,110.749" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="372.394" y="118.385" width="107" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="425.894" y="136.385" text-anchor="middle">next cycle</text>
+<path d="M 560 300 L 560 440" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="560,440 554,428 566,428" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="526.3" y="359" width="67.4" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="560" y="377" text-anchor="middle">orphan</text>
+<path d="M 544.773 440.289 L 377.399 311.034 L 370.213 99.6835" fill="none" stroke="#000000" stroke-width="2.0"/>
+<polygon points="370.213,99.6835 376.617,111.473 364.624,111.88" fill="#000000" stroke="#000000" stroke-width="1"/>
+<rect x="412.536" y="364.661" width="97.1" height="22" fill="#FFFFFF" stroke="none"/>
+<text x="461.086" y="382.661" text-anchor="middle">late resp</text>
+</svg>

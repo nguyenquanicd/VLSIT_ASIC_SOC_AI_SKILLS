@@ -6,7 +6,7 @@
 # File     : vlsit_pdf_render.py
 # Function : render a PDF page, such as a compiled diagram, to SVG or PNG
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Turn the first page of a PDF (for example a compiled LaTeX block diagram) into an SVG or PNG image.
 

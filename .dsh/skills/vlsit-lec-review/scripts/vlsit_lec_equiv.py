@@ -3,7 +3,7 @@
 # File     : vlsit_lec_equiv.py
 # Function : prove or disprove the equivalence of each traced cone
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Compare the two cones structurally and by truth table (rule R-026).
 

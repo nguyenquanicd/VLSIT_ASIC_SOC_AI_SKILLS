@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_check.py
 # Function : check SystemVerilog RTL against the mechanical rules of VLSIT_RTL_Design_Rule.md v2
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check design RTL files against the VLSIT RTL rules (v2) that a script can decide.
 

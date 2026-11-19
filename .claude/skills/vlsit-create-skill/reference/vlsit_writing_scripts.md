@@ -39,7 +39,7 @@ what the result means) in SKILL.md.
   # File     : vlsit_example.py
   # Function : one line - what the script does
   # Author   : VLSI Technology
-  # GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+  # GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
   # ---------------------------------------------------------------------------
   ```
 

@@ -3,7 +3,7 @@
 # File     : vlsit_verify_plan.py
 # Function : check, export and summarize a verification plan in CSV form
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check, export and summarize a verification plan (vplan).
 

@@ -139,5 +139,8 @@
  },
  "foot": {
   "text": "d_error=1 on the D channel; PSLVERR is high in the PREADY cycle"
+ },
+ "config": {
+  "hscale": 2
  }
 }

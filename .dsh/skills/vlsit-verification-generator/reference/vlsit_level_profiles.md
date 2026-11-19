@@ -153,7 +153,7 @@ A gate record in `sim/docs/00_plan/signoff.md` contains the gate ID, the date, t
 6. Run smoke, directed and constrained-random tests; close functional and assertion coverage.
 7. Inject end-to-end faults and verify that the block scoreboard, not only the VIP checkers, detects them.
 8. Run block regression; triage every failure; quarantine only with a bug ID.
-9. Review at G3 and G4; complete the block sign-off checklist.
+9. Review at G3, G5 and G6; complete the block sign-off checklist.
 
 **Exit criteria:** block vplan closure; reference model reviewed; end-to-end checks pass; coverage targets met; mutation target met; regression clean or residual risk approved; documentation complete.
 

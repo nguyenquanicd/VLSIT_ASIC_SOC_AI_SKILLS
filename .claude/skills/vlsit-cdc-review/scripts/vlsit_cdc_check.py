@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_check.py
 # Function : verify the CDC report, its findings, figures and counts
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the delivered CDC report against the rules (rule R-019, R-022, R-023, R-031, R-032).
 

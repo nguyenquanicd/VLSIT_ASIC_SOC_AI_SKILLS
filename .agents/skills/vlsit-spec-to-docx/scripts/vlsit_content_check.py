@@ -3,7 +3,7 @@
 # File     : vlsit_content_check.py
 # Function : validate content.json against the schema and the template map before the DOCX is filled
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Validate the content file used by vlsit_docx_fill.py.
 

@@ -3,7 +3,7 @@
 # File     : vlsit_lec_svg.py
 # Function : draw one cone figure per traced failing point
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Write one SVG per traced fail, reference cone on the left, netlist cone on the right (rule R-030).
 

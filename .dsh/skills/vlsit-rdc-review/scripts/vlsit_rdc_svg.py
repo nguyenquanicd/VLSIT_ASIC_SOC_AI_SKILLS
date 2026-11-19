@@ -3,7 +3,7 @@
 # File     : vlsit_rdc_svg.py
 # Function : draw one SVG figure per reset mechanism used in the report
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Write one figure per mechanism so every reset claim has a picture (rule R-018).
 

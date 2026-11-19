@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function : regression-test retention, dependency checks and actually executed replay
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Synthetic Python producer only; these tests do not simulate hardware."""
 import contextlib
 import io

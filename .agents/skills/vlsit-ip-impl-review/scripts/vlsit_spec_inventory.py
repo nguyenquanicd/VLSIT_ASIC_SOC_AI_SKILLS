@@ -3,7 +3,7 @@
 # File     : vlsit_spec_inventory.py
 # Function : extract the reviewable facts of an ASIC IP specification into one JSON file
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Extract the facts a specification review needs.
 

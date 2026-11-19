@@ -3,7 +3,7 @@
 # File     : vlsit_docx_render.py
 # Function : render a DOCX to PDF and, when PyMuPDF is present, to one PNG per page
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Render a DOCX so the layout can be inspected.
 

@@ -3,7 +3,7 @@
 # File     : vlsit_verify_rules.py
 # Function : list, slice and validate the verification rule book
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """List, slice and validate the verification rule book.
 

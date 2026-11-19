@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------
 # File     : vlsit_find_python.ps1
-# Function : find a working Python 3 on Windows or install one with the user's agreement
+# Function : find a working Python 3 (3.8 or later) on Windows, or install one
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 <#
 .SYNOPSIS

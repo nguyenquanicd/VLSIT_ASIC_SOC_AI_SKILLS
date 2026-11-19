@@ -3,7 +3,7 @@
 # File     : vlsit_cdc_parse_spyglass.py
 # Function : normalise a Spyglass CDC/CDC report and read its .waive file
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Parse a Spyglass reset report into the common violation record (rule R-020, R-030).
 

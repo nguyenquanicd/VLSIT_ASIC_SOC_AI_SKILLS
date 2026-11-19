@@ -315,3 +315,24 @@ completed below. No test suites were added or run in this turn; this change is a
 workflow/rule/template update. Runtime enforcement that a future generated testbench
 is correct remains the responsibility of design review, qualification and the
 existing source-bound verification flow.
+
+## Cross-skill review (2026-11-19)
+
+Review of all 18 skills for conflicting or duplicated rules and content. Within each skill the rule IDs are unique and every referenced ID exists; `vlsit_skillkit.py validate` passes for 18/18 and the skill test suites pass (microspec 26 + 17 + 9, spec-change 9 + 28, SDC 6).
+
+| ID | Issue | Resolution |
+|---|---|---|
+| X-01 | Script headers carried two GitHub links; `VLSIT_CODEX_CLAUDE_SKILLS` is the old repository name (it redirects) and one script had the typo `nguyenquanicid`. | All headers now use `https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS` (the `origin`). |
+| X-02 | `vlsit_find_python.ps1` existed in three variants that differed only in header text. | One canonical copy (from `vlsit-create-skill`) in all 18 skills. |
+| X-03 | microspec R-058 said "draw with WaveDrom" while the script renders SVG itself from the WaveJSON. | R-058 now says: WaveJSON is the source, `vlsit_waveform_svg.py` renders the SVG, and the WaveDrom viewer, PNG, VCD and image conversion come from `vlsit-wavedrom-waveform`. |
+| X-04 | `vlsit_library_symbols.py` rejected `labelBackgroundColor`, which the FSM generator sets, so every FSM build failed. | Added to `EDITABLE` in both copies (microspec, hierarchy) and named in RHD-022. |
+| X-05 | `vlsit_drawio_to_svg.py` drew every FSM state as a rectangle and dropped the transition labels. | It now draws ellipses and edge labels. |
+| X-06 | `vlsit_waveform_svg.py check` ignored `config.hscale` although its message advised it. | `check` uses the same cell size as `render` (new `--cell`). |
+| X-07 | The microspec library documents still gave the old library hash `D1631ACF...`, as did the logic-diagram gate catalogue; the bundled library is `15DFB183...`. | Hash updated in both skills; the logic library's first 39 entries were verified identical to the current library. |
+| X-08 | `VLSIT_DRAWIO_LIB_LOGIC.xml` was not well-formed XML (three appended entries were not escaped). | Entries escaped; the file parses and holds 42 entries. |
+| X-09 | microspec `vlsit_csr_generator.md` was older than the RTL-generator copy (generator v3.3, `i_hw_clr_` naming, register-event sideband). | Facts merged; the skill-specific questions and rule references were kept. |
+| X-10 | The worked example `apb_tlul_bridge` no longer passed the skill's own checks (no FSM diagram, old draw.io and TikZ block diagram, `N/A` format, template line, waveform label fit). | Example regenerated: two-tab draw.io block diagram, FSM diagram, waveform `hscale`, spec check PASS. |
+| X-11 | microspec tests were stale (version register at 0x0, `insert` JSON sidecar, SVG ellipse). | Tests updated; all pass. |
+
+Not changed: the per-skill report templates and scorecards of the review skills differ on purpose (different areas, same verdict thresholds); the historical one-tab examples of the hierarchy skill keep their old library hash as a record.
+

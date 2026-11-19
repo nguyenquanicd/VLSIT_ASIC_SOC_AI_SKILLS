@@ -3,7 +3,7 @@
 # File     : vlsit_spec_scan.py
 # Function : map a VLSIT Markdown specification onto the DOCX template sections and list the gaps
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Scan a specification and report what the template needs but the source lacks.
 

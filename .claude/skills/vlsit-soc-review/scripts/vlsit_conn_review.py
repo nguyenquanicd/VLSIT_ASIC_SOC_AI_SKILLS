@@ -3,7 +3,7 @@
 # File     : vlsit_conn_review.py
 # Function : judge every top connection by the role of its source and destination
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Flag a protocol change, a role mismatch and an inferred role on the top connections (rule R-018 to R-022).
 

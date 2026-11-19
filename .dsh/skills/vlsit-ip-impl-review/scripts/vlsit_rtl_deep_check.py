@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_deep_check.py
 # Function : deep static checks on synthesizable RTL beyond the rule checker
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Find the defects a lint run alone does not explain: latch, case default, mixed
 assignment styles, multiple drivers, reset without a synchroniser and unreset state.

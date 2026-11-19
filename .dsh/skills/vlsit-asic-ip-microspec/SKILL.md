@@ -148,7 +148,7 @@ Run each script as `<python> "<skill folder>\scripts\<script>.py" <action>`.
 | `scripts/vlsit_spec_diagram.py` | Step 10: `template`, `from-spec`, `check`, `build`, `insert` (draw.io block diagram, with `vlsit_drawio_frame_diagram.py`, `vlsit_drawio_geometry_check.py`, `vlsit_drawio_to_svg.py`, `vlsit_layout_search.py`) |
 | `scripts/vlsit_fsm_diagram.py` | Step 10: `template`, `check`, `build`, `insert` (VLSIT-library FSM diagram, JSON sidecar, layout report, SVG) |
 | `scripts/vlsit_block_diagram.py` | Step 10 fallback: `check`, `tex`, `build`, `drawio` |
-| `scripts/vlsit_waveform_svg.py` | Step 10: check label fit, then render WaveJSON to SVG |
+| `scripts/vlsit_waveform_svg.py` | Step 10: check label fit (`check`, honours `config.hscale`), then render WaveJSON to SVG; the interactive WaveDrom viewer is in `vlsit-wavedrom-waveform` |
 | `scripts/vlsit_library_symbols.py` | Step 10 with draw.io: `validate` a .drawio file against the VLSIT library |
 | `scripts/vlsit_approved_packages.txt` | Not run: the record of the third-party packages the user approved (openpyxl, PyMuPDF; rule R-022); `vlsit_skillkit.py validate` reads it |
 

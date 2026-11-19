@@ -3,7 +3,7 @@
 # File     : vlsit_lec_check.py
 # Function : verify the LEC report, its language blocks, severities and counts
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Check the delivered report against the rules (rule R-019, R-029 to R-031, R-034, R-035).
 

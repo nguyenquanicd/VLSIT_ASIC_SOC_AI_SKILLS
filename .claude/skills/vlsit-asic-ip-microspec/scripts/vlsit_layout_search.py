@@ -3,7 +3,7 @@
 # File     : vlsit_layout_search.py
 # Function : run the diagram generator over many parameter sets and rank the layouts
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Run the diagram generator over many parameter sets and rank the results (RHD-097).
 

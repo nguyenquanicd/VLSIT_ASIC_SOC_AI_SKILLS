@@ -3,7 +3,7 @@
 # File     : vlsit_lint_rtl.py
 # Function : find lint tools, build filelist.f in compile order, and lint an RTL file set
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Find lint tools, write filelist.f, and run lint on an RTL set (Windows, Linux, macOS).
 

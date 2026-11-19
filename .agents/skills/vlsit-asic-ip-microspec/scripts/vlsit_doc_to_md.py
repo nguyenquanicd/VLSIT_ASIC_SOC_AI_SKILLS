@@ -3,7 +3,7 @@
 # File     : vlsit_doc_to_md.py
 # Function : convert a standard document (DOCX, HTML, Markdown, text) to a verbatim Markdown file and verify it
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Convert a standard document (DOCX, HTML, Markdown, text) to a verbatim Markdown file with a protocol header.
 

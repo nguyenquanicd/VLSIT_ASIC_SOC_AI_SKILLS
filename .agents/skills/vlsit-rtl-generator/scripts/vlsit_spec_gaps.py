@@ -3,7 +3,7 @@
 # File     : vlsit_spec_gaps.py
 # Function : read a spec written in the VLSIT ASIC IP template, list what is missing for RTL
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Find the gaps of a VLSIT-template specification before RTL is written.
 

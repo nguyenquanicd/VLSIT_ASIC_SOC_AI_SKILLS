@@ -3,7 +3,7 @@
 # File     : vlsit_soc_checks.py
 # Function : tie, pulse and destination-limit checks on the top connection model
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Run the tie, pulse or limit check on rtl.json (rule R-023, R-024, R-025).
 

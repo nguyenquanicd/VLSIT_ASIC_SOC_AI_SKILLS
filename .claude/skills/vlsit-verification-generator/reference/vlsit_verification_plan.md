@@ -8,7 +8,7 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read thi
 
 ## 1. Why a vplan
 
-A test list answers "what do we run?" A vplan answers "what must be true, how do we know, and what evidence proves it?" A test list can look complete while a requirement is untested; a vplan shows the gap.
+A testlist answers "what do we run?" A vplan answers "what must be true, how do we know, and what evidence proves it?" A testlist can look complete while a requirement is untested; a vplan shows the gap.
 
 The vplan is the single source of truth for scope, traceability, coverage commitments and evidence links. It is approved at gate G0 and updated at every later gate.
 

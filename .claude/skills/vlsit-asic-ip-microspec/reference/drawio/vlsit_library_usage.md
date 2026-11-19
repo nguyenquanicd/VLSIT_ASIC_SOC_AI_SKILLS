@@ -7,7 +7,7 @@ Terminology: Register-Transfer Level (RTL); JavaScript Object Notation (JSON). S
 The sole symbol source is [VLSIT_DRAWIO_LIB_V1.drawio.xml](VLSIT_DRAWIO_LIB_V1.drawio.xml). The bundled file is an exact copy of the user-supplied library, not a generated substitute.
 
 - Format: mxlibrary XML containing a JSON array of 39 templates.
-- Snapshot SHA-256: D1631ACF98A920526B235E8970FEDDC9305EA2F0D6A35C6529CD220D62AFABB6.
+- Snapshot SHA-256: 15DFB183E267D2A94F8CAB316E01EB3D2E9D2F9C006DC816790A394F4123506C.
 - Entries have no titles. Identify them by zero-based JSON array index and actual decoded cells; do not reorder the library.
 - This file defines symbol appearance, not RTL behavior. Placeholder labels such as COM, STATE, Description, and enable ? are not evidence about the analyzed design.
 

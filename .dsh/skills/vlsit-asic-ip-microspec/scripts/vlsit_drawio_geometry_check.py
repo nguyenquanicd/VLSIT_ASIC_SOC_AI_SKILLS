@@ -3,7 +3,7 @@
 # File     : vlsit_drawio_geometry_check.py
 # Function : review the geometry of a generated multi-page draw.io file without rendering it
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Geometric review of a generated multi-page .drawio file (no rendering needed).
 

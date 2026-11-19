@@ -3,7 +3,7 @@
 # File     : vlsit_has_extract.py
 # Function : extract the address, IO, interrupt and bus maps from the HAS Markdown
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Extract the system facts of the HAS and list its gaps (rule R-010, R-011, R-026).
 

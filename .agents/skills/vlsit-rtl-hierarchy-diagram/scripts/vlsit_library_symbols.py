@@ -25,7 +25,7 @@ EDITABLE = {
     'labelPosition', 'verticalLabelPosition', 'spacing', 'spacingTop',
     'spacingBottom', 'spacingLeft', 'spacingRight', 'entryX', 'entryY',
     'entryDx', 'entryDy', 'exitX', 'exitY', 'exitDx', 'exitDy',
-    'entryPerimeter', 'exitPerimeter', 'jumpStyle', 'jumpSize',
+    'entryPerimeter', 'exitPerimeter', 'jumpStyle', 'jumpSize', 'labelBackgroundColor',
 }
 BLACK = {'black', '#000000', '#000'}
 WHITE = {'white', '#ffffff', '#fff'}

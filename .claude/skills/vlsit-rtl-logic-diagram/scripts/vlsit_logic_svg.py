@@ -3,7 +3,7 @@
 # File     : vlsit_logic_svg.py
 # Function : draw every logic page as a standalone SVG with real gate shapes
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Render layout.json to one SVG per cluster page (rule R-019, R-022).
 

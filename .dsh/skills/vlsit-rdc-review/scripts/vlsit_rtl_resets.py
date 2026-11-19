@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_resets.py
 # Function : build the reset model of an RTL design (domains, flops, chains)
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Read the RTL alone and report every reset, the flops it resets and the flop chains (rule R-010).
 

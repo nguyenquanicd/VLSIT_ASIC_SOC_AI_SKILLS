@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Function: Run lint and self-checking tests on baseline and modified RTL and check the expected before/after outcome.
 # Author: VLSI Technology
-# GitHub: https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub: https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 """Verification helper for a minimal RTL change (RSC-230..236).
 
 Purpose : (1) detect which lint and simulation tools are installed, (2) lint the RTL and report only the

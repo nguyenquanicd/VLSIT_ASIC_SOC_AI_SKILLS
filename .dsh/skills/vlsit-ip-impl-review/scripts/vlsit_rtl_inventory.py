@@ -3,7 +3,7 @@
 # File     : vlsit_rtl_inventory.py
 # Function : list modules, ports, parameters, FSM states and instances of a SystemVerilog RTL set
 # Author   : VLSI Technology
-# GitHub   : https://github.com/nguyenquanicd/VLSIT_CODEX_CLAUDE_SKILLS
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
 # ---------------------------------------------------------------------------
 """Inventory an RTL source set with file and line for every element.
 
