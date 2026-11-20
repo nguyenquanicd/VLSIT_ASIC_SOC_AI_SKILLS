@@ -37,6 +37,14 @@ One row per feature. The method follows R-240 and `vlsit_verification_strategy.m
 |---|---|---|---|---|
 | <feature> | <REQ-...; PROTO-...> | <high/medium/low> | <formal / simulation / formal+simulation / emulation / review> | <one line> |
 
+### 3.1 Function inventory and functional verification matrix (R-246)
+
+Paste the function-to-test table of `<python> scripts/vlsit_verify_plan.py matrix sim/docs/00_plan/vplan.csv` here. It shows, for each feature and function, the combined tests and the single-function tests that exercise it, and the function that has no combined test (with its `combine_na` reason). The test-to-function table is in section 6.1a.
+
+| Function | Combined tests | Single-function tests | Status |
+|---|---|---|---|
+| <function> | <t_...> | <t_...> | <combined covered / no combination: reason / NO COMBINED TEST> |
+
 ## 4. Failure-mode list (R-242)
 
 Ask for each feature how it can fail. Every row maps to a vplan obligation or to a reasoned not-applicable entry.
@@ -86,7 +94,7 @@ Workspace: `sim/` as in `vlsit_sim_workspace.md`. Tools: <simulator and version,
 
 ### 6.1 Test list
 
-One row per test. A combined test names every function it exercises; every test runs with all checkers of section 5.3.
+One row per test, in the order of the matrix of section 6.1a (the test with the most combined functions first). A combined test names every function it combines and describes the interaction it checks (R-247), in the same words as the vplan `combines` and `interaction` columns; every test runs with all checkers of section 5.3.
 
 | Test ID | Type | Purpose: what the test proves | Functions / requirements | Scenario outline | Stimulus and constraints (source) | Failure modes | Expected bins | Method | Tier | Priority |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -94,11 +102,11 @@ One row per test. A combined test names every function it exercises; every test 
 
 ### 6.1a Functional verification matrix (R-246)
 
-Paste the output of `<python> scripts/vlsit_verify_plan.py matrix sim/docs/00_plan/vplan.csv` here (or link `sim/docs/00_plan/functional_matrix.md`). Combined tests run first; a function with no combined test has a `combine_na=<reason>` note in the vplan.
+Paste the output of `<python> scripts/vlsit_verify_plan.py matrix sim/docs/00_plan/vplan.csv` here (or link `sim/docs/00_plan/functional_matrix.md`). The test with the most functions runs first; a function with no combined test has a `combine_na=<reason>` note in the vplan.
 
-| Test | Kind | Test type | Priority | Functions exercised | Count | Requirements |
-|---|---|---|---|---|---:|---|
-| <t_...> | <combined / single> | <test type> | <priority> | <function; function> | <n> | <REQ-...> |
+| Order | Test | Kind | Test type | Priority | Functions exercised | Count | Interaction checked | Requirements |
+|---:|---|---|---|---|---|---:|---|---|
+| <1, 2, ...> | <t_...> | <combined / single> | <test type> | <priority> | <function; function> | <n> | <interaction checked> | <REQ-...> |
 
 | Function | Combined tests | Single-function tests | Status |
 |---|---|---|---|

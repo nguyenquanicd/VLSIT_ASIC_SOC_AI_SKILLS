@@ -20,7 +20,8 @@ tests:
     testbench: vip_apb_master
     test: apb_write_0wait
     test_type: directed
-    combines: []
+    combines: []          # combined tests list every function, as in the vplan combines field (R-247)
+    interaction: ""       # combined tests: the interaction checked (R-247)
     seed: 1
     timeout_s: 60
     tier: smoke

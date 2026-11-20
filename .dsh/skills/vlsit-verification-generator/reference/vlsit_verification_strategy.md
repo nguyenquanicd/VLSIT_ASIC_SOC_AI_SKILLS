@@ -39,7 +39,7 @@ Each step names its output; a step starts only when the previous output exists.
 | 6 | Design the environment architecture; reuse VIPs first | Environment section of the plan document | G1 |
 | 7 | Build and qualify the oracles: model, scoreboard, assertions | Qualification records with known answers and injected faults | G2 or G3 |
 | 8 | Run formal on the formal obligations: proofs, covers, unreachability | Proof results, cover traces, unreachable bins for exclusion review | — |
-| 9 | Build the stimulus: smoke, combined first (R-246), directed, constrained random, fault injection | Tests, testlist, generators, functional verification matrix | — |
+| 9 | Build the stimulus: smoke, widest combined tests first (R-246, R-247), directed, constrained random, fault injection | Tests, testlist, generators, functional verification matrix | — |
 | 10 | Run the regression under the resource budget | Evidence bundles per run | — |
 | 11 | Triage every failure; fix; re-run | Triage records, bug and fix records | — |
 | 12 | Close the gaps: coverage holes, mutants that survive, vacuous assertions | Gap log, new tests or reviewed exclusions | G5 |

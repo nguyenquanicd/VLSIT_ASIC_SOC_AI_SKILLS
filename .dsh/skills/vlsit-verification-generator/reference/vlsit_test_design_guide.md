@@ -14,6 +14,7 @@ Rules for a combined test:
 
 - Combine only functions that the specification allows to run concurrently.
 - Name every function in the vplan `combines` field and in the testlist `combines` list.
+- Describe the combination (R-247): the vplan `combines` field names every function and the `interaction` field states which functions run together, the shared resource or state, and the failure the combination can expose; the test plan, the testlist and the report repeat the same function list.
 - Keep one checker per function and one checker for the interaction.
 - If the test fails, the report must say which function or interaction failed, so the combined test keeps debug resolution.
 - Do not combine functions whose concurrent use the specification forbids. That would test an illegal state, not the design.
@@ -28,7 +29,7 @@ Record which functions every test combines in the functional verification matrix
 <python> "<skill folder>/scripts/vlsit_verify_plan.py" matrix sim/docs/00_plan/vplan.csv --output sim/docs/00_plan/functional_matrix.md --force
 ```
 
-The first table has one row per test (combined tests first) with the functions it exercises and their requirements. The second table has one row per function with its combined tests and its single-function tests; the status `NO COMBINED TEST` means the function is only tested alone. Fix it with a combined test, or write `combine_na=<reason>` in the `notes` of the vplan row when no legal combination exists (for example, the specification forbids concurrent use). Order the testlist so that the combined tests run first; keep single-function directed tests for bring-up, for debug resolution and for the functions that have no legal combination.
+The first table has one row per test with an order number (combined tests first, the test with the most functions first), the functions it exercises, the interaction it checks and its requirements. The second table has one row per function with its combined tests and its single-function tests; the status `NO COMBINED TEST` means the function is only tested alone. Fix it with a combined test, or write `combine_na=<reason>` in the `notes` of the vplan row when no legal combination exists (for example, the specification forbids concurrent use). Order the testlist as the matrix: the test that combines the most functions runs first, then the other combined tests; keep single-function directed tests for bring-up, for debug resolution and for the functions that have no legal combination.
 
 ## 2. Constrained-random stimulus (R-251)
 

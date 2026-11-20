@@ -15,7 +15,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from vlsit_verify_closure import assess, canonical, digest, DIMENSIONS, QUAL_EXPECTED
-from vlsit_verify_plan import REQUIRED_COLUMNS, check_plan, plan_stats, matrix_findings, matrix_text
+from vlsit_verify_plan import REQUIRED_COLUMNS, check_plan, plan_stats, matrix_findings, matrix_text, matrix_order, matrix_model
 
 
 class ClosureTests(unittest.TestCase):
@@ -345,5 +345,31 @@ class FunctionalMatrixTests(unittest.TestCase):
         messages=[m for _l,_n,m in matrix_findings(rows)]
         self.assertFalse(any("'read'" in m for m in messages))
         self.assertTrue(any("'ghost'" in m for m in messages))
+
+    def test_widest_combined_test_comes_first_and_interaction_is_listed(self):
+        rows=[self.row('a','t_two','combined','a+b'),self.row('a','t_three','combined','a+b+c'),self.row('a','t_one')]
+        rows[1]['interaction']='shared buffer'
+        names=[n for n,_r in matrix_order(matrix_model(rows)[0])]
+        self.assertEqual(names,['t_three','t_two','t_one'])
+        self.assertIn('| 1 | t_three | combined |',matrix_text(rows))
+        self.assertIn('shared buffer',matrix_text(rows))
+    def test_combined_test_needs_an_interaction_description(self):
+        base=Path(tempfile.mkdtemp())
+        cols=REQUIRED_COLUMNS+['test_type','combines','interaction']
+        def run(interaction):
+            row={c:'x' for c in cols}
+            row.update(req_id='R1',level='block',priority='high',status='planned',evidence='',test='t_c',test_type='combined',combines='a+b',interaction=interaction,coverage_bin='cg_c',checker='chk')
+            plan=base/'v.csv'
+            with open(plan,'w',encoding='utf-8',newline='') as h:
+                w=csv.DictWriter(h,fieldnames=cols);w.writeheader();w.writerow(row)
+            (base/'s.txt').write_text('R1'+chr(10),encoding='utf-8')
+            out=io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code=check_plan(plan,None,str(base/'s.txt'),None,datetime.date(2026,11,20))
+            return code,out.getvalue()
+        code,text=run('')
+        self.assertEqual(code,1);self.assertIn('R-247',text)
+        code,text=run('write and error share the response register')
+        self.assertNotIn('R-247',text)
 
 if __name__=='__main__':unittest.main()

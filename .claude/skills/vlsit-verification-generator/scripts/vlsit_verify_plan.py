@@ -12,8 +12,8 @@ Actions:
           and waiver fields of a vplan CSV.
   export  write the plan as a Markdown table or JSON.
   matrix  write the functional verification matrix (R-246): per test the
-          functions it exercises, per function the tests that exercise it,
-          combined tests first.
+          functions it exercises, per function the tests that exercise it;
+          the widest combined test first (order number per test).
   stats   print inventory/status counts; never grants measured closure.
 
 Standard library only (Python 3.8 or later). Exit codes: 0 success, 1 findings,
@@ -32,7 +32,7 @@ REQUIRED_COLUMNS = [
     "req_id", "level", "feature", "scenario", "stimulus", "checker",
     "coverage_bin", "test", "priority", "status", "evidence", "owner",
 ]
-OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "method", "failure_mode", "notes", "obligation_id", "configuration", "dimension"]
+OPTIONAL_COLUMNS = ["assertion", "test_type", "combines", "interaction", "method", "failure_mode", "notes", "obligation_id", "configuration", "dimension"]
 ALLOWED_LEVELS = {"component", "vip", "block", "soc"}
 ALLOWED_PRIORITIES = {"high", "medium", "low"}
 ALLOWED_STATUSES = {"planned", "implemented", "passing", "failing", "blocked", "waived"}
@@ -167,6 +167,8 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
             functions = {item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()}
             if len(functions) < 2:
                 add("ERROR", line, "combined test must name at least two functions in combines")
+            if "interaction" in columns and not row.get("interaction"):
+                add("ERROR", line, "combined test has an empty interaction; describe the functions that run together, the shared resource or state and the failure it can expose (R-247)")
 
         method = row.get("method", "")
         if "method" in columns and not method:
@@ -250,6 +252,8 @@ def check_plan(path, evidence_root, spec_index, scan_root, today):
             if missing.startswith("a_"):
                 add("WARN", "-", "assertion '%s' appears in source but not in the vplan" % missing)
 
+    if "interaction" not in columns and any(row.get("test_type") == "combined" for row in rows):
+        add("WARN", "-", "the vplan has combined tests but no interaction column; add it and describe every combined test (R-247)")
     for level, line, message in matrix_findings(rows):
         add(level, line, message)
 
@@ -278,7 +282,7 @@ def matrix_model(rows):
 
     for row in rows:
         feature = row.get("feature", "").strip()
-        combined = row.get("test_type", "") == "combined"
+        combined = row.get("test_type", "") == "combined" or bool(row.get("combines", "").strip())
         extra = [item.strip() for item in re.split(r"[+;]", row.get("combines", "")) if item.strip()]
         names = []
         for name in ([feature] if feature else []) + extra:
@@ -288,7 +292,9 @@ def matrix_model(rows):
         if feature and reason:
             function(feature)["na"] = reason.group(1).strip()
         for test in split_ids(row.get("test", "")):
-            record = tests.setdefault(test, {"type": set(), "priority": set(), "functions": [], "reqs": [], "combined": False})
+            record = tests.setdefault(test, {"type": set(), "priority": set(), "functions": [], "reqs": [], "combined": False, "interaction": ""})
+            if row.get("interaction") and not record["interaction"]:
+                record["interaction"] = row["interaction"]
             record["type"].add(row.get("test_type", "") or "-")
             record["priority"].add(row.get("priority", "") or "-")
             if row.get("req_id") and row["req_id"] not in record["reqs"]:
@@ -323,16 +329,24 @@ def matrix_findings(rows):
     return findings
 
 
+def matrix_order(tests):
+    """Order of work: combined tests first, the one with the most functions first, then priority, then ID."""
+    rank = {"high": 0, "medium": 1, "low": 2}
+    return sorted(tests.items(), key=lambda item: (not item[1]["combined"], -len(item[1]["functions"]),
+                                                   rank.get(sorted(item[1]["priority"])[0], 3), item[0]))
+
+
 def matrix_text(rows):
     tests, functions = matrix_model(rows)
-    order = sorted(tests.items(), key=lambda item: (not item[1]["combined"], {"high": 0, "medium": 1, "low": 2}.get(sorted(item[1]["priority"])[0], 3), item[0]))
     lines = ["## Test to function matrix", "",
-             "| Test | Kind | Test type | Priority | Functions exercised | Count | Requirements |",
-             "|---|---|---|---|---|---:|---|"]
-    for test, record in order:
-        lines.append("| %s | %s | %s | %s | %s | %d | %s |" % (
-            test, "combined" if record["combined"] else "single", ", ".join(sorted(record["type"])),
-            ", ".join(sorted(record["priority"])), "; ".join(record["functions"]), len(record["functions"]), "; ".join(record["reqs"])))
+             "Order: combined tests first, the test with the most functions first (R-246).", "",
+             "| Order | Test | Kind | Test type | Priority | Functions exercised | Count | Interaction checked | Requirements |",
+             "|---:|---|---|---|---|---|---:|---|---|"]
+    for number, (test, record) in enumerate(matrix_order(tests), 1):
+        lines.append("| %d | %s | %s | %s | %s | %s | %d | %s | %s |" % (
+            number, test, "combined" if record["combined"] else "single", ", ".join(sorted(record["type"])),
+            ", ".join(sorted(record["priority"])), "; ".join(record["functions"]), len(record["functions"]),
+            record["interaction"].replace("|", "/") or "-", "; ".join(record["reqs"])))
     lines += ["", "## Function to test matrix", "",
               "| Function | Combined tests | Single-function tests | Status |", "|---|---|---|---|"]
     for record in functions.values():

@@ -340,7 +340,7 @@ MUST complete SoC sign-off and define the post-silicon correlation plan.
 ## Test design and reporting rules (R-250–R-259)
 
 ### R-250 Combined-function tests
-MUST select legal combined-function scenarios where shared resources, timing or state create relevant interaction risk, preserving per-function and interaction checkers. Do not require every possible feature combination; R-246 records the combinations in the functional verification matrix and fixes their priority.
+MUST select legal combined-function scenarios where shared resources, timing or state create relevant interaction risk, preserving per-function and interaction checkers. Do not require every possible feature combination; R-246 records the combinations in the functional verification matrix and fixes their priority, and R-247 requires the description of each combined test.
 - Why: purposeful combinations expose interaction defects while controlling run count and debug cost.
 - Check: each selected combination names distinct functions and its interaction rationale.
 
@@ -525,7 +525,7 @@ MUST apply data classification, model-version pinning, license review and prompt
 - Why: unclassified data, a silently upgraded model and an injected instruction can each invalidate the result or leak the design.
 - Check: the AI governance checklist is part of the run record and names the data class, model version, license decision and prompt-injection review.
 
-## Verification strategy rules (R-240–R-246)
+## Verification strategy rules (R-240–R-247)
 
 These rules fix the order and the method of the work. The principles behind them and the ordered workflow are explained in `reference/vlsit_verification_strategy.md`.
 
@@ -560,10 +560,15 @@ MUST write the verification plan document from `reference/templates/vlsit_verifi
 - Check: manual - every test and obligation in the document exists in the vplan and the reverse, and gate G0 records the approval of both.
 
 ### R-246 Functional verification matrix
-MUST record in the plan document a functional verification matrix, generated from the vplan with `scripts/vlsit_verify_plan.py matrix`, that lists for every test the features and functions it exercises (the feature of its row and every function in `combines`) with their requirements, and for every feature and function the combined tests and the single-function tests that exercise it.
-- Priority: combined tests come first. For each group of functions with interaction risk (R-250) the combined test is planned, scheduled and run before the single-function tests of the same functions, and a function keeps a dedicated single-function test only for bring-up, debug resolution, a concurrent use that the specification forbids, or a function with no legal combination; a function without any combined test records `combine_na=<reason>` in the `notes` of its vplan row.
-- Why: a reviewer can see from one table which functions each test combines and which functions are only ever tested alone, and running the combined tests first finds interaction defects while the single-function tests still isolate them.
-- Check: `scripts/vlsit_verify_plan.py matrix` writes both tables and `check` reports no `WARN` of R-246, or each warned function has its reason; manual - the matrix in the plan document equals the generated one and every combined test appears before the single-function tests of its functions in the testlist order.
+MUST record a functional verification matrix, generated from the vplan with `scripts/vlsit_verify_plan.py matrix`, in the verification plan document (the function inventory of section 3 and the test plan of section 6) and in the verification report; it lists for every test the features and functions it exercises (the feature of its row and every function in `combines`) with their requirements, and for every feature and function the combined tests and the single-function tests that exercise it.
+- Priority: a test that combines more functions is written, scheduled and run first. The matrix gives each test an order number: combined tests before single-function tests, and among combined tests the one with the most functions first; a function keeps a dedicated single-function test only for bring-up, debug resolution, a concurrent use that the specification forbids, or a function with no legal combination, and a function without any combined test records `combine_na=<reason>` in the `notes` of its vplan row.
+- Why: a reviewer can see from one table which functions each test combines and which functions are only ever tested alone, and running the widest combinations first finds interaction defects early while the single-function tests still isolate them.
+- Check: `scripts/vlsit_verify_plan.py matrix` writes both tables and `check` reports no `WARN` of R-246, or each warned function has its reason; manual - the matrix in the plan document and in the report equals the generated one, and the testlist runs the tests in the matrix order.
+
+### R-247 Combined-test description
+MUST describe every combined test with the exact functions it combines and the interaction it checks: the vplan row names every function in `combines` and states the interaction in `interaction` (which functions run together, the shared resource, timing or state that couples them, and the failure the combination can expose), and the test-plan row, the testlist entry and the report row repeat the same function list.
+- Why: a combined test whose functions are not named cannot be reviewed for completeness or debugged, because a failure cannot be traced to one function or to their interaction.
+- Check: `scripts/vlsit_verify_plan.py check` reports an `ERROR` for a combined row with an empty `interaction` and a `WARN` for a vplan without the column; manual - the function list is identical in the vplan, the test plan, the testlist and the report.
 
 ## Scalable verification rules (R-260–R-280)
 

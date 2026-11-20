@@ -82,11 +82,19 @@ One row per test run. A test with several seeds has one row per seed. Status is 
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | <t_...> | <one sentence> | <function+function; REQ-...> | <test_type> | <seed> | <pass / fail / error / timeout / not_run / blocked> | <short cause and FA-ID, or "-"> | <n>/<n> | <ev_...> | <name, or agent+model> | <agree / disagree / needs-info> | <comment> / <response> |
 
+### 4.0 Functional verification matrix (R-246)
+
+Paste the output of `<python> scripts/vlsit_verify_plan.py matrix sim/docs/00_plan/vplan.csv` (both tables). It must equal the matrix of the verification plan.
+
+| Order | Test | Kind | Functions exercised | Interaction checked | Result |
+|---:|---|---|---|---|---|
+| <1, 2, ...> | <t_...> | <combined / single> | <function; function> | <interaction> | <pass/fail> |
+
 ### 4.1 Combined tests
 
-| Test ID | Functions combined | Interaction checked | Result |
+| Test ID | Functions combined (as in the vplan) | Interaction checked (R-247) | Result |
 |---|---|---|---|
-| <t_...> | <function+function> | <shared resource or state> | <pass/fail> |
+| <t_...> | <function+function> | <shared resource or state, failure it can expose> | <pass/fail> |
 
 ### 4.2 Fault-injection tests
 

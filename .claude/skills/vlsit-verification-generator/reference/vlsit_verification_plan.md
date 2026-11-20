@@ -46,6 +46,7 @@ The machine-readable plan is a UTF-8 CSV file with a header row. The readable pl
 | `test` | Test ID or IDs that implement the scenario | Yes | `t_...`; several IDs separated by `;` |
 | `test_type` | Kind of test | Yes for new plans | `directed`, `constrained_random`, `combined`, `fault_injection`, `formal`, `stress`, `use_case`, `boot`, `compliance`, `regression` |
 | `combines` | Functions combined in one test | Yes when `test_type` is `combined` | At least two function names separated by `+` or `;` |
+| `interaction` | The interaction a combined test checks (R-247) | Yes when `test_type` is `combined` | Which functions run together, the shared resource, timing or state, and the failure the combination can expose; empty is an `ERROR` for a combined row |
 | `method` | Verification method of the obligation (R-240) | Yes for new plans | `formal`, `simulation`, `formal+simulation`, `emulation`, `review` |
 | `failure_mode` | Failure-mode IDs from the plan document that the row covers (R-242) | Yes for new plans when the row covers a failure mode | `FM-...`; several IDs separated by `;` |
 | `priority` | Planning priority | Yes | `high`, `medium`, `low` |
@@ -96,7 +97,8 @@ REQ-SOC-001,soc,Boot,Boot from ROM and enumerate peripherals,CPU reset; fetch bo
 8. **Evidence:** every `passing` row has an evidence ID, and the bundle exists under `--evidence-root` when that option is given.
 9. **Waivers:** every `waived` row has all four waiver fields and a future expiry.
 10. **Duplicates:** the same test ID is not used twice for the same requirement.
-14. **Functional verification matrix (R-246):** a `combines` item that is not the feature of any row is a `WARN`, and so is a function that has no combined test and no `combine_na=<reason>` in `notes`.
+14. **Functional verification matrix (R-246, R-247):** a combined row with an empty `interaction` is an `ERROR` (a vplan without the column gets a `WARN`).
+15. **Functional verification matrix (R-246):** a `combines` item that is not the feature of any row is a `WARN`, and so is a function that has no combined test and no `combine_na=<reason>` in `notes`.
 11. **Orphans:** with `--scan-root`, identifiers of the form `t_...`, `cg_...` and `a_...` found in source files are compared with the plan; an identifier missing from the plan is a `WARN`.
 12. **Inventory completeness:** --spec-index is mandatory and includes protocol clauses. Unknown IDs and inventory IDs absent from the plan are errors.
 13. **Reverse implementation links:** with --scan-root, plan IDs not found in sources are warnings; review generated/runtime IDs explicitly.
