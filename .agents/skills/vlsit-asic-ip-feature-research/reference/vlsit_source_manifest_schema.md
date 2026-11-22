@@ -20,6 +20,14 @@ Example for a paper; use `--category datasheet` and `--family-key vendor_product
 
 For a datasheet, provide `--family-key` and `--publisher`; peer-review status is not applicable (`na`). For a user-provided authorized document, use `--access-basis user-authorized` with `register` instead of attempting a credentialed download.
 
+## List the documents the user supplied
+
+Read-only: lists every `.pdf`, `.docx`, `.doc`, `.html`, `.htm`, `.md`, `.txt` and `.epub` file below the folder with its size and SHA-256, and with `--bundle` whether a file with the same hash is already registered. It copies nothing and writes nothing.
+
+```powershell
+<python> "<skill folder>\scripts\vlsit_asic_ip_feature_research.py" inventory "<folder of user documents>" --bundle "<research directory>"
+```
+
 ## Register a user-provided document
 
 ```powershell

@@ -14,9 +14,9 @@
 
 ## Input / Đầu vào
 
-**EN** — Target ASIC IP or SoC, feature/function or architecture question, application context and a user-supplied output directory. Users may provide documents they are authorized to use. The skill asks for missing scope details.
+**EN** — Target ASIC IP or SoC, feature/function or architecture question, application context and a user-supplied output directory. Users may provide documents they are authorized to use; the skill asks whether to start from the user documents (recommended), search for everything, or use the user documents only, registers the user documents first, and proposes a supplementary search only for the measured shortfall. The skill asks for missing scope details.
 
-**VI** — IP ASIC hoặc SoC mục tiêu, câu hỏi về feature/function hay kiến trúc, ngữ cảnh ứng dụng và thư mục đầu ra do người dùng cung cấp. Người dùng có thể đưa tài liệu mà họ có quyền sử dụng. Skill sẽ hỏi nếu thiếu thông tin phạm vi.
+**VI** — IP ASIC hoặc SoC mục tiêu, câu hỏi về feature/function hay kiến trúc, ngữ cảnh ứng dụng và thư mục đầu ra do người dùng cung cấp. Người dùng có thể đưa tài liệu mà họ có quyền sử dụng; skill hỏi chọn chế độ nguồn: bắt đầu từ tài liệu của người dùng (khuyến nghị), tìm kiếm toàn bộ, hoặc chỉ dùng tài liệu của người dùng, đăng ký tài liệu của người dùng trước, và chỉ đề xuất tìm kiếm bổ sung cho phần còn thiếu đã đo được. Skill sẽ hỏi nếu thiếu thông tin phạm vi.
 
 ## Output / Đầu ra
 

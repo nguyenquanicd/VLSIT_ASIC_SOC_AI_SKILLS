@@ -12,6 +12,7 @@ Actions:
   init      create a manifest and source directory without replacing files
   download  download one user-approved, directly accessible document
   register  copy one user-approved local document into the source bundle
+  inventory list the documents in a user folder (read-only) and whether they are registered
   check     audit qualifying counts, unique keys, file presence and hashes
 
 Acquisition timestamps use Coordinated Universal Time (UTC).
@@ -333,12 +334,43 @@ def action_check(args):
     products = len(product_families)
     papers = len(paper_keys)
     if products < MINIMUM or papers < MINIMUM:
-        print("INCOMPLETE: datasheets=%d/%d papers=%d/%d duplicate_file_hashes=%d" %
-              (products, MINIMUM, papers, MINIMUM, duplicate_hashes))
+        print("INCOMPLETE: datasheets=%d/%d papers=%d/%d duplicate_file_hashes=%d missing_datasheets=%d missing_papers=%d" %
+              (products, MINIMUM, papers, MINIMUM, duplicate_hashes,
+               max(0, MINIMUM - products), max(0, MINIMUM - papers)))
         return 4
     print("READY: datasheets=%d papers=%d duplicate_file_hashes=%d" %
           (products, papers, duplicate_hashes))
     print("LIMIT: source quality, relevance, legal rights and report claims require manual review")
+    return 0
+
+
+DOCUMENT_SUFFIXES = {".pdf", ".docx", ".doc", ".html", ".htm", ".md", ".txt", ".epub"}
+INVENTORY_LIMIT = 500
+
+
+def action_inventory(args):
+    """Read-only list of the candidate documents of a user folder; copies and writes nothing."""
+    folder = Path(args.folder)
+    if not folder.is_dir():
+        return say_error("folder not found: %s" % folder)
+    registered = set()
+    if args.bundle:
+        _root, manifest = manifest_path(args.bundle)
+        if manifest.is_file():
+            try:
+                registered = {row.get("sha256", "").lower() for row in read_manifest(manifest)}
+            except (OSError, ValueError, csv.Error) as exc:
+                return say_error(str(exc))
+    files = sorted(p for p in folder.rglob("*") if p.is_file() and p.suffix.lower() in DOCUMENT_SUFFIXES)
+    print("path | size_bytes | sha256 | registered")
+    for path in files[:INVENTORY_LIMIT]:
+        digest = sha256_file(path)
+        print("%s | %d | %s | %s" % (path.relative_to(folder).as_posix(), path.stat().st_size, digest,
+                                     "yes" if digest.lower() in registered else "no"))
+    if len(files) > INVENTORY_LIMIT:
+        print("... %d more file(s) not listed" % (len(files) - INVENTORY_LIMIT))
+    pending = sum(1 for p in files[:INVENTORY_LIMIT] if sha256_file(p).lower() not in registered)
+    print("INVENTORY: files=%d not_registered=%d (read-only; nothing was copied or written)" % (len(files), pending))
     return 0
 
 
@@ -375,11 +407,15 @@ def main():
     register = sub.add_parser("register", help="copy one authorized local source file")
     add_source_fields(register)
     register.add_argument("--file", required=True)
+    inventory = sub.add_parser("inventory", help="list the documents of a user folder (read-only)")
+    inventory.add_argument("folder", help="folder with the documents the user supplied")
+    inventory.add_argument("--bundle", help="research directory whose manifest marks the registered files")
     check = sub.add_parser("check", help="audit source thresholds and file integrity")
     check.add_argument("directory")
     args = parser.parse_args()
     return {"init": action_init, "download": action_download,
-            "register": action_register, "check": action_check}[args.action](args)
+            "register": action_register, "inventory": action_inventory,
+            "check": action_check}[args.action](args)
 
 
 if __name__ == "__main__":

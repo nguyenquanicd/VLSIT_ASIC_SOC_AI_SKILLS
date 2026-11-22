@@ -24,15 +24,27 @@ Before any script, locate Python 3.8 or later using `scripts/vlsit_find_python.p
 
 Identify the target IP or SoC, the feature/function or architecture question, intended applications and users, relevant product/market scope, technology or interface constraints, and desired depth. Ask concise questions for material gaps; do not silently choose an ambiguous expansion such as Neural Processing Unit versus Network Processing Unit. The user must supply an absolute or workspace-relative research output directory. Ask for it if absent. Preserve existing files and keep all acquired materials inside the chosen research directory.
 
-### 4. Freeze the search protocol
+### 4. Choose the source mode and freeze the protocol
 
-Read [reference/vlsit_source_qualification.md](reference/vlsit_source_qualification.md) and [reference/vlsit_research_method.md](reference/vlsit_research_method.md). Record the research question, inclusion/exclusion criteria, search engines/catalogs, exact queries, search date, time range, language, product families, and how sources will be deduplicated before counting. Search primary sources for product documents and reputable peer-reviewed venues for papers. Keep other source types as context only; they do not satisfy the minimum counts.
+Ask how the sources are obtained (R-026), in the question format of the house rules: options with their advantages and disadvantages, a recommendation and an open choice.
 
-### 5. Find, qualify and approve source candidates
+| Option | What happens | Advantage | Disadvantage |
+|---|---|---|---|
+| A. My documents first, search only for the gap (recommended) | You give a folder or list of documents; the skill registers and qualifies them, reports what is still missing, and only then proposes a supplementary search | Uses what you already have and are authorized to use; the search is limited to the shortfall | You must collect the documents first |
+| B. Search for everything | The skill finds all candidates and asks approval per batch | No preparation by you | Misses documents you hold; more candidates to review |
+| C. My documents only, no search | The skill analyses only what you provide | No network use; full control of the corpus | Likely `INCOMPLETE` if the thresholds are not met |
 
-Find at least ten distinct, eligible datasheets/databooks covering distinct product families and at least ten distinct, relevant, full-text peer-reviewed scientific papers. The user may also provide documents they are authorized to use. Check publisher, venue, review status, relevance, revision/date, full-text availability, legal access basis and duplicate relationships. Do not count abstracts, search snippets, vendor marketing pages, duplicate editions, or an inaccessible paper as a full-text paper.
+Read [reference/vlsit_source_qualification.md](reference/vlsit_source_qualification.md) and [reference/vlsit_research_method.md](reference/vlsit_research_method.md). Record the research question, inclusion/exclusion criteria, search engines/catalogs, exact queries, search date, time range, language, product families, and how sources will be deduplicated before counting. In option A, freeze the criteria before assessing the user documents and freeze the queries only when the supplementary search is proposed; in option C record that no search was performed. Search primary sources for product documents and reputable peer-reviewed venues for papers. Keep other source types as context only; they do not satisfy the minimum counts.
 
-Before downloading a batch, show a compact candidate list with title, publisher/venue, date, direct source link, access basis, estimated file size when known, license/copyright notice and intended local filename. Ask the user to approve that batch. Never sign in, evade a paywall, defeat a download restriction, or infer that public visibility grants redistribution rights. Then use `vlsit_asic_ip_feature_research.py` to initialize the evidence directory and record approved downloads or user-provided files. Read [reference/vlsit_license_and_patent_review.md](reference/vlsit_license_and_patent_review.md) for the distinctions and evidence required.
+### 5. Register user documents, then find and approve what is missing
+
+**5a. User documents first (options A and C).** Ask for the folder or the list of documents. Run `inventory` on the folder (read-only: path, size, SHA-256, whether already registered), classify each file as a datasheet/databook or a paper, and ask the user for the missing facts of each (product-family key, publisher or venue, year, peer-review status, licence notice). Register each document with `register --access-basis user-authorized` (the user confirms they are authorized to use it), qualify it by the criteria below, and run `check` to get the counts. Report the achieved and missing counts, the product families and topics that are still thin, and the documents that do not qualify with the reason.
+
+**5b. Supplementary search (option A, or B from the start).** When a threshold or a topic is short, say exactly what is missing and propose the search (queries, catalogs, number of candidates to find) as a separate question: search, or stay with the user documents and label the study `INCOMPLETE`. Search only after the user answers yes. Candidates the user already supplied are not proposed again.
+
+**5c. Candidate rules (all options).** Find at least ten distinct, eligible datasheets/databooks covering distinct product families and at least ten distinct, relevant, full-text peer-reviewed scientific papers. Check publisher, venue, review status, relevance, revision/date, full-text availability, legal access basis and duplicate relationships. Do not count abstracts, search snippets, vendor marketing pages, duplicate editions, or an inaccessible paper as a full-text paper.
+
+Before downloading a batch (user-supplied files need no download), show a compact candidate list with title, publisher/venue, date, direct source link, access basis, estimated file size when known, license/copyright notice and intended local filename. Ask the user to approve that batch. Never sign in, evade a paywall, defeat a download restriction, or infer that public visibility grants redistribution rights. Then use `vlsit_asic_ip_feature_research.py` to initialize the evidence directory and record approved downloads or user-provided files. Read [reference/vlsit_license_and_patent_review.md](reference/vlsit_license_and_patent_review.md) for the distinctions and evidence required.
 
 If either minimum cannot be met, continue only if useful, label the work `INCOMPLETE`, show the achieved and missing counts, and do not present its prevalence or recommendation as meeting the agreed evidence threshold. Do not manufacture sources or lower the threshold silently.
 
@@ -70,7 +82,7 @@ Use `/` in the path on Linux/macOS. A complete evidence gate exits 0 and reports
 
 ### 11. Verify against the rules
 
-Check the report and bundle against every rule ID in [rule.md](rule.md). Distinguish script checks from manual judgments. Report the status (`READY` or `INCOMPLETE`), actual qualifying source counts, saved artifact paths, search date, key limits, and anything not verified. Never claim a legal clearance or market-wide prevalence.
+Check the report and bundle against every rule ID in [rule.md](rule.md). Distinguish script checks from manual judgments. Report the source mode, the status (`READY` or `INCOMPLETE`), actual qualifying source counts, how many came from the user and how many from the search, saved artifact paths, search date, key limits, and anything not verified. Never claim a legal clearance or market-wide prevalence.
 
 ## Reference
 
@@ -93,8 +105,9 @@ Read a file when its workflow step calls for it.
 | `scripts/vlsit_find_python.ps1` and `scripts/vlsit_find_python.sh` | Locating Python before a script run |
 | `scripts/vlsit_asic_ip_feature_research.py init <directory>` | Creating a new evidence directory and empty source manifest; stops if either already exists |
 | `scripts/vlsit_asic_ip_feature_research.py download <directory> ...` | Saving one approved, directly accessible file and registering its metadata/hash |
+| `scripts/vlsit_asic_ip_feature_research.py inventory <folder> [--bundle <directory>]` | Step 5a: listing the documents the user supplied (path, size, SHA-256, already registered or not); read-only |
 | `scripts/vlsit_asic_ip_feature_research.py register <directory> ...` | Copying one user-provided, authorized file into the evidence directory and registering it |
-| `scripts/vlsit_asic_ip_feature_research.py check <directory>` | Checking minimum evidence counts, deduplication keys, file presence and SHA-256 hashes |
+| `scripts/vlsit_asic_ip_feature_research.py check <directory>` | Checking minimum evidence counts (and how many datasheet families and papers are still missing), deduplication keys, file presence and SHA-256 hashes |
 
 Command syntax and required metadata flags are documented in [reference/vlsit_source_manifest_schema.md](reference/vlsit_source_manifest_schema.md). Download and register commands require `--approved`, representing the user's approval of the proposed batch.
 

@@ -8,7 +8,7 @@ State target, question, status (`READY` or `INCOMPLETE`), top findings, confiden
 
 ## 2. Scope and method
 
-Record target and application context, product generation, search date, exact queries, catalogs/databases, inclusion and exclusion criteria, languages, date limits and deduplication method.
+Record the source mode (user documents first, search for everything, or user documents only), the number of documents supplied by the user and the number found by search, target and application context, product generation, search date (or that no search was performed), exact queries, catalogs/databases, inclusion and exclusion criteria, languages, date limits and deduplication method.
 
 ## 3. Evidence inventory and quality
 

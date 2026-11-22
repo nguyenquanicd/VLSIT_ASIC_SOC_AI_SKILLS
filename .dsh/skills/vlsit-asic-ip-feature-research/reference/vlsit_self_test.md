@@ -15,5 +15,7 @@ Use these cases when changing the manifest checker. The script checks record str
 | Changed local file | Recorded checksum differs from file bytes | Error, exit 1 |
 | Restricted or unknown basis | Access basis is not one of the accepted values | Error, exit 1 |
 | Ten plus ten valid records | All thresholds, unique keys, files and hashes valid | `READY`, exit 0 |
+| Shortfall report | Seven families and four papers registered | `INCOMPLETE` with `missing_datasheets=3 missing_papers=6`, exit 4 |
+| Inventory of user documents | Folder with a PDF, a text file, an image and a registered duplicate | Lists the PDF and the text file, flags the registered one, skips the image, writes nothing |
 
 An implementation change must preserve these outcomes. Temporary fixtures must be created in a fresh temporary directory and removed after the check. Never test against or modify a user's research bundle.

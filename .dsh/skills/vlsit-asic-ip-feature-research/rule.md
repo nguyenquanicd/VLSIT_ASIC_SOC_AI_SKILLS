@@ -25,7 +25,7 @@ MUST label a study `INCOMPLETE` whenever either source threshold or any required
 - Check: script status and report counts agree; manual - compare claims with the qualifying manifest rows.
 
 ### R-005 Search provenance
-MUST record search date, exact queries, search/catalog sources, date and language limits, inclusion/exclusion criteria and source access basis.
+MUST record search date, exact queries, search/catalog sources, date and language limits, inclusion/exclusion criteria and source access basis, or the statement that no search was performed because the corpus is user-supplied (R-026).
 - Why: another researcher needs to understand selection bias and reproduce or extend the search.
 - Check: manual - all protocol fields appear in the report or its linked research log.
 
@@ -132,3 +132,10 @@ MUST run the bundle checker after registering sources and distinguish its mechan
 MUST report search blind spots, source conflicts, confidence, missing evidence and the limited generalizability of the corpus.
 - Why: a useful study makes its uncertainty visible rather than turning it into false precision.
 - Check: manual - the report includes an evidence-limits section and confidence is supported by stated criteria.
+
+## Source acquisition mode
+
+### R-026 User documents first
+MUST ask the user, with options, explanations and an open choice, how the sources are obtained (the user supplies reference documents first, the skill searches for everything, or the user's documents only with no search),; user-supplied documents are then registered and qualified before any search, a supplementary search is proposed only for the measured shortfall, and it runs only after the user approves it.
+- Why: the user often holds the documents that matter for the question, and a search that ignores them repeats work, adds sources the user did not choose and may fetch material the user already has under a better licence.
+- Check: manual - the report states the chosen mode; with the user-first mode the manifest shows the user-authorized records registered before any downloaded record, the shortfall (counts and missing families or topics) is stated before the search proposal, and no search or download precedes the approval of the proposal; with the no-search mode the report is `INCOMPLETE` unless the user documents alone meet both thresholds.

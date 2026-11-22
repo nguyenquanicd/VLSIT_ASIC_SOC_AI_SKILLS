@@ -28,6 +28,8 @@ Use a simple qualitative level (high, medium, low) with a sentence of rationale.
 
 Search manufacturer and standards-body pages for product documents; use scholarly indexes, publisher pages, institutional repositories and author repositories for papers. Log exact queries and date. Prefer canonical publisher copies or lawful open versions. Confirm that a repository states a license or open-access basis before labeling a paper open access. A publicly reachable document may still carry restrictions; preserve its notice and do not redistribute it.
 
+Documents the user supplies (R-026) are qualified by the same criteria as searched sources: they count only when they are manufacturer datasheets or databooks of a distinct product family, or full-text peer-reviewed papers, and the user confirms that they are authorized to use them (`--access-basis user-authorized`). A user document that does not qualify (marketing sheet, abstract, duplicate revision) is kept as context and listed with its reason, not counted.
+
 If full text is unavailable without credentials, do not bypass the access control. Ask the user to supply an authorized copy if they have access. Do not count an abstract or metadata record toward the full-text threshold. Keep standards specifications separate from scholarly papers and product datasheets.
 
 ## Minimum threshold audit

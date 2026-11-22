@@ -2,7 +2,7 @@
 
 ## Freeze the protocol
 
-Before extraction, write the question, scope, intended applications, product generation, date range, languages, databases/catalogs, exact search strings, inclusion/exclusion criteria and source categories. Keep product documentation, scholarly papers, standards, patents, application notes and market claims in separate evidence classes. Record each candidate and why it was included or excluded.
+Before extraction, write the question, scope, intended applications, product generation, date range, languages, databases/catalogs, exact search strings, inclusion/exclusion criteria and source categories. With the user-first mode (R-026) freeze the inclusion and exclusion criteria before assessing the user documents, then record the gap (missing product families, papers and thin topics) and freeze the search queries only when the supplementary search is approved; with the no-search mode write that no search was performed. Keep product documentation, scholarly papers, standards, patents, application notes and market claims in separate evidence classes. Record each candidate and why it was included or excluded.
 
 ## Build the feature taxonomy
 
