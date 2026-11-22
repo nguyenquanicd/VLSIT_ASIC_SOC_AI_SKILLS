@@ -5,24 +5,103 @@
 
 **VI:** Xem [thuật ngữ và từ viết tắt](GLOSSARY.md) cùng glossary của từng skill. BFM là Bus Functional Model (mô hình giao tiếp bus); cần phân biệt VIP với VPI và DPI.
 <!-- VLSIT_TERMINOLOGY_END -->
-**EN** — Eighteen engineering skills for ASIC, RTL, verification, documentation and design review. Each skill is stored in three repository discovery trees: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex, and `.dsh/skills/` for DeepSeek Harness.
+**EN** — Nineteen engineering skills for Application-Specific Integrated Circuit (ASIC), register-transfer-level (RTL), verification, documentation and design review. Each skill is stored in three repository discovery trees: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex, and `.dsh/skills/` for DeepSeek Harness.
 
-**VI** — Mười tám skill cho thiết kế ASIC, RTL, verification, tài liệu và review. Mỗi skill có trong ba cây để công cụ nhận diện: `.claude/skills/` cho Claude Code, `.agents/skills/` cho Codex và `.dsh/skills/` cho DeepSeek Harness.
+**VI** — Mười chín skill cho thiết kế ASIC, RTL, verification, tài liệu và review. Mỗi skill có trong ba cây để công cụ nhận diện: `.claude/skills/` cho Claude Code, `.agents/skills/` cho Codex và `.dsh/skills/` cho DeepSeek Harness.
 
 ## Start / Bắt đầu
 
 1. Open the repository root as the project/workspace in the assistant. / Mở thư mục gốc repo làm project/workspace trong công cụ.
 2. Use the skill's listed runtime and optional dependencies. A skill asks before installing tools or packages. / Dùng runtime và dependency được nêu trong README của từng skill. Skill sẽ hỏi trước khi cài công cụ hoặc package.
-3. Invoke by name or describe the work: Claude Code and DeepSeek Harness use `/vlsit-<name>`; Codex uses `$vlsit-<name>`. / Gọi theo tên hoặc mô tả công việc: Claude Code và DeepSeek Harness dùng `/vlsit-<name>`; Codex dùng `$vlsit-<name>`.
+3. Invoke by name or describe the work: Claude Code and DeepSeek Harness use `/vlsit-<name>`; Codex uses `$vlsit-<name>` or opens `/skills` to choose a skill. / Gọi theo tên hoặc mô tả công việc: Claude Code và DeepSeek Harness dùng `/vlsit-<name>`; Codex dùng `$vlsit-<name>` hoặc mở `/skills` để chọn skill.
+
+## Install / Cài đặt
+
+### Use from this repository / Dùng trong repo này
+
+**EN** — Open this repository as the project/workspace. The project skill folders are `.claude/skills/` for Claude Code, `.agents/skills/` for Codex and `.dsh/skills/` for this repository's DeepSeek Harness integration. No user-level copy is needed when the tool has this repository open.
+
+**VI** — Mở repo này làm project/workspace. Các thư mục skill cấp project là `.claude/skills/` cho Claude Code, `.agents/skills/` cho Codex và `.dsh/skills/` cho tích hợp DeepSeek Harness của repo. Không cần chép sang thư mục cá nhân nếu công cụ đang mở repo này.
+
+### Install one skill manually / Cài thủ công một skill
+
+**EN** — Copy the complete skill folder, not only `SKILL.md`, into the matching personal skill directory. Replace an existing version only after confirming that its local edits can be discarded.
+
+**VI** — Chép toàn bộ thư mục skill, không chỉ riêng `SKILL.md`, vào thư mục skill cá nhân tương ứng. Chỉ thay bản đã có sau khi xác nhận có thể bỏ các chỉnh sửa cục bộ.
+
+| Assistant | Source in this repository | Personal destination |
+|---|---|---|
+| Claude Code | `.claude/skills/<skill-name>/` | `~/.claude/skills/<skill-name>/` |
+| Codex | `.agents/skills/<skill-name>/` | `~/.agents/skills/<skill-name>/` |
+| DeepSeek Harness | `.dsh/skills/<skill-name>/` | `~/.dsh/skills/<skill-name>/` |
+
+After installing, reload the project or restart the assistant so it discovers the new files. / Sau khi cài, tải lại project hoặc khởi động lại công cụ để nhận diện file mới.
+
+## Troubleshooting discovery / Khắc phục lỗi không nhận diện skill
+
+- **Claude Code:** confirm the full folder is under `.claude/skills/<skill-name>/` and contains `SKILL.md`; invoke it with `/vlsit-<name>`. / Kiểm tra skill nằm trong `.claude/skills/<skill-name>/` và có `SKILL.md`; gọi bằng `/vlsit-<name>`.
+- **Codex:** confirm the project is open at this repository root and the skill is under `.agents/skills/<skill-name>/`; use `$vlsit-<name>` or `/skills` to choose it. Codex does not invoke a skill using Claude's `/vlsit-<name>` syntax. / Kiểm tra Codex đang mở đúng gốc repo và skill nằm trong `.agents/skills/<skill-name>/`; dùng `$vlsit-<name>` hoặc `/skills` để chọn. Codex không gọi skill bằng cú pháp `/vlsit-<name>` của Claude.
+- **DeepSeek Harness:** confirm `.dsh/skills/<skill-name>/SKILL.md` exists, then invoke `/vlsit-<name>`. / Kiểm tra file `.dsh/skills/<skill-name>/SKILL.md`, sau đó gọi `/vlsit-<name>`.
+- If a skill is still missing, check that `name` in the frontmatter matches its folder name and reload the project/session. / Nếu vẫn không thấy, kiểm tra `name` trong frontmatter có trùng tên thư mục và tải lại project/phiên làm việc.
+
+### Install one skill with Windows PowerShell / Cài một skill bằng Windows PowerShell
+
+Run this from the repository root. Set `$taskSkill` to a folder name listed in the table below; the command copies all three platform variants, updates matching files and keeps unrelated files in the destination.
+
+```powershell
+$taskSkill = "vlsit-verification-generator"
+$taskSkillTargets = @(
+  @{ SourceRoot = ".claude\skills"; UserRoot = Join-Path $env:USERPROFILE ".claude\skills" },
+  @{ SourceRoot = ".agents\skills"; UserRoot = Join-Path $env:USERPROFILE ".agents\skills" },
+  @{ SourceRoot = ".dsh\skills"; UserRoot = Join-Path $env:USERPROFILE ".dsh\skills" }
+)
+foreach ($taskTarget in $taskSkillTargets) {
+  $taskSourcePath = Join-Path $taskTarget.SourceRoot $taskSkill
+  $taskDestinationPath = Join-Path $taskTarget.UserRoot $taskSkill
+  New-Item -ItemType Directory -Path $taskDestinationPath -Force | Out-Null
+  Copy-Item -Path (Join-Path $taskSourcePath "*") -Destination $taskDestinationPath -Recurse -Force
+}
+```
+
+The `-Force` option replaces files with the same names in the selected skill folder. Review or back up local edits first. / Tùy chọn `-Force` thay file cùng tên trong skill được chọn. Hãy kiểm tra hoặc sao lưu chỉnh sửa cục bộ trước.
+
+### Refresh project mirrors / Đồng bộ các bản trong repo
+
+Edit the canonical `.claude/skills/<skill-name>/` folder, then run the skill-library helper from the repository root. This refreshes the project copies for Codex and DeepSeek Harness; `--check` only compares them.
+
+```powershell
+python .claude\skills\vlsit-create-skill\scripts\vlsit_skillkit.py mirror .claude\skills\<skill-name>
+python .claude\skills\vlsit-create-skill\scripts\vlsit_skillkit.py mirror .claude\skills\<skill-name> --check
+```
+
+Chỉnh bản chuẩn trong `.claude/skills/<skill-name>/`, sau đó chạy helper tại thư mục gốc repo. Lệnh đầu cập nhật bản project cho Codex và DeepSeek Harness; `--check` chỉ đối chiếu, không ghi file.
 
 ## Consolidation review / Báo cáo hợp nhất
 
 See [SKILLS_CONSOLIDATION_REPORT.md](SKILLS_CONSOLIDATION_REPORT.md) for the audited source comparison, issues, decisions, and validation limits. / Xem [SKILLS_CONSOLIDATION_REPORT.md](SKILLS_CONSOLIDATION_REPORT.md) để đọc đối chiếu nguồn, issue, quyết định hợp nhất và giới hạn kiểm tra.
 
+## Practical ASIC design flow / Flow thiết kế ASIC thực hành
+
+Use this as a short default path for a new ASIC IP. The research step is optional; specialized reviews run when their inputs are available. Follow each skill's sign-off gates before moving to the next design-changing step. / Đây là luồng mặc định ngắn cho IP ASIC mới. Bước nghiên cứu là tùy chọn; các review chuyên biệt chạy khi đã có đủ đầu vào. Hoàn tất sign-off của từng skill trước khi sang bước làm thay đổi thiết kế tiếp theo.
+
+| Step | Action and skill / Công việc và skill | Main result or gate / Kết quả hoặc gate |
+|---|---|---|
+| 1. Explore (optional) / Khảo sát (tùy chọn) | Research product features, scientific papers, applications and integration using [`vlsit-asic-ip-feature-research`](.agents/skills/vlsit-asic-ip-feature-research/README.md). / Khảo sát feature sản phẩm, bài báo khoa học, ứng dụng và tích hợp. | Evidence-backed feature options and research gaps. / Các phương án feature và khoảng trống nghiên cứu có evidence. |
+| 2. Specify / Viết đặc tả | Use [`vlsit-asic-ip-microspec`](.agents/skills/vlsit-asic-ip-microspec/README.md) to define functions, interfaces, configuration and Control and Status Registers (CSRs), then document the architecture. / Xác định chức năng, interface, cấu hình, thanh ghi điều khiển/trạng thái và kiến trúc. | Reviewable Markdown specification and design artifacts. / Đặc tả Markdown và tài liệu thiết kế để review. |
+| 3. Review and sign off / Review và sign-off | Critique the specification with [`vlsit-ip-spec-review`](.agents/skills/vlsit-ip-spec-review/README.md); resolve critical gaps with the designer before implementation. / Phản biện đặc tả và xử lý vấn đề quan trọng với designer trước khi triển khai. | Approved specification baseline. / Baseline đặc tả được duyệt. |
+| 4. Implement RTL / Triển khai RTL | Choose [`vlsit-rtl-generator`](.agents/skills/vlsit-rtl-generator/README.md) for new RTL; [`vlsit-rtl-spec-change-implementer`](.agents/skills/vlsit-rtl-spec-change-implementer/README.md) for a minimal feature change to existing RTL; or [`vlsit-vhdl-to-systemverilog`](.agents/skills/vlsit-vhdl-to-systemverilog/README.md) to convert Very High-Speed Integrated Circuit Hardware Description Language (VHDL) to SystemVerilog. / Chọn skill tương ứng để sinh RTL mới, sửa feature tối thiểu trên RTL có sẵn, hoặc chuyển đổi VHDL sang SystemVerilog. | RTL changes tied to the approved specification and recorded checks. / RTL gắn với đặc tả đã duyệt và các kiểm tra được ghi nhận. |
+| 5. Inspect structure / Kiểm tra cấu trúc | Use [`vlsit-rtl-hierarchy-diagram`](.agents/skills/vlsit-rtl-hierarchy-diagram/README.md) for hierarchy/interfaces or [`vlsit-rtl-logic-diagram`](.agents/skills/vlsit-rtl-logic-diagram/README.md) for logic paths. / Xem hierarchy/interface hoặc đường logic. | Source-grounded diagrams and analysis; these are not functional verification results. / Sơ đồ và phân tích dựa trên source; không thay thế kết quả verification chức năng. |
+| 6. Verify function / Verification chức năng | Plan, build and run specification-based tests with [`vlsit-verification-generator`](.agents/skills/vlsit-verification-generator/README.md). / Lập kế hoạch, tạo và chạy test theo đặc tả. | Simulation evidence, measured coverage, retained test environment and replay instructions. / Evidence simulation, coverage đo được, môi trường test và hướng dẫn chạy lại. |
+| 7. Review implementation and integration / Review triển khai và tích hợp | Run applicable Clock-Domain Crossing (CDC), Reset-Domain Crossing (RDC), Synopsys Design Constraints (SDC) and Logical Equivalence Checking (LEC) reviews; then use [`vlsit-soc-review`](.agents/skills/vlsit-soc-review/README.md) for System-on-Chip (SoC) connections and [`vlsit-ip-impl-review`](.agents/skills/vlsit-ip-impl-review/README.md) to compare implementation with the specification and evidence. / Chạy các review phù hợp về crossing clock/reset, ràng buộc timing và equivalence; sau đó review kết nối SoC và đối chiếu triển khai IP với đặc tả/evidence. | Findings closed or explicitly accepted with evidence and risk. / Findings được xử lý hoặc chấp nhận rõ ràng kèm evidence và rủi ro. |
+| 8. Prepare final documents / Hoàn thiện tài liệu | Export the approved specification with [`vlsit-spec-to-docx`](.agents/skills/vlsit-spec-to-docx/README.md); create a timing illustration with [`vlsit-wavedrom-waveform`](.agents/skills/vlsit-wavedrom-waveform/README.md) when needed. / Xuất đặc tả đã duyệt và tạo waveform minh họa khi cần. | Final editable specification and selected document/figure exports. / Đặc tả nguồn cuối cùng cùng các bản xuất tài liệu/hình đã chọn. |
+
+For an existing design, start at the step matching the request: inspect RTL, verify it, review a proposed change, or audit integration. Do not generate RTL before the specification gate when the task requires specification sign-off. / Với thiết kế có sẵn, bắt đầu từ bước phù hợp: phân tích RTL, verification, review thay đổi hoặc audit tích hợp. Không sinh RTL trước gate duyệt đặc tả nếu task yêu cầu sign-off đặc tả.
+
 ## Skills / Danh sách skill
 
 | Skill | Function / Chức năng | Main output / Đầu ra chính |
 |---|---|---|
+| [`vlsit-asic-ip-feature-research`](.agents/skills/vlsit-asic-ip-feature-research/README.md) | **EN:** Research Application-Specific Integrated Circuit (ASIC) intellectual-property (IP) and System-on-Chip (SoC) features from product documents and peer-reviewed papers, quantify corpus occurrence, analyze integration and rights, and propose evidence-backed improvements. **VI:** Nghiên cứu feature của IP ASIC/SoC từ tài liệu sản phẩm và bài báo phản biện, tính tỷ lệ xuất hiện trong tập nguồn, phân tích tích hợp/license và đề xuất cải tiến có căn cứ. | English report, source bundle/manifest, feature matrix and draw.io figures / Báo cáo tiếng Anh, bộ nguồn/manifest, ma trận feature và hình draw.io |
 | [`vlsit-asic-ip-microspec`](.agents/skills/vlsit-asic-ip-microspec/README.md) | **EN:** Interview the designer and produce a traceable ASIC IP micro-architecture specification. **VI:** Phỏng vấn designer và tạo đặc tả vi kiến trúc ASIC IP có truy vết. | HDS Markdown, CSR workbook, two-tab draw.io/JSON figures, WaveJSON / Đặc tả, workbook CSR, hình draw.io hai tab/JSON, WaveJSON |
 | [`vlsit-cdc-review`](.agents/skills/vlsit-cdc-review/README.md) | **EN:** Review clock-domain crossings and synchronization evidence. **VI:** Review crossing giữa clock domain và bằng chứng đồng bộ. | CDC review and findings / Báo cáo CDC và findings |
 | [`vlsit-create-skill`](.agents/skills/vlsit-create-skill/README.md) | **EN:** Interview, design, validate and mirror a skill in the VLSIT format. **VI:** Phỏng vấn, thiết kế, validate và mirror skill theo định dạng VLSIT. | `SKILL.md`, `rule.md`, references and scripts / Bộ skill hoàn chỉnh |

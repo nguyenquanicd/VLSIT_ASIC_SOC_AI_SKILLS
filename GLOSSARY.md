@@ -34,6 +34,7 @@
 | DFT | Design for Test | Design features for manufacturing/test access; define scan/BIST and functional-mode assumptions. | Thiết kế phục vụ kiểm thử; cần nêu scan/BIST và giả định mode chức năng. |
 | DMA | Direct Memory Access | Hardware-controlled data movement; specify descriptors, ordering and completion semantics. | Truy cập bộ nhớ trực tiếp bằng phần cứng; cần nêu descriptor, ordering và completion. |
 | DOCX | Word Open XML document format | File-format extension, not a hardware protocol abbreviation. | Định dạng tài liệu Word Open XML; là phần mở rộng file. |
+| DOI | Digital Object Identifier | Persistent identifier for a scholarly work; resolve it to the cited version and venue. | Mã định danh bền vững của tài liệu khoa học; cần xác định đúng phiên bản và nơi xuất bản. |
 | DPI | Direct Programming Interface | SystemVerilog interface for foreign-language function calls, commonly C/C++; DPI-C names the C binding. | Giao diện gọi hàm giữa SystemVerilog và ngôn ngữ ngoài, thường C/C++; không đồng nghĩa VPI. |
 | DUT | Design Under Test | The exact hardware design/configuration being verified, with a recorded baseline. | Thiết kế và cấu hình cụ thể đang được kiểm chứng. |
 | DV | Design Verification | Hardware verification activity in this repository; define scope and evidence. | Hoạt động kiểm chứng thiết kế phần cứng trong repo. |
