@@ -1,6 +1,6 @@
 ---
 name: vlsit-rtl-generator
-description: Generate synthesizable SystemVerilog RTL from a design specification written in the VLSIT ASIC IP template, or modify existing RTL after the designer approves a change plan, under VLSIT_RTL_Design_Rule.md, then verify it with a rule checker and lint. Use when the user asks to write, generate, create or fix RTL from a specification, or to bring RTL into line with the VLSIT RTL rules.
+description: Generate synthesizable SystemVerilog RTL from a design specification written in the VLSIT ASIC IP template, or modify existing RTL after the designer approves a change plan, under VLSIT_RTL_Design_Rule.md, then check it with a rule checker and lint and deliver a specification-based functional testcase suite. Use when the user asks to write, generate, create or fix RTL from a specification, or to bring RTL into line with the VLSIT RTL rules.
 compatibility: Python 3.8 or later, standard library only, except the CSR step: openpyxl (approved by the user on 2026-10-28) and the APB-CSR-Generator repository. Windows or Linux, offline. Windows PowerShell 5.1 (Windows) or POSIX sh (Linux, macOS) is used only to locate or install Python. Lint needs Verilator or slang, found in PATH or in an OSS CAD Suite folder; without one the skill still runs the rule check and reports that lint was not run. Nothing is installed without the user's agreement.
 ---
 
@@ -9,7 +9,7 @@ compatibility: Python 3.8 or later, standard library only, except the CSR step: 
 <!-- VLSIT_TERMINOLOGY_START -->
 Terminology: Design Under Test (DUT); Register-Transfer Level (RTL); Intellectual Property (hardware IP) (IP); Control and Status Register (CSR); Clock-Domain Crossing (CDC); Value Change Dump (VCD); Application-Specific Integrated Circuit (ASIC); Finite-State Machine (FSM); Advanced Peripheral Bus (APB). Read [reference/vlsit_glossary.md](reference/vlsit_glossary.md) before using this skill. Expand abbreviations on first use in generated prose; preserve code identifiers and resolve context-dependent meanings from the specification.
 <!-- VLSIT_TERMINOLOGY_END -->
-This skill writes synthesizable SystemVerilog design RTL from a specification that follows the VLSIT ASIC IP specification template, or changes existing RTL after the designer approves a plan. Every file follows the VLSIT RTL design rules, and the result is checked by a rule-check script and by lint. It writes a simulation testbench with protocol assertions only when the designer asks for one, always from the specification and the protocol standards and never from the RTL, and it never decides an open point of the specification by itself: it asks the designer.
+This skill writes synthesizable SystemVerilog design RTL from a specification that follows the VLSIT ASIC IP specification template, or changes existing RTL after the designer approves a plan. Every file follows the VLSIT RTL design rules, and the result is checked by a rule-check script and by lint. It delivers a simulation testbench and at least ten integrated functional testcases. The approved specification defines the test behavior. Ask the designer to resolve open specification points.
 
 Reply to the user in the language they use.
 
@@ -117,9 +117,15 @@ Run `vlsit_rtl_check.py check` once more on the final folder, with `--report` if
 
 Write the reason in the module header for every deviation from a SHOULD rule (R-011).
 
-### 8b. Simulation testbench (only when the designer asks)
+### 8b. Specification-based simulation testbench
 
-Do not write a testbench unless the designer asks for one (R-022). Read [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) first. Derive every stimulus, expected value and check from the specification and protocol standards, citing a requirement ID or clause, and read RTL only for port names, widths and parameters (R-023). Before finalizing the plan, ask whether code coverage is requested and which supported metric; measure and report a baseline before asking for a target the designer has not supplied (R-047). Plan focused tests for primary functions before combined flows (R-048). Put at least 20 assertions on each standard protocol and assertions relating converted interfaces, count their hits, and make the run fail when any assertion fails or never fires (R-024, R-025). Save the testbench in its own folder beside the RTL. When a check or assertion fails and the cause is unclear, give the designer the analysis in the guide and wait before editing (R-026). Save all planned simulation waveforms, compare them in `waveform_compare.md` and explain non-matching results (R-033, R-088 to R-091). For designs with CDC, run the synthesis and metastability-model branches with at least three seeds; keep the defined branch labels and report a missing model as a gap (R-034, R-092 to R-094). Only the specified `VLSIT_SYNTHESIS` branch is excluded from RTL checks; report its warnings and check code under other macros normally (R-027, R-086 to R-089).
+Read [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md). Draft and revise the plan and tests in a specification-only context before integration. Use only the approved specification and incorporated protocol clauses, including for interface assumptions and expected behavior. Ask the designer for missing facts (R-022, R-023). Before finalizing the plan, ask whether code coverage is requested and which supported metric; measure and report a baseline before asking for a target the designer has not supplied (R-047).
+
+Generate at least ten distinct integrated testcases and cover every primary function through executable checks. In each required case, check how functions interact in one sequence. Give every testcase a structured software or transaction flow header, verification method and at least five distinct executable checks (R-048, R-095). Put at least 20 assertions on each standard protocol and assertions relating converted interfaces, count their hits, and make the run fail when an enabled assertion fails or a required assertion never fires (R-024, R-025).
+
+Save the testbench beside the RTL. Demonstrate fault detection with a baseline and controlled negative run per case. Retain a waveform for each testcase and a ledger for named engineer review of every testcase and waveform. Apply INTEGRITY_HOLD to confirmed false PASS, fabricated evidence or weak tests presented as effective (R-096 to R-098).
+
+When a check or assertion fails and the cause is unclear, give the designer the analysis in the guide and wait before editing (R-026). Save all planned simulation waveforms, compare them in `waveform_compare.md` and explain non-matching results (R-033, R-088 to R-091). For designs with CDC, run the synthesis and metastability-model branches with at least three seeds; keep the defined branch labels and report a missing model as a gap (R-034, R-092 to R-094). Only the specified `VLSIT_SYNTHESIS` branch is excluded from RTL checks; report its warnings and check code under other macros normally (R-027, R-086 to R-089).
 
 ### 9. Verify against the rules and report
 
@@ -139,7 +145,7 @@ Read a file only when the step needs it.
 | [reference/vlsit_csr_generator.md](reference/vlsit_csr_generator.md) | Step 5b: what the generator builds, its limits, the APB behavior and the integration points |
 | [reference/vlsit_lint_and_install.md](reference/vlsit_lint_and_install.md) | Step 6: running lint, reading warnings, install options |
 | [reference/vlsit_reuse_guide.md](reference/vlsit_reuse_guide.md) | Step 4c: how to judge a library candidate, the wording of the reuse question with its advantages, what to do after the answer |
-| [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of checks, focused/combined test ordering, coverage selection, assertions, failure analysis, waveform evidence, and both branches of a crossing |
+| [reference/vlsit_testbench_guide.md](reference/vlsit_testbench_guide.md) | Step 8b: source of checks, integrated testcase design and engineer review, coverage selection, assertions, failure analysis, waveform evidence, and both branches of a crossing |
 | `reference/rtl_example/m_moore_fsm_example.sv` | Step 5: example of a Moore FSM (current-state process, next-state process, state-only output process) |
 | `reference/rtl_example/m_mealy_fsm_example.sv` | Step 5: example of a Mealy FSM (outputs depend on the state and the inputs) |
 
@@ -163,4 +169,8 @@ Exit codes: `vlsit_spec_gaps.py` 0 no BLOCK gap, 2 gaps; `vlsit_rtl_check.py` 0 
 
 ## Output
 
-All deliverables are saved in the output folder the user names (R-018): the `.sv` files, `filelist.f`, the lint logs, the rule-check report if one was asked for, and, when asked, the testbench folder with its simulation logs and assertion table, the evidence folder `waveforms_sim`, and for a design with a crossing the logs of the synthesis branch and of the metastability runs. The final message gives the folder, the file list, the top module, the rule-ID report and the commands that reproduce the checks.
+All deliverables are saved in the output folder the user names (R-018): the `.sv` files, `filelist.f`, the lint logs, the rule-check report if one was asked for, and the testbench folder with the test plan, source headers, check outcomes, fault qualification, engineer review ledger and available simulation logs, the evidence folder `waveforms_sim`, and for a design with a crossing the logs of the synthesis branch and of the metastability runs. The final message gives the folder, the file list, the top module, the rule-ID report and the commands that reproduce the checks.
+
+## FSM draw.io example
+
+Compare the [Moore transfer controller](reference/examples/vlsit_fsm_moore_transfer.drawio) with [the bundled Moore SystemVerilog example](reference/rtl_example/m_moore_fsm_example.sv). The diagram shows normal state transitions and reset. The SystemVerilog example also defines recovery for an invalid state encoding.

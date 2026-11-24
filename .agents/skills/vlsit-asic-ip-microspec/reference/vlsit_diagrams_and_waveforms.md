@@ -25,15 +25,15 @@ PNG is an additional compatibility copy only. The JSON is the structured figure 
 3. Confirm the `.drawio` has exactly two tabs, `BLOCK_DIAGRAM` then `BLOCK_INFORMATION`; check the first contains only the diagram and the second contains both tables and the symbol legend. Look at the SVG rendered from `BLOCK_DIAGRAM`, then run `vlsit_spec_diagram.py insert SPEC.md --figure figures/<ip>_block_diagram.svg --source figures/<ip>_block_diagram.drawio --caption "..."`. `insert` embeds only the diagram tab's SVG; it names the complete two-tab source and places the diagram-spec JSON block immediately after the image link (R-073).
 4. LaTeX/TikZ is an optional fallback only when the user requests it or the draw.io build cannot meet the requirement: `vlsit_block_diagram.py template/check/tex/build`, then `vlsit_pdf_render.py`.
 
+For every required detail view, repeat the same JSON check, build and visual review. Use the documented parent decomposition for the block and interface sources. Every functional block needs a genuine connector to a distinct peer and a function description. Each labeled interface needs endpoints, direction, purpose and signals in the information table. Insert the SVG and adjacent inline JSON in the owning section, with a unique caption naming the editable source. Check the same structured connectivity for a LaTeX fallback and retain equivalent information tables.
+
 ## LaTeX/TikZ fallback
 
 Use the LaTeX/TikZ fallback only after the user requests it or draw.io cannot satisfy the diagram requirement. Check that a LaTeX compiler is installed before building. This is separate from using TeX math in the Markdown specification; DOCX/PDF exports are described in [vlsit_document_formats.md](vlsit_document_formats.md).
 
 ## FSM diagram (rules R-068 to R-071)
 
-1. Derive one JSON FSM specification from each state table in section 10.1. Preserve the initial state, complete RTL enum names, and each labelled transition condition.
-2. Run `vlsit_fsm_diagram.py check SPEC.json`, then `build SPEC.json --out-dir figures`. The build writes a VLSIT-library `.drawio`, adjacent JSON source, layout report, and SVG. Resolve all layout, label-fit, crossing, and distribution findings.
-3. Insert it at the top of section 10.1 with `vlsit_fsm_diagram.py insert SPEC.md --figure figures/<fsm>.svg --source figures/<fsm>.drawio`. The JSON source is included immediately after the image link (R-073).
+Follow the [FSM workflow](drawio/vlsit_fsm_diagram_rules.md) and [all twenty drawing rules](drawio/vlsit_fsm_drawing_rulebook.md). Each FSM needs a figure and its own section 10.1 description, state table and abstract transition mapping. Run the geometry checks and inspect the SVG before insertion.
 
 ## Waveform plan (rule R-024)
 

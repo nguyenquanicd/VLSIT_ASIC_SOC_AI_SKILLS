@@ -80,7 +80,7 @@ The script checks that the manifest lists at least these paths. A path is matche
 | Block | a coverage XML under `coverage/`; `mutation/report.md` is a warning if absent |
 | SoC | a coverage XML under `coverage/`; `mutation/report.md` is a warning if absent |
 
-A formal run adds `formal/report.md`. `resource_usage.json` is required for every run (R-277 to R-280) and the evidence manifest lists/hashes it. A waveform is required when failure diagnosis or a reviewed verification need requires a time window; otherwise the run records `not_captured` and why in `resource_usage.json`. Prefer a named signal scope and time window over a full-chip/full-duration dump.
+A formal run adds `formal/report.md`. `resource_usage.json` is required for every run (R-277 to R-280) and the evidence manifest lists/hashes it. In addition to any failure-diagnosis captures, save one distinct, run-bound waveform for each of the ten highest-priority tests in the campaign, or for every test when there are fewer than ten (R-283). Record each capture path, scope, time window and source/run/configuration/seed binding in the evidence index; include and hash the waveform in that run's bundle. Tests outside the required priority set may record `not_captured` with a reason when the reviewed policy permits it. Keep capture scope and duration narrow; a full-chip/full-duration dump is not the default.
 
 ## 4. Hashing
 

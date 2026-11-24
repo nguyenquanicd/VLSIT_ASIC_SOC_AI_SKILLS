@@ -184,3 +184,39 @@ Every exception in the report has a reason. A report that says "waived" or "excl
 ## 11. Large IP and measured closure
 
 Use [vlsit_large_ip_verification.md](vlsit_large_ip_verification.md) for no-VIP verification and C/C++/Python reference models. Use [vlsit_closure_contract.md](vlsit_closure_contract.md) for explicit obligations and measured results. Combined scenarios are selected for interaction risk rather than every legal feature cross product.
+
+## 12. Testcase source header and software flow (R-103, R-281, R-286)
+
+Every testcase source begins with a completed header copied from [the testcase header template](templates/vlsit_testcase_header.md.tpl). The header is part of the reviewable testcase contract, not decorative commentary. It identifies the purpose, priority and rationale, requirement/feature/protocol trace, configuration and preconditions, exact software or transaction flow, stimulus, expected outcome, checkpoints, checker/oracle, targeted defect, seed/replay command, waveform and evidence references.
+
+For a software-visible IP, spell out the ordered operations a driver or firmware performs, such as reset release, initialization, control/status register (CSR) writes, start, polling or interrupt service, data movement, result/status reads and shutdown. For a protocol-level case with no software interface, state `N/A` and why, then give the full request/response transaction flow. Each checkpoint has a stable ID, trigger or cycle, expected signal/value/state, checker/assertion ID, timeout and explicit failure condition. A requirement name or a sentence such as “test the error path” is not a checkpoint.
+
+Use only the approved specification and its incorporated clauses when authoring a testcase. Record at least five distinct functional checks in the header and implement each as an executable checkpoint or assertion. Checkpoints backed by an assertion count once. Repeated hits, placeholders and checks without a requirement reference do not count. Record an outcome per check and withhold PASS and coverage credit if any required check is missing, vacuous or unreached.
+
+Do not leave a placeholder in an executable testcase. The source header, verification plan, testlist and executed behavior must agree. A complete header does not establish that the stimulus ran or that the checker detected a defect.
+
+## 13. Testcase quality and defect-detection audit (R-282)
+
+Assess every testcase independently of its simulation status. Record a separate quality verdict (`effective`, `weak`, `invalid`, `not_run` or `not_assessed`) and evidence for each item:
+
+- Traceable purpose and legal, intentional stimulus that reaches the intended feature/configuration.
+- Independent expected behavior, with observable checkpoints and the qualified checker or oracle identified.
+- Evidence that the test actually ran to completion, each required checkpoint was reached, and each applicable checker was active and counted observations.
+- Bounded timeout, deterministic replay inputs and exact command/seed.
+- A named defect class and fault-detection evidence for each highest-priority testcase.
+
+Qualify high-priority detection with a plausible injected fault or RTL mutation that the testcase is intended to catch. Count a mutant as killed only when the test executes and the qualified checker reports the expected mismatch. A compile failure, simulator crash, timeout, unrelated assertion or manually edited `PASS` string is not a killed mutant. Classify equivalent and invalid mutants with evidence; keep survivors visible as open detection gaps. When an injection is technically inapplicable, state why and show an equivalent known-bad checker/oracle qualification; otherwise mark detection as unqualified. Report valid, killed, survived, equivalent and invalid counts separately, with no hidden denominator.
+
+Treat a run as vacuous or ineffective if it exits successfully without reaching a required checkpoint, observes no relevant transaction, has no checker activity, compares against a derived/circular expected value, or passes with the targeted fault present. Never infer effectiveness from code coverage, a test name, a log string or simulator exit status alone. Simulation result and testcase-quality verdict are separate fields.
+
+## 14. Priority waveforms and per-test engineer review (R-283, R-284)
+
+Rank testcases by consequence and likelihood of failure, using safety/security impact, critical requirements, protocol boundaries, configuration diversity, reset/error/recovery behavior and interaction risk. Capture one separate waveform file for each of the ten highest-priority tests in a campaign, or for every test if the campaign has fewer than ten. Do not substitute one aggregate regression dump for a per-test waveform.
+
+Use a bounded signal scope and time window that show the relevant setup, software/transaction flow, named checkpoints and observed response. Include the test ID, run ID, configuration, seed and source/build hashes in the evidence index. Prefer compact raw simulator waveform data plus a readable rendering when the installed tools support both. This requirement does not authorize full-chip/full-duration capture; use R-277–R-280 to plan storage and concurrency. If the simulator cannot emit a waveform, report the affected case as blocked/not-run for this review requirement and obtain a human-approved alternative; do not claim the waveform requirement passed.
+
+A named hardware verification engineer reviews every testcase source and its actual result. The engineer also opens and reviews every waveform artifact produced for the campaign, compares observed events with the expected checkpoints and specification, and records findings. Use [the testcase review ledger template](templates/vlsit_testcase_review.csv.tpl) with source/waveform hashes, reviewer name/role/date and a per-test disposition. A test without a waveform still needs source/result review and a reasoned waveform `N/A`. Set disposition to `pending` until the engineer actually reviews it; an AI must not fill the human review fields or say that visual review occurred on the engineer's behalf.
+
+## 15. Response to a false PASS (R-285)
+
+If a human finds a false PASS, vacuous test, fabricated evidence or misrepresented review, stop closure and classify the campaign `INTEGRITY_HOLD`. State plainly that the earlier PASS claim was false and classify it as dishonest/misleading AI verification behavior and an integrity failure; explain that the affected conclusion is unreliable. Preserve the original testbench, checker, model, logs, waveforms, manifests and hashes. Retract every affected test, mutation, coverage and closure claim, identify the impacted runs, determine whether the defect is in stimulus, testbench, checker, model, runner, result parser, generator or report, then correct it in a new source-bound run and repeat the engineer review. Never rewrite the old run as passing or quietly remove the finding. Do not claim deliberate intent without evidence; the false claim itself is a serious integrity violation.

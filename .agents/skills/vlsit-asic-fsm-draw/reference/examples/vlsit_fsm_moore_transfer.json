@@ -1,0 +1,107 @@
+{
+  "page_name": "FSM_MOORE_TRANSFER",
+  "out_name": "vlsit_fsm_moore_transfer.drawio",
+  "function": "Moore transfer controller",
+  "initial": "ENUM_ST_IDLE",
+  "reset": {
+    "signal": "i_rst_n_core",
+    "active_level": "low"
+  },
+  "states": [
+    {
+      "name": "ENUM_ST_IDLE",
+      "conditional_exit": true,
+      "hold_conditions": []
+    },
+    {
+      "name": "ENUM_ST_LOAD",
+      "conditional_exit": false,
+      "hold_conditions": []
+    },
+    {
+      "name": "ENUM_ST_SEND",
+      "conditional_exit": true,
+      "hold_conditions": []
+    },
+    {
+      "name": "ENUM_ST_DONE",
+      "conditional_exit": false,
+      "hold_conditions": []
+    }
+  ],
+  "condition_aliases": [
+    {
+      "label": "accepted nonfinal item",
+      "expression": "i_ready && !i_last"
+    },
+    {
+      "label": "accepted final item",
+      "expression": "i_ready && i_last"
+    }
+  ],
+  "transitions": [
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_IDLE",
+      "label": "",
+      "route_type": "curved"
+    },
+    {
+      "src": "ENUM_ST_IDLE",
+      "dst": "ENUM_ST_LOAD",
+      "label": "i_start",
+      "route_type": "straight"
+    },
+    {
+      "src": "ENUM_ST_LOAD",
+      "dst": "ENUM_ST_SEND",
+      "label": "always",
+      "route_type": "straight"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_SEND",
+      "label": "",
+      "route_type": "curved"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_LOAD",
+      "label": "accepted nonfinal item",
+      "route_type": "curved"
+    },
+    {
+      "src": "ENUM_ST_SEND",
+      "dst": "ENUM_ST_DONE",
+      "label": "accepted final item",
+      "route_type": "straight"
+    },
+    {
+      "src": "ENUM_ST_DONE",
+      "dst": "ENUM_ST_IDLE",
+      "label": "always",
+      "route_type": "straight"
+    }
+  ],
+  "layout": {
+    "positions": {
+      "ENUM_ST_IDLE": [
+        280,
+        220
+      ],
+      "ENUM_ST_LOAD": [
+        690,
+        220
+      ],
+      "ENUM_ST_SEND": [
+        690,
+        520
+      ],
+      "ENUM_ST_DONE": [
+        280,
+        520
+      ]
+    },
+    "route_candidates": 20
+  }
+}

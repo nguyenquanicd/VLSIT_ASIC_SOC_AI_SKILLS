@@ -22,6 +22,10 @@ Generates synthesizable SystemVerilog design RTL from a specification written in
 
 Tạo RTL SystemVerilog tổng hợp được từ specification theo mẫu ASIC IP của VLSIT, hoặc sửa RTL có sẵn sau khi designer duyệt kế hoạch thay đổi. Mọi file tuân theo `VLSIT_RTL_Design_Rule.md` (v2). Kết quả được kiểm bằng script kiểm rule (`scripts/vlsit_rtl_check.py`) và lint (`scripts/vlsit_lint_rtl.py`), báo cáo cuối theo ID quy tắc. Điểm chưa rõ trong specification không bao giờ bị đoán: skill hỏi designer kèm các lựa chọn và ví dụ.
 
+**EN** — RTL delivery includes at least ten integrated testcases covering every primary function. Author them from the approved specification, with a software flow header, five or more executable checks per case, demonstrated fault detection, and a separate waveform for engineer review. False PASS or weak tests presented as effective trigger an integrity hold.
+
+**VI** — Bàn giao RTL kèm ít nhất 10 testcase tích hợp bao phủ mọi chức năng chính. Testcase được viết từ đặc tả đã duyệt, có header mô tả luồng phần mềm, ít nhất 5 điểm kiểm tra thực thi được, bằng chứng bắt lỗi và waveform riêng để kỹ sư review. Báo PASS giả hoặc trình bày test yếu như đã đạt sẽ chặn sign-off.
+
 ## Inputs and output / Đầu vào và đầu ra
 
 - Input: the specification file (template structure), an optional external rule file (the bundled VLSIT rule is the default), the output folder, the project name and the user name for the file headers; for a change request also the RTL folder. / Đầu vào: file specification (cấu trúc mẫu), file rule, thư mục output, tên project và tên người dùng cho header; với yêu cầu sửa còn cần thư mục RTL.
@@ -40,3 +44,7 @@ Tạo RTL SystemVerilog tổng hợp được từ specification theo mẫu ASIC
 | `vlsit_sim_evidence.py` | `plan`, `check`, `cdc`: waveform evidence and CDC branch logs, with non-match analysis and branch evidence requirements (R-033 to R-034, R-088 to R-094). / Kiểm waveform mô phỏng, phân tích sai khác và log hai nhánh CDC. |
 
 Claude Code: `/vlsit-rtl-generator`; Codex: `$vlsit-rtl-generator`; DeepSeek Harness: `/vlsit-rtl-generator`; or describe the task naturally. / Claude Code: `/vlsit-rtl-generator`; Codex: `$vlsit-rtl-generator`; DeepSeek Harness: `/vlsit-rtl-generator`; hoặc mô tả trực tiếp yêu cầu.
+
+## FSM draw.io example / Ví dụ FSM bằng draw.io
+
+Open the editable [Moore transfer controller](reference/examples/vlsit_fsm_moore_transfer.drawio) example to see reset entry, hold loops and labeled transitions. / Mở ví dụ để xem đường vào do reset, vòng lặp giữ trạng thái và các điều kiện chuyển trạng thái. Tệp có thể chỉnh sửa trực tiếp trong draw.io.

@@ -4,7 +4,7 @@
 Terminology: Register-Transfer Level (RTL); Design Under Test (DUT); Finite-State Machine (FSM). See the [skill glossary](vlsit_glossary.md) for context and other abbreviations. Preserve identifiers and use the exact specification/tool revision.
 <!-- VLSIT_TERMINOLOGY_END -->
 
-Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-010, R-022 to R-026, R-033 to R-034, R-088 to R-094). Read this before you write or change a simulation testbench. A testbench is written only when the user asks for one (R-022).
+Guidance only; the mandatory requirements are in [rule.md](../rule.md) (R-010, R-022 to R-026, R-033 to R-034, R-048 and R-088 to R-098). Read this before planning or authoring the simulation testbench that accompanies RTL delivery.
 
 ## 1. What the testbench is derived from (R-023)
 
@@ -12,7 +12,7 @@ The order of authority is:
 
 1. The specification of the design: requirements (REQ-IDs), the cycle-level behavior, the port list, the parameters, the test plan and the assertion list of its verification section.
 2. The standard of every protocol on the ports (APB, AXI, TL-UL, ...): the clause that defines a signal rule, a transfer, a response or an error. Take the text from the converted standard of the project (for example the `md_doc` folder of the specification skill), not from memory.
-3. The RTL, **only** for the names, widths and parameters of the ports it must connect to. The behavior of the RTL is never a source for a stimulus, an expected value or a check.
+Use only the approved specification and its incorporated clauses during authoring. The specification owner supplies missing port facts. Move to a separate phase for RTL integration or diagnosis.
 
 Why: a test copied from the RTL agrees with the RTL even when the RTL is wrong. Write each check from the specification first, then run it on the RTL.
 
@@ -29,7 +29,20 @@ Every check, expected value and assertion carries the requirement ID or the prot
 | Constrained-random test | Random traffic with a seed (`+SEED`) and a length (`+N`), checked by the same scoreboard and assertions. |
 | Result | A table of the assertions, a one-line PASS or FAIL, and a non-zero exit status on failure (`$fatal`). |
 
-Build the directed-test plan in two ordered groups (R-048): focused cases for each primary function named in the specification, then integrated flows that combine multiple functions. Use the minimum legal stimulus and dependencies for each focused case. If the architecture prevents isolation, name the required dependency and keep other functions inactive where possible.
+Build a matrix with primary function, requirement, testcase ID, interacting functions, interaction check ID and execution evidence. Select at least ten distinct integrated scenarios, prioritizing high-risk interactions and new observations. A configuration, transfer, backpressure and completion sequence is useful when the specification defines how each step changes the next and the test checks that effect. Add focused cases where a distinct result or easier fault isolation warrants one.
+
+Place this header at the top of each testcase source in the language's comment syntax:
+
+| Header field | Required content |
+|---|---|
+| Test ID, priority and objective | Scenario, target defect and risk rationale |
+| Specification trace and setup | Revision, requirement IDs, configuration, initial state |
+| Software or transaction sequence | Ordered initialization, operations, completion and recovery as applicable |
+| Verification method | Monitors, independent oracle, observable interaction and expected result |
+| Check inventory | At least five check IDs with specification references, triggers, expectations, checker IDs, deadlines and failure conditions |
+| Replay and evidence | Exact command, seed, run result and waveform references |
+
+Reuse a small harness with shared drivers, monitors and expectations derived from the specification. Keep each scenario independently runnable with a clean initial state, bounded waits and per-check outcomes.
 
 Before finalizing the plan, ask whether code coverage is wanted and which supported metric to measure (R-047). A line/statement example counts whether a specified function's RTL statements execute; a branch example counts both outcomes of a decision; a toggle example counts signal transitions; an FSM metric counts states or transitions. The installed simulator determines which metrics are available. Do not compare percentages from different metrics.
 
@@ -55,7 +68,7 @@ Rules for the assertions:
 
 - Name each one with the standard and the clause (for example `APB-04 ... (IHI0024D 3.1, 4.1)`) or with the requirement ID.
 - Count how many times the antecedent was true (hits) and how many times the consequent failed (fails), and print the table at the end.
-- The run fails when an assertion fails and also when an assertion has no hit: a check that never fired proves nothing. Make the stimulus reach it or remove it.
+- The run fails when an enabled assertion fails or a required assertion has no hit. Plan which scenarios exercise each applicable protocol assertion and record scenario-inapplicable assertions with reasons. Keep every required assertion in the plan until the stimulus exercises it.
 - A rule that binds the other side (the requester or the device) checks that the testbench stimulus is legal. When a test breaks such a rule on purpose (for example an orphan response, or a read driven with a non-zero strobe), mask exactly that assertion for exactly that cycle with an input of the assertion module, and say so in its header.
 - Sample at the active clock edge before the flip-flops update, like a concurrent assertion. If the simulator has no concurrent assertions, write them as clocked checks:
 
@@ -78,7 +91,9 @@ endtask
 
 ## 4. How strong is the testbench
 
-Show that the testbench can fail. Copy the RTL, inject a bug that matches a requirement (a rule not applied, a signal stuck, a phase one cycle late), run the testbench and record which check or assertion fired. A bug that nothing catches means a missing check or a missing stimulus. State in the report how many injected bugs were caught and which ones were equivalent to the original design. Do this on a copy, never on the delivered RTL.
+Pair each testcase baseline with a plausible injected fault or qualified known-bad observation under R-096. Record the expected detecting check before the negative run, then record the actual mismatch, run IDs and verdict. Keep survived or invalid injections visible. Save a distinct scoped simulator waveform per testcase.
+
+Keep a review ledger with testcase ID, source hash, run ID, waveform path and hash, checker outcomes, fault result, reviewer, date, findings and disposition. The engineer opens the waveform and compares each relevant checkpoint to the specification. Keep human review pending until performed. Preserve originals and open an integrity incident under R-098 if evidence shows false PASS, fabrication, or that an ineffective testcase was presented as effective.
 
 ## 5. When a simulation check or assertion fails (R-026)
 
@@ -149,4 +164,4 @@ end
 
 ## 8. Report
 
-State which standards and which requirements the testbench was derived from, the number of assertions and the table of their hits, the stimulus cases and their focused/combined group, the seeds, the result of `vlsit_sim_evidence.py` for the waveform evidence and, for a crossing, the runs of both branches, the number of injected bugs caught, every failure with its decision, and what was not verified. When code coverage is requested, report its status, selected metric, measured baseline and final covered/coverable counts, target, DUT scope and exclusions, simulator/version, uncovered points, and whether the target was met. Use `not_requested`, `not_supported`, `baseline_only`, `target_met`, or `target_unmet` where applicable; distinguish code coverage from functional/requirement coverage and mutation score.
+State which standards and which requirements the testbench was derived from, the number of assertions and the table of their hits, the functional traceability matrix, distinct integrated scenario count, per-check results, fault qualification and engineer review status, the seeds, the result of `vlsit_sim_evidence.py` for the waveform evidence and, for a crossing, the runs of both branches, the number of injected bugs caught, every failure with its decision, and what was not verified. When code coverage is requested, report its status, selected metric, measured baseline and final covered/coverable counts, target, DUT scope and exclusions, simulator/version, uncovered points, and whether the target was met. Use `not_requested`, `not_supported`, `baseline_only`, `target_met`, or `target_unmet` where applicable; distinguish code coverage from functional/requirement coverage and mutation score.

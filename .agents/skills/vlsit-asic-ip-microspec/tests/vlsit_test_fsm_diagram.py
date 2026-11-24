@@ -14,9 +14,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import vlsit_fsm_diagram as F  # noqa: E402
-import vlsit_library_symbols as L  # noqa: E402
-import vlsit_drawio_to_svg as R  # noqa: E402
+import vlsit_fsm_diagram as CLI
+import vlsit_fsm_layout as F  # noqa: E402
+import vlsit_fsm_library_symbols as L  # noqa: E402
+import vlsit_fsm_to_svg as R  # noqa: E402
 
 
 class FsmSpecChecks(unittest.TestCase):
@@ -27,6 +28,7 @@ class FsmSpecChecks(unittest.TestCase):
         self.assertEqual(F.validate_spec(self.spec), [])
 
     def test_state_name_must_follow_the_rtl_rule(self):
+        self.spec["state_pattern"] = r"^ENUM_ST_[A-Z0-9_]+$"
         self.spec["states"][0]["name"] = "idle"
         errors = F.validate_spec(self.spec)
         self.assertTrue(any("naming pattern" in e for e in errors))
@@ -56,9 +58,13 @@ class FsmSpecChecks(unittest.TestCase):
 
     def test_state_pattern_can_be_overridden(self):
         self.spec["state_pattern"] = r"^ST_[A-Z]+$"
-        self.spec["states"] = [{"name": "ST_A"}, {"name": "ST_B"}]
+        self.spec["states"] = [
+            {"name": "ST_A", "conditional_exit": False, "hold_conditions": []},
+            {"name": "ST_B", "conditional_exit": False, "hold_conditions": []},
+        ]
         self.spec["initial"] = "ST_A"
         self.spec["transitions"] = [{"src": "ST_A", "dst": "ST_B", "label": "go"}]
+        self.spec["condition_aliases"] = []
         self.assertEqual(F.validate_spec(self.spec), [])
 
 
@@ -83,8 +89,8 @@ class Geometry(unittest.TestCase):
 
     def test_flow_ranks_start_at_the_initial_state(self):
         self.assertEqual(self.rank["ENUM_ST_IDLE"], 0)
-        self.assertGreater(self.rank["ENUM_ST_SEND"], 0)
-        self.assertGreater(self.rank["ENUM_ST_WAIT"], self.rank["ENUM_ST_SEND"])
+        self.assertGreater(self.rank["ENUM_ST_WAIT"], 0)
+        self.assertGreater(self.rank["ENUM_ST_DONE"], self.rank["ENUM_ST_WAIT"])
 
     def test_chosen_layout_is_two_dimensional_and_passes_geometry(self):
         layout, positions, _stats, min_gap, _rank_gap, margin = F.choose_layout(
@@ -123,30 +129,40 @@ class DrawioAndSvg(unittest.TestCase):
             digest, prototypes = L.load_library()
             pages = L.read_pages(path)
             checked = L.validate_pages(pages, digest, prototypes)
-            self.assertEqual(checked, len(names) + len(spec["transitions"]))
+            self.assertEqual(checked, 1 + len(names) + len(spec["transitions"]))
             styles = [cell.get("style") or "" for cell in pages[0].find("root").findall("mxCell")]
             self.assertTrue(any("ellipse" in style for style in styles))
             svg = R.render_page(pages[0]).render()
             self.assertIn("<ellipse", svg)
             self.assertIn("ENUM_ST_IDLE", svg)
-            self.assertIn("psel", svg)
+            self.assertIn("request accepted", svg)
+
+    def make_insert_args(self, spec, stem, function):
+        figure = spec.parent / "figures" / (stem + ".svg")
+        figure.parent.mkdir(exist_ok=True)
+        source = figure.with_suffix(".drawio")
+        figure.write_text("<svg/>", encoding="utf-8")
+        source.write_text("<mxfile/>", encoding="utf-8")
+        source.with_suffix(".json").write_text("{}", encoding="utf-8")
+        report = figure.with_name(stem + "_layout_report.txt")
+        report.write_text("CROSSINGS: 0\nCONNECTOR CONFLICTS: 0 (minimum clearance 50 px)\nRESULT: PASS\n",
+                          encoding="utf-8")
+        return argparse.Namespace(spec=str(spec), figure=str(figure), source=str(source),
+                                  function=function, caption=None, json_source=None)
 
     def test_insert_adds_and_replaces_the_fsm_figure(self):
         text = "# Spec\n\n### 10.1 Modes and state transitions\n\n| A | B |\n|---|---|\n| x | y |\n"
         with tempfile.TemporaryDirectory() as folder:
             spec = Path(folder) / "spec.md"
             spec.write_text(text, encoding="utf-8")
-            args = argparse.Namespace(spec=str(spec), figure="figures/fsm.svg",
-                                      source="figures/fsm.drawio", function="bridge", caption=None,
-                                      json_source=str(Path(folder) / "fsm.json"))
-            Path(args.json_source).write_text("{}", encoding="utf-8")
-            self.assertEqual(F.action_insert(args), 0)
+            args = self.make_insert_args(spec, "fsm", "bridge")
+            self.assertEqual(CLI.action_insert(args), 0)
             result = spec.read_text(encoding="utf-8")
             self.assertIn("<!-- FSM-DIAGRAM:bridge -->", result)
             self.assertIn("![FSM state diagram of bridge](figures/fsm.svg)", result)
             self.assertLess(result.find("<!-- FSM-DIAGRAM:bridge -->"), result.find("| A | B |"))
-            args.figure = "figures/fsm_v2.svg"
-            self.assertEqual(F.action_insert(args), 0)
+            args = self.make_insert_args(spec, "fsm_v2", "bridge")
+            self.assertEqual(CLI.action_insert(args), 0)
             result = spec.read_text(encoding="utf-8")
             self.assertEqual(result.count("<!-- FSM-DIAGRAM:bridge -->"), 1)
             self.assertIn("figures/fsm_v2.svg", result)
@@ -163,12 +179,8 @@ class DrawioAndSvg(unittest.TestCase):
             spec = Path(folder) / "spec.md"
             spec.write_text(text, encoding="utf-8")
             for function in ("bridge", "aux"):
-                args = argparse.Namespace(spec=str(spec), figure="figures/%s.svg" % function,
-                                          source="figures/%s.drawio" % function,
-                                          function=function, caption=None,
-                                          json_source=str(Path(folder) / ("%s.json" % function)))
-                Path(args.json_source).write_text("{}", encoding="utf-8")
-                self.assertEqual(F.action_insert(args), 0)
+                args = self.make_insert_args(spec, function, function)
+                self.assertEqual(CLI.action_insert(args), 0)
             result = spec.read_text(encoding="utf-8")
             self.assertNotIn("<fsm-function>", result)
             self.assertNotIn("placeholder.svg", result)

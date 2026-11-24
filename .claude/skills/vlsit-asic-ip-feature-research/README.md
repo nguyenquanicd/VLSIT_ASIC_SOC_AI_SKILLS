@@ -33,3 +33,7 @@
 ## Use / Cách dùng
 
 Claude Code: `/vlsit-asic-ip-feature-research`; Codex: `$vlsit-asic-ip-feature-research`; DeepSeek Harness: `/vlsit-asic-ip-feature-research`; or describe the research task naturally. / Claude Code: `/vlsit-asic-ip-feature-research`; Codex: `$vlsit-asic-ip-feature-research`; DeepSeek Harness: `/vlsit-asic-ip-feature-research`; hoặc mô tả yêu cầu nghiên cứu bằng ngôn ngữ tự nhiên.
+
+## FSM draw.io example / Ví dụ FSM bằng draw.io
+
+Open the editable [Moore transfer controller](reference/examples/vlsit_fsm_moore_transfer.drawio) example to see reset entry, hold loops and labeled transitions. / Mở ví dụ để xem đường vào do reset, vòng lặp giữ trạng thái và các điều kiện chuyển trạng thái. Tệp có thể chỉnh sửa trực tiếp trong draw.io.

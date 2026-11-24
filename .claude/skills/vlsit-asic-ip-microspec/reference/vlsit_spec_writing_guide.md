@@ -34,7 +34,7 @@ The specification source is Markdown. Write inline equations in TeX as `$...$` a
 
 ## FSM state diagram, section 10.1 (rules R-068 to R-071)
 
-Every finite state machine represented by the 10.1 state table gets a diagram at the top of that subsection. Build it from a JSON FSM specification with `scripts/vlsit_fsm_diagram.py`; keep the JSON, editable `.drawio`, and rendered SVG beside the specification. Use VLSIT library ovals for state nodes and the complete RTL enum names. Start with the initial state, follow transition flow, minimize crossings, and check the layout report for state-label fit, transition-label conflicts, distribution, and crossings. Insert the image with the script so the JSON representation follows the image link (R-073). See [vlsit_fsm_diagram_rules.md](drawio/vlsit_fsm_diagram_rules.md).
+Inventory every FSM and document its purpose, owning block, state functions, abstract transition events and precise guards in section 10.1. Insert a checked figure or approved linked views for each FSM. Follow the [FSM workflow and rulebook](drawio/vlsit_fsm_diagram_rules.md). Apply the top diagram’s connectivity and documentation requirements to every required detail block diagram (R-075).
 
 ## Version register (rule R-067)
 

@@ -1,0 +1,47 @@
+{
+  "page_name": "FSM_REQUEST_CONTROLLER",
+  "out_name": "vlsit_fsm_request_controller.drawio",
+  "function": "Request controller",
+  "initial": "ENUM_ST_IDLE",
+  "reset": {
+    "signal": "i_rst_n",
+    "active_level": "low"
+  },
+  "state_pattern": "^ENUM_ST_[A-Z0-9_]+$",
+  "states": [
+    {
+      "name": "ENUM_ST_IDLE",
+      "conditional_exit": true,
+      "hold_conditions": ["request pending"]
+    },
+    {
+      "name": "ENUM_ST_WAIT",
+      "conditional_exit": true,
+      "hold_conditions": ["response pending"]
+    },
+    {
+      "name": "ENUM_ST_DONE",
+      "conditional_exit": true,
+      "hold_conditions": ["result pending"]
+    }
+  ],
+  "transitions": [
+    {"src": "ENUM_ST_IDLE", "dst": "ENUM_ST_IDLE", "label": "request pending"},
+    {"src": "ENUM_ST_IDLE", "dst": "ENUM_ST_WAIT", "label": "request accepted"},
+    {"src": "ENUM_ST_WAIT", "dst": "ENUM_ST_WAIT", "label": "response pending"},
+    {"src": "ENUM_ST_WAIT", "dst": "ENUM_ST_DONE", "label": "response returned"},
+    {"src": "ENUM_ST_DONE", "dst": "ENUM_ST_DONE", "label": "result pending"},
+    {"src": "ENUM_ST_DONE", "dst": "ENUM_ST_IDLE", "label": "result consumed"}
+  ],
+  "condition_aliases": [
+    {"label": "request pending", "expression": "!i_start || !i_ready"},
+    {"label": "request accepted", "expression": "i_start && i_ready"},
+    {"label": "response pending", "expression": "!i_resp_valid"},
+    {"label": "response returned", "expression": "i_resp_valid"},
+    {"label": "result pending", "expression": "!i_result_ready"},
+    {"label": "result consumed", "expression": "i_result_ready"}
+  ],
+  "layout": {
+    "margin": 160
+  }
+}

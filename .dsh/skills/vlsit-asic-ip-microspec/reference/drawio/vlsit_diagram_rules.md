@@ -10,3 +10,7 @@ Guidance for rules R-018 to R-020. Source rules: RHD-020..059, 079, 086..089, 09
 - The draw.io source has exactly two tabs in order: `BLOCK_DIAGRAM`, `BLOCK_INFORMATION`. In the specification, embed only an SVG rendered from `BLOCK_DIAGRAM`; keep the information tab only in the editable draw.io source.
 - Deviation for the specification flow: a single column of five or more independent channel blocks is accepted when every block has its boundary interfaces on two opposite sides (RHD-087 would forbid it); state it in the report.
 - Example: `reference/drawio/example/vlsit_axi_bridge_diagram_spec.json` and its output (`vlsit_spec_diagram.py build`).
+
+## Connectivity at every hierarchy level
+
+Apply R-075 to the IP top and each required detail view. Each functional block must have a real labeled connector to a distinct peer. Boundary stubs, clock/reset fanout alone and self-links do not satisfy peer connectivity. Document each block and every drawn interface in BLOCK_INFORMATION.

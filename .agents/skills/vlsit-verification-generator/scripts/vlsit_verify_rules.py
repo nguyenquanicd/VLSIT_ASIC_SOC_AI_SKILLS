@@ -34,10 +34,10 @@ CHECK_RE = re.compile(r"^\s*-\s*Check:\s*\S", re.M)
 # A level reads its own section plus every lower-level section and the
 # cross-cutting sections. A SoC run reads the whole book.
 LEVEL_SECTIONS = {
-    "component": ["Core", "Component", "Test", "Coverage", "Regression", "AI", "Verification", "Scalable"],
-    "vip": ["Core", "Component", "VIP", "Test", "Coverage", "Regression", "AI", "Verification", "Scalable"],
-    "block": ["Core", "Component", "VIP", "Block", "Test", "Coverage", "Regression", "AI", "Verification", "Scalable"],
-    "soc": ["Core", "Component", "VIP", "Block", "SoC", "Test", "Coverage", "Regression", "AI", "Verification", "Scalable"],
+    "component": ["Core", "Component", "Test", "Testcase", "Coverage", "Regression", "AI", "Verification", "Scalable"],
+    "vip": ["Core", "Component", "VIP", "Test", "Testcase", "Coverage", "Regression", "AI", "Verification", "Scalable"],
+    "block": ["Core", "Component", "VIP", "Block", "Test", "Testcase", "Coverage", "Regression", "AI", "Verification", "Scalable"],
+    "soc": ["Core", "Component", "VIP", "Block", "SoC", "Test", "Testcase", "Coverage", "Regression", "AI", "Verification", "Scalable"],
 }
 
 

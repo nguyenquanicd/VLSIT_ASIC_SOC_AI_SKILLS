@@ -329,21 +329,25 @@ def check_block_diagram(sec5, base, errors):
 def check_fsm_diagram(sec10, base, errors):
     """R-068, R-069, R-028: section 10.1 links an FSM figure for a real state table and its JSON source."""
     body = subsection(sec10, "10.1")
-    if NR_RE.search(body):
-        return
     states = []
+    state_table = False
     for line in body.splitlines():
         if not line.startswith("|"):
+            state_table = False
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        if len(cells) < 5 or set(cells[0]) <= set("-: "):
+        if cells[0].lower() == "mode/state":
+            state_table = True
+            continue
+        if not state_table or len(cells) < 5 or set(cells[0]) <= set("-: "):
             continue
         if cells[0].lower().startswith("mode/state") or cells[0].startswith("<"):
             continue
-        states.append(cells[0])
+        states.append(cells[0].strip("`"))
     images = re.findall(r"!\[[^\]]*\]\(([^)\s]+\.(?:svg|png))\)", body)
     if states and not images:
         errors.append("section 10.1: no FSM state diagram image for %d state(s) (rule R-068)" % len(states))
+    drawn_states = set()
     for image in images:
         if base is None:
             continue
@@ -351,10 +355,21 @@ def check_fsm_diagram(sec10, base, errors):
         if not path.is_file():
             errors.append("section 10.1: image %s not found (rule R-068)" % image)
         else:
-            if not path.with_suffix(".json").is_file():
+            source = path.with_suffix(".json")
+            if not source.is_file():
                 errors.append("section 10.1: no FSM-spec .json beside %s (rules R-068, R-057)" % image)
+            else:
+                try:
+                    spec = json.loads(source.read_text(encoding="utf-8-sig"))
+                    drawn_states.update(state["name"] for state in spec["states"])
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    errors.append("section 10.1: invalid FSM source %s: %s" % (source, exc))
             if not path.with_suffix(".drawio").is_file():
                 errors.append("section 10.1: no editable .drawio source beside %s (rules R-068, R-057)" % image)
+    if base is not None and images:
+        missing = sorted(set(states) - drawn_states)
+        if missing:
+            errors.append("section 10.1: states missing from FSM figures (R-068): " + ", ".join(missing))
 
 
 def check_wave_plan(sec10, base, errors):

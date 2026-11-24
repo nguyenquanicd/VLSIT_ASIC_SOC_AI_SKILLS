@@ -10,8 +10,10 @@ that simulation exhausts every state of a large IP.
 
 ## 1. Scope before infrastructure
 
-Collect RTL directory, top, filelist, supported configurations, specification and
-requirement inventory, exact protocol revisions, clocks/resets and available tools.
+Collect the approved specification, requirement inventory, supported configurations,
+incorporated protocol revisions and specified clocks/resets. Track available
+tools separately. Collect the RTL directory, top and filelist for build and
+integration after specification-only plan and testcase authoring (R-103).
 Ask for missing behavior that changes expected results. Review the project VIP and
 reference-model inventories, licenses and qualification evidence before reuse.
 Record which protocol layers, features and physical effects are in scope. Licensed

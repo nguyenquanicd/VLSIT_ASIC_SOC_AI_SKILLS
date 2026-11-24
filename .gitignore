@@ -4,6 +4,7 @@ __pycache__/
 # Local output folders (not released)
 /Output/
 /can_level1_output/
+/test_output/
 
 # Licensed standard converted to Markdown (Arm APB, redistribution forbidden, rule R-008)
 .agents/skills/vlsit-asic-ip-microspec/reference/md_doc/vlsit_apb_amba_apb_ihi0024d.md

@@ -17,6 +17,7 @@ The rules are grouped by verification level and by cross-cutting concern. The ru
 | Block | R-160–R-169 | A verification block, and every block inside a SoC |
 | SoC | R-180–R-189 | A SoC or system verification environment |
 | Test design and reporting | R-250–R-259 | Every run that selects, designs or reports tests |
+| Testcase quality and human review | R-281–R-286 | Every run that creates, executes, assesses or reports testcases |
 | Verification strategy | R-240–R-245 | Every run that plans, implements, runs, reviews or reports verification |
 | Scalable verification | R-260–R-280 | Every run, with profile-specific applicability |
 | Coverage | R-200–R-207 | Every run that plans, measures or closes coverage |
@@ -45,9 +46,9 @@ MUST read the core rules and the rule slice of the selected level before writing
 - Check: the output of `scripts/vlsit_verify_rules.py slice --level <level>` is part of the run record.
 
 ### R-103 Specification and standard authority
-MUST derive every stimulus, expected value, check and assertion from the specification and the protocol standard, and read the RTL only for port names, widths, parameters and integration details.
+MUST use the approved specification and the exact protocol clauses it incorporates as the sole authority for the test plan and testcase authorship, including stimuli, expected values, assertions and interface assumptions. Do not open, search, parse or ask another agent or tool to inspect DUT RTL for these activities. Do not use summaries, extracted interfaces, waveforms or other RTL-derived artifacts as design inputs. Obtain missing interface facts or expected behavior from the specification owner under R-104 before proceeding with affected work. After authoring, RTL may be used in a separate build, integration, execution or diagnostic phase. Any change to the plan or testcase behavior returns to specification-only authoring.
 - Why: a check copied from the RTL agrees with the RTL even when the RTL is wrong, so the testbench would certify the bug it was meant to find.
-- Check: manual - each check names a requirement ID or a protocol clause, and every RTL citation is limited to interface facts.
+- Check: record the approved specification revision and requirement references in the plan and testcase. Review authoring inputs for absence of RTL or RTL-derived design facts.
 
 ### R-104 Stop on specification gaps
 MUST stop and ask about every specification gap and every ambiguity that changes verification behaviour.
@@ -90,7 +91,7 @@ MUST record the simulator, reference models, operating system, compile/run optio
 - Check: the run manifest identifies every dependency and its version or hash.
 
 ### R-112 One evidence bundle per run
-MUST save one evidence bundle per run with logs, assertions, applicable coverage/reports, `resource_usage.json` and hashes. Apply the waveform capture policy in R-278 and record its status and scope, or the reason no waveform was captured.
+MUST save one evidence bundle per run with logs, assertions, applicable coverage/reports, `resource_usage.json` and hashes. Apply the waveform capture policy in R-278 and record its status and scope, or the reason no waveform was captured; a missing waveform is not permitted for the tests required by R-283.
 - Why: per-run evidence must remain auditable while avoiding large, low-value waveform dumps.
 - Check: `scripts/vlsit_verify_evidence.py check` verifies listed files and hashes; manual - `resource_usage.json` records measured or explicitly unavailable resource data, and waveform status follows R-278.
 
@@ -385,7 +386,7 @@ MUST NOT drive stimulus by forcing internal design signals; an unavoidable force
 - Check: manual - the verification report has a force table, and the static review finds no force outside it.
 
 ### R-259 Single verification report
-MUST deliver one verification report file that contains the test results, bug and fix records, coverage, exclusions, waivers, protocol deviations, VIP changes, force report, rule-ID table and residual risk, with a reason for every exception.
+MUST deliver one verification report file that contains the test results, testcase quality and human-review status, bug and fix records, coverage, exclusions, waivers, protocol deviations, VIP changes, force report, rule-ID table and residual risk, with a reason for every exception.
 - Why: scattered reports go out of sync, and a reviewer cannot see the whole verification state in one place.
 - Check: manual - the report contains every section named by `reference/templates/vlsit_verification_report.md.tpl`.
 
@@ -485,10 +486,10 @@ MUST keep every AI-generated code, assertion, coverage, test or diagnosis as a c
 - Why: AI output can be plausible, compilable and still semantically wrong, so tool acceptance and human judgement are separate safeguards.
 - Check: the evidence bundle contains the AI provenance record, the tool results and the reviewer approval.
 
-### R-232 Interface-only RTL context
-MUST give an AI model only the interface facts of the RTL, such as ports, widths and parameters, when the task is to derive expected values or checks.
-- Why: implementation behaviour in a prompt turns the model into a copier of the RTL and defeats specification-based checking.
-- Check: the prompt record lists the RTL files and the interface facts that were provided, with no implementation body.
+### R-232 Specification-only AI authoring context
+MUST exclude DUT RTL and RTL-derived artifacts from any AI context used to write the verification plan, testcase, expected values or checks. If the current context contains such material, use a clean authoring context and supply the approved specification and incorporated clauses under R-103.
+- Why: implementation behavior and interface assumptions extracted from RTL can bias independent verification.
+- Check: the authoring input record identifies the approved sources and confirms the absence of RTL and RTL-derived inputs.
 
 ### R-233 Grounded prompts
 MUST ground every AI prompt in specification IDs, protocol clauses and the target level's contract.
@@ -550,7 +551,7 @@ MUST NOT change a checker, expected value, assertion, coverage bin, constraint, 
 - Check: manual - every oracle change made after the first failing run of the affected test links a triage record (R-218) and an approval, and the verification report lists it.
 
 ### R-244 Reviewed report rows
-MUST give every test result and every failure-analysis row of the verification report a review record with the reviewer identity (engineer name, or AI agent and model version), a verdict (`agree`, `disagree` or `needs-info`), a comment and the author's response.
+MUST give every test result and every failure-analysis row of the verification report a review record with the reviewer identity (engineer name, or AI agent and model version), a verdict (`agree`, `disagree` or `needs-info`), a comment and the author's response. Testcase source and associated waveform review additionally require a hardware verification engineer under R-284; AI review is advisory only.
 - Why: a second reader catches wrong verdicts and weak root-cause claims, and recording the exchange keeps the disagreement and its resolution auditable.
 - Check: manual - no review cell is empty; a review by an AI agent is labelled as advisory and never replaces the human approval of R-113 and R-230; an open `disagree` or `needs-info` blocks the gate that uses the row.
 
@@ -664,9 +665,9 @@ MUST define a reviewed campaign resource budget in `sim/env/resource_budget.json
 - Check: the reviewed resource budget and each run's `resource_usage.json` are present and hashed; the job limit follows measured peak memory, or defaults to one when peak memory is unavailable.
 
 ### R-278 Tiered waveform capture
-MUST define a reviewed waveform capture policy in `sim/env/resource_budget.json`, avoid full-chip/full-duration dumps by default, and capture only the signals and time windows required by a planned verification or diagnostic need. When failure diagnosis needs more waveform detail, preserve the original run and use a new run with the same configuration and seed for targeted capture. Record waveform status, scope, time window and any omitted-capture reason in `resource_usage.json`, then include and hash that file in the evidence manifest.
-- Why: broad waveforms can dominate storage and slow simulation without adding useful evidence to ordinary passing runs.
-- Check: each run records `captured` or `not_captured`, its reason and scope; failures that require waveform analysis have a targeted waveform attached to the new run, while the original run remains intact.
+MUST define a reviewed waveform capture policy in `sim/env/resource_budget.json`, avoid full-chip/full-duration dumps by default, and capture only the signals and time windows required by a planned verification or diagnostic need. In addition, capture one separate, run-bound waveform for each of the ten highest-priority testcases in the campaign, or for every testcase when the campaign contains fewer than ten (R-283). Preserve the original run when a targeted diagnostic capture is needed and use a new run with the same configuration and seed. Record waveform status, scope, time window and any omitted-capture reason in `resource_usage.json`, then include and hash that file in the evidence manifest.
+- Why: compact, targeted waveforms control storage while the mandatory high-risk sample remains directly inspectable by an engineer.
+- Check: each run records `captured` or `not_captured`, its reason and scope; the risk-ranked testcase list identifies the required waveform set, each required test has its own waveform in its evidence bundle, and failures that need extra detail have a targeted waveform in a new run.
 
 ### R-279 Disk budget and run admission
 MUST define the observed free disk, a reviewed minimum-free-space stop threshold and a conservative per-run output estimate with its basis in `sim/env/resource_budget.json`. Before each run, ensure the expected outputs of all admitted concurrent jobs fit above the threshold; if output size cannot be credibly estimated, first perform a bounded pilot under a reviewed size limit or pause for a reviewed alternative. Record free disk before/after, expected output bytes and actual run output size in `resource_usage.json`. If a safe free-space measurement cannot be obtained, mark it `not_measured`, disclose the limitation and pause the campaign until a reviewed alternative is available.
@@ -677,3 +678,35 @@ MUST define the observed free disk, a reviewed minimum-free-space stop threshold
 MUST preserve the exact contents of retained RTL, testbench, environment, logs, coverage, snapshots, runs and evidence. Lossless compression is allowed only when the decompressed bytes match the original SHA-256 and the run manifest/retention catalog are updated and checked; deleting or overwriting retained artifacts to meet a resource limit is prohibited.
 - Why: space savings must not erase the replay basis or audit history.
 - Check: compressed artifacts have original/archive hashes and a successful round-trip result; manifests/catalogs validate and all original bytes remain recoverable.
+
+## Testcase quality and human-review rules (R-281–R-286)
+
+### R-281 Testcase source header and software flow
+MUST put a completed, structured header at the beginning of every testcase source. It identifies the test ID and priority; purpose; requirement and feature IDs; DUT configuration and preconditions; the ordered software-visible flow or a justified `N/A`; stimulus; named checkpoints with trigger and expected result; checker/oracle; targeted failure mode; seed and exact replay command; and the waveform ID or reason it is outside the required waveform set. Describe software initialization, configuration writes, start, polling/interrupt/data handling and shutdown when applicable. A protocol-level testcase without software interaction records `N/A` with a reason and describes its full transaction sequence instead. Do not leave placeholders in an executable testcase.
+- Why: reviewers must be able to understand what a testcase intends to prove and when it should detect a defect without guessing from stimulus code.
+- Check: manual - every testcase source has all applicable fields from `reference/templates/vlsit_testcase_header.md.tpl`, and the recorded sequence/checkpoints agree with its vplan row and specification.
+
+### R-282 Testcase quality and demonstrated detection
+MUST assess every testcase for requirement traceability, meaningful stimulus, an independent expected result, active checker coverage, reached checkpoints, bounded completion and reproducibility. Do not credit a testcase as effective from a simulator exit code, a `PASS` string, code coverage or assertion inactivity alone. For each highest-priority testcase, name at least one plausible defect/fault it targets and show that the qualified checker detects an applicable injected fault or mutation; if injection is technically inapplicable, record why and provide an equivalent known-bad oracle/checker qualification, otherwise leave detection effectiveness unqualified. Report valid, killed, survived, equivalent and invalid mutants separately.
+- Why: a passing test can be vacuous, exercise the wrong path or use an ineffective oracle.
+- Check: the testcase-quality report shows source review, execution/checkpoint evidence, checker activity, targeted defect classes and fault-detection results per testcase; survivors and unqualified detection remain open findings, not PASS evidence.
+
+### R-283 Mandatory priority-test waveforms
+MUST select the ten highest-priority testcases from a risk-ranked campaign list and save one separate waveform artifact for each selected testcase; if fewer than ten testcases are in the campaign, save a waveform for every testcase. Bind each waveform to the test ID, actual run ID, configuration, seed and source/build hashes. Capture enough named signals and a bounded time window to show the relevant setup, software/transaction flow, checkpoints and observed response. Store and hash the waveform in the run evidence bundle; a screenshot, waveform plan or shared multi-test dump without per-test separation does not satisfy this rule.
+- Why: a human engineer needs observable, source-bound evidence for the tests most likely to expose consequential defects.
+- Check: the priority list, testlist, run manifests and waveform index agree; each required testcase has a distinct waveform file with a valid manifest hash and the listed checkpoint signals.
+
+### R-284 Per-test engineer review
+MUST require a named hardware verification engineer to inspect every testcase source and its actual result, and every waveform artifact produced for the campaign, before testcase quality or the campaign is described as human-reviewed. Record per-test source and waveform hashes, reviewer name/role, date, disposition, findings and response using `reference/templates/vlsit_testcase_review.csv.tpl`. The review of tests without a waveform records the approved `N/A` reason. AI review may assist but cannot fill, infer or substitute the engineer's disposition.
+- Why: automatic checks cannot reliably establish that a human-readable testcase and waveform match the intended behavior.
+- Check: each test has a completed engineer review record; every waveform artifact has an explicit reviewed disposition; pending, rejected or disputed rows block human-approved sign-off.
+
+### R-285 False-PASS integrity response
+MUST treat any demonstrated false PASS, vacuous PASS, fabricated evidence or misrepresented human review as an `INTEGRITY_HOLD`, an AI-verification integrity failure and dishonest/misleading verification behavior. Immediately retract affected PASS, mutation, coverage and closure claims; preserve the original sources, logs, waveforms and hashes; stop success reporting; identify all affected tests and runs; acknowledge plainly that the prior claim was false and the earlier conclusion unreliable; and require root-cause correction plus fresh, source-bound reruns and engineer review before restoring any verdict. Never silently edit the result or characterize a confirmed false PASS as a minor documentation issue. Do not claim deliberate intent unless evidence establishes it.
+- Why: a false PASS can hide a design defect and destroys trust in dependent coverage and closure claims.
+- Check: the report records the integrity incident, retracted claims, affected evidence, root cause, corrective action, fresh run IDs and engineer review; no affected old run is relabeled as passing.
+
+### R-286 Minimum functional checks per testcase
+MUST plan and implement at least five distinct executable functional checks per testcase, in any combination of checkpoints with an active checker and assertions. For each check, document a stable ID, specification requirement or clause, trigger, expected observation, checker or assertion ID, deadline or timeout, and explicit failure condition in the source header. Different observations of the same requirement may count when they check distinct specification-defined behaviors or phases. Count a checkpoint and its backing assertion once. Exclude repeated hits, duplicate predicates, printed markers, and checks without a specification reference. If fewer than five meaningful checks can be derived, record the gap and revise the scenario or ask the specification owner before accepting the case.
+- Why: a testcase should check multiple concrete observations, including intermediate behavior when the specification defines it.
+- Check: reconcile the five or more unique planned IDs with the source and recorded outcome per ID. A test cannot receive PASS or coverage credit when a required check did not run, was vacuous, or lacked evidence. Record early termination as the actual non-passing result and show any checks not reached.

@@ -10,6 +10,10 @@ Write this section last. Every number here repeats a number from a later section
 |---|---|---|
 | Overall status | <closed / conditionally closed / open / not assessed> | 15 |
 | Tests | <n pass, n fail, n error, n timeout, n not run> of <n> runs, <n> seeds | 4 |
+| Testcase quality | <n effective, n weak, n invalid, n not assessed> | 4.6 |
+| Priority-test waveforms | <n required / n captured and hash-checked> | 4.6 |
+| Engineer testcase reviews | <n approved, n rejected, n pending> | 4.6 |
+| False-PASS integrity incidents | <n, or none> | 4.7 |
 | Open failures | <n> (<n> DUT, <n> testbench, <n> specification, <n> environment or tool, <n> not yet classified) | 4.4 |
 | Bugs | <n found, n fixed, n open> | 11 |
 | Functional coverage | <covered/total, %> against target <%> | 5 |
@@ -60,7 +64,7 @@ Status is `pass`, `fail`, `waived` or `not applicable`. Every `fail` and `waived
 | R-241 | All applicable checkers on in every test | <status> | <section 19.2> |
 | R-242 | Failure-mode list mapped to obligations | <status> | <plan document section 4> |
 | R-243 | No oracle change without triage and approval | <status> | <section 19.3> |
-| R-244 | Every result row reviewed | <status> | <sections 4, 4.4 and 4.5> |
+| R-244 | Every result row reviewed | <status> | <sections 4, 4.4, 4.5 and 4.6> |
 | R-245 | Plan document consistent with the vplan | <status> | <plan path and check result> |
 | R-250 | Combined-function tests | <status> | <test IDs and vplan rows> |
 | R-251 | Constrained-random stimulus | <status> | <constraint files and clauses> |
@@ -72,6 +76,12 @@ Status is `pass`, `fail`, `waived` or `not applicable`. Every `fail` and `waived
 | R-257 | Detailed exclusions | <status> | <exclusions section> |
 | R-258 | No unjustified force | <status> | <force table> |
 | R-259 | Single verification report | <status> | <this file> |
+| R-281 | Complete testcase source header and software/transaction flow | <status> | <test sources and headers> |
+| R-282 | Non-vacuous testcase quality and demonstrated fault detection | <status> | <quality and mutation evidence> |
+| R-283 | Waveform for the ten highest-priority tests, or every test if fewer | <status> | <waveform index and hashes> |
+| R-284 | Hardware engineer reviewed each testcase and every campaign waveform | <status> | <testcase review ledger> |
+| R-285 | False-PASS integrity response | <status> | <incident record or none> |
+| R-286 | At least five distinct executable functional checks per testcase | <status> | <check inventory and execution outcome per check ID> |
 | <level rule ID> | <statement> | <status> | <evidence> |
 
 ## 4. Test results
@@ -123,6 +133,24 @@ Discussion that does not fit a table cell. An open `disagree` or `needs-info` bl
 | Review ID | Row (test or FA ID) | Reviewer and type | Date | Comment | Author response | Resolution | Closed |
 |---|---|---|---|---|---|---|---|
 | RV-001 | <t_... / FA-...> | <name, engineer / agent+model, advisory> | <YYYY-MM-DD> | <comment> | <response> | <changed X / no change because Y> | <yes / no> |
+
+### 4.6 Testcase quality, priority waveforms and engineer review (R-281–R-284)
+
+List every testcase, including cases not run. Record the specification revision used during authoring and the outcome for each functional check ID, including checks not reached. Reconcile the results with at least five distinct required checks per test (R-286). A simulation result of `pass` does not imply an `effective` testcase or an approved engineer review. Include actual source and waveform hashes; use `N/A` only with a reason.
+
+| Test ID | Priority and rationale | Purpose / requirements | Software flow and checkpoints | Reached / required checkpoints | Checker activity | Targeted fault / detection result | Simulation status | Quality verdict | Waveform path / SHA-256 | Engineer / date | Review disposition / finding |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| <t_...> | <P0/P1/...; risk reason> | <purpose; REQ IDs> | <source header path> | <n>/<n> | <checker IDs; observed/hit counts> | <mutant ID; killed/survived/not applicable with reason> | <pass/fail/error/timeout/not_run> | <effective/weak/invalid/not_assessed> | <path and hash, or N/A with reason> | <named human engineer / YYYY-MM-DD> | <approved/rejected/pending/needs-info; finding> |
+
+Use `reference/templates/vlsit_testcase_review.csv.tpl` as the detailed per-test ledger. The engineer must inspect every testcase source and actual result, and open every waveform artifact produced for the campaign. If one test has multiple waveform artifacts, record one ledger row per waveform and repeat its testcase source/reviewer fields. AI review is advisory and cannot be recorded as engineer approval.
+
+### 4.7 False-PASS integrity incidents (R-285)
+
+If none were identified, state the scope and evidence reviewed. If any false PASS, vacuous PASS, fabricated evidence or misrepresented human review was found, set the campaign status to `INTEGRITY_HOLD`, retract affected claims, and record the incident below. State plainly that the prior claim was false and classify it as dishonest/misleading AI verification behavior and an integrity failure, without claiming deliberate intent unless supported by evidence. Do not overwrite or relabel the original run.
+
+| Incident ID | False claim and detection source | Affected tests/runs/metrics | Retracted claims | Preserved evidence and hashes | Root cause | Corrective action / new run IDs | Engineer reviewer / disposition |
+|---|---|---|---|---|---|---|---|
+| <INTEG-... or none> | <claim; human review or fault-injection evidence> | <test/run IDs, coverage/closure> | <PASS, mutation, coverage, closure> | <paths and hashes> | <confirmed or open> | <fix and fresh source-bound reruns> | <name/date; pending/approved> |
 
 ## 5. Coverage
 
@@ -294,7 +322,7 @@ Record the approved contract and inventory digests, complete scenario matrix and
 | Failed and successful run retention | <run IDs, retained outputs and archive location> |
 | Campaign resource budget | <resource_budget.json; RAM headroom/limit; job concurrency; disk stop threshold; reviewer> |
 | Per-run resource usage | <resource_usage.json per run; peak RAM, disk before/after, output bytes; measurement status/reason> |
-| Waveform capture policy | <capture/no-capture reason, signal scope and time window per applicable run> |
+| Waveform capture policy | <risk-ranked top ten or all-if-fewer, per-test capture paths/hashes, signal scopes/time windows, plus any diagnostic captures> |
 | Lossless compression | <artifact, original/archive hashes, round-trip check, updated manifest/catalog> |
 
 List any missing input, unavailable dependency or legacy-layout exception explicitly.

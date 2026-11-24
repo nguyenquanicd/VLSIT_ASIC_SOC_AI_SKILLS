@@ -424,17 +424,17 @@ MUST apply the ordinary RTL checks to code excluded by any preprocessing macro o
 
 ## Simulation testbench
 
-These rules apply only when the user asks for a testbench; the skill never writes one on its own.
+These rules apply to RTL generation and modification from a specification.
 
-### R-022 Testbench on request
-MUST write a simulation testbench only when the user asks for one, and save it in its own folder beside the design RTL, never in the design file set.
+### R-022 Simulation testbench deliverable
+MUST deliver a simulation testbench and functional testcase suite with generated or modified RTL, in a separate verification folder beside the design RTL. Keep simulation sources out of the design file set.
 - Why: the rule file and the lint cover design RTL, so verification code in the same folder would be judged by rules that do not apply to it.
-- Check: manual - the request for a testbench is in the chat, and the testbench files are outside the folder given to `vlsit_rtl_check.py` and `filelist.f`.
+- Check: manual - the testcase suite and testbench are present, and the testbench files are outside the folder given to `vlsit_rtl_check.py` and `filelist.f`.
 
 ### R-023 Specification and standards are the reference
-MUST derive every stimulus, expected value and check of a testbench from the specification and from the standards of the protocols on the ports, naming the requirement ID or the clause, and never from the behavior of the RTL code.
+MUST author and revise the test plan, testcases, assertions and independent expected results in a context containing only the approved specification and the exact protocol clauses it incorporates as design authority. Exclude DUT RTL, extracted RTL interfaces, and other RTL-derived facts from authoring. If the design context already contains RTL, use a separate authoring context and pass only the approved specification and incorporated clauses. Ask the specification owner for missing behavior, interface facts or legal interactions under R-005. Use RTL separately for integration, execution and diagnosis. Revisions to the plan, stimulus or checks return to specification-only authoring.
 - Why: a test copied from the RTL agrees with the RTL even when the RTL is wrong, so it proves nothing.
-- Check: manual - each check names a requirement ID or a protocol clause, and the RTL was read only for port names, widths and parameters.
+- Check: manual - record the approved revision and clause sources, confirm the authoring inputs exclude RTL and RTL-derived facts, and check traceability by requirement or clause.
 
 ### R-024 Protocol assertions
 MUST include in the testbench at least 20 assertions on the rules of the standard protocol of each port, and assertions that relate the interfaces when the design converts between protocols, each named with the clause or requirement it checks.
@@ -442,7 +442,7 @@ MUST include in the testbench at least 20 assertions on the rules of the standar
 - Check: manual - the simulation log lists every assertion with its name, clause and hit count, and the count is at least 20 per protocol.
 
 ### R-025 Assertions must fire
-MUST make the simulation fail, with a non-zero exit status, when an assertion fails and when an assertion never became active.
+MUST make the simulation fail, with a non-zero exit status, when an enabled assertion fails or a required assertion for that scenario never becomes active. List scenario-inapplicable protocol assertions separately with reasons. Across the suite, exercise each applicable protocol assertion under at least one planned scenario.
 - Why: an assertion whose condition was never reached proves nothing, and a passing run would hide that.
 - Check: the last simulation log prints "assertion failures: 0, assertions never exercised: 0"; manual - the exit status was non-zero when a failure was injected.
 
@@ -487,14 +487,34 @@ MUST report the missing metastability model as a verification gap and ask the de
 - Check: manual - the report names the gap and the designer is asked before the branch is waived.
 
 ### R-047 Coverage intent, metric, and target
-MUST ask, before finalizing a requested testbench plan, whether code coverage is wanted; when it is, record the metric/type and any target already supplied. If the metric is missing, present only types supported by the installed simulator, such as line/statement (which statements execute), branch (which decision outcomes execute), toggle (which signal transitions occur), or FSM state/transition coverage, and ask the designer to choose; recommend line/statement first when supported because its denominator is easier to explain. If no target is supplied, run or reuse the approved plan with coverage instrumentation, then show the measured baseline, metric, covered/coverable counts, DUT scope, exclusions, simulator/version, and uncovered points before asking for a target from 0 to 100 percent. If the user requests a different metric, measure and report that metric's baseline before asking for its target. Explain that unlike metrics cannot be combined and that code coverage differs from functional coverage, requirement coverage, and mutation score. Do not infer a target from an example or choose a percentage for the user. If coverage is unsupported, report N/A and ask whether to use a supported tool or proceed without coverage. If the user already supplied the metric and target, preserve them, report the baseline first, and do not ask them to repeat the choice. Follow R-006 for the question format.
+MUST ask, before finalizing the testbench plan, whether code coverage is wanted; when it is, record the metric/type and any target already supplied. If the metric is missing, present only types supported by the installed simulator, such as line/statement (which statements execute), branch (which decision outcomes execute), toggle (which signal transitions occur), or FSM state/transition coverage, and ask the designer to choose; recommend line/statement first when supported because its denominator is easier to explain. If no target is supplied, run or reuse the approved plan with coverage instrumentation, then show the measured baseline, metric, covered/coverable counts, DUT scope, exclusions, simulator/version, and uncovered points before asking for a target from 0 to 100 percent. If the user requests a different metric, measure and report that metric's baseline before asking for its target. Explain that unlike metrics cannot be combined and that code coverage differs from functional coverage, requirement coverage, and mutation score. Do not infer a target from an example or choose a percentage for the user. If coverage is unsupported, report N/A and ask whether to use a supported tool or proceed without coverage. If the user already supplied the metric and target, preserve them, report the baseline first, and do not ask them to repeat the choice. Follow R-006 for the question format.
 - Why: a percentage is meaningful only with a named metric, a measured denominator, and a stated DUT scope; an invented target or mixed metrics can make incomplete verification look complete.
 - Check: manual - the test plan or report records requested/not-requested status, metric, target or baseline-only choice, baseline evidence and tool/scope; confirm no unsupported or mixed percentage is reported.
 
-### R-048 Focus primary functions before combined flows
-MUST organize and run requested functional tests in this order: first, focused cases for each primary function named by the specification, using the minimum legal stimulus and dependencies needed to exercise that function; second, integrated-flow cases that combine multiple IP functions. When the specification or interface prevents isolating a function, record the dependency and test it with the fewest other functions active. Combined-flow cases supplement the focused cases and do not replace them; every case still traces to a requirement or protocol clause under R-023.
-- Why: focused cases expose a fault in the IP's main behavior directly, while later combined cases verify interactions without making failures difficult to localize.
-- Check: manual - the test plan and run order list the focused primary-function group before the combined-flow group, show requirement/clause trace for each case, and explain any function that could not be isolated.
+### R-048 Integrated functional testcase suite
+MUST generate at least ten distinct executable functional testcases. Map every primary function in the approved specification to at least one executable check. Each testcase in the minimum suite must exercise two or more specified functions in one coherent activity sequence and check their interaction, such as a configuration affecting a transfer or an error affecting recovery. Rank scenarios by interaction risk and unique checks. Repeated seeds or cosmetic variants without a new specification-defined observation do not count as separate cases. Add focused diagnostic cases where useful. If the specification cannot support ten distinct combined scenarios or leaves a primary function uncheckable, ask the specification owner and record the suite as incomplete until resolved.
+- Why: meaningful interaction checks expose defects that isolated function calls miss.
+- Check: inspect the function-to-test-to-check matrix for complete primary-function mapping and at least ten qualifying test IDs with explicit interaction checks. Distinguish planned, implemented, executed and verified coverage.
+
+### R-095 Testcase header and executable checks
+MUST put a structured header in each testcase source with its ID, objective, priority, requirement or clause references, configuration and initial state, ordered software operations, stimulus, targeted failure mode, verification method, seed and replay command. When there is no software interface, explain why and list the equivalent transaction flow. Implement at least five distinct executable functional checkpoints or assertions per testcase. Give each check an ID, specification reference, trigger, expected observation, checker ID, deadline and failure condition. Count a checkpoint and its backing assertion once. Use shared stimulus helpers, monitors and independent comparators, isolated per-test state, stable IDs, deterministic replay and bounded waits. Keep test sequences readable and avoid duplicating harness code.
+- Why: a reviewer must be able to follow the software or transaction sequence and locate the precise evidence for each check.
+- Check: reconcile headers, executable checks and results by ID. Duplicate predicates, printed markers and inactive or unreached checks do not qualify.
+
+### R-096 Demonstrate testcase fault detection
+MUST run each testcase on the baseline when the simulator is available and record actual outcomes and activity for its required checks. For every testcase, inject a plausible fault on a disposable DUT copy or through a controlled interface and demonstrate the expected mismatch at a named checker. Keep the delivered DUT unchanged during qualification. A compile failure, crash, unrelated timeout or unrelated assertion is insufficient. Record surviving faults and missing evidence as open findings. If injection is technically infeasible, document the reason and demonstrate the same checker with a known-bad observation or leave detection unqualified. Withhold PASS and coverage credit when required checks are missing, vacuous or unevidenced.
+- Why: a passing simulation can hide a checker that never runs or never reports a mismatch.
+- Check: inspect paired baseline and fault evidence, check IDs and outcomes. Distinguish the simulation verdict from testcase effectiveness.
+
+### R-097 Per-test waveforms and engineer review
+MUST save a separate simulator waveform for each testcase, including the ten required integrated cases, using the smallest signal scope and time window that shows the interaction and required checkpoints. Bind each file to the test ID, run ID, seed, configuration and source/build hashes. Keep the specification waveform comparisons under R-033 as separate evidence. A named hardware verification engineer must review every testcase source, its actual results and every generated waveform against the specification. Record reviewer, date, hashes, findings and disposition per case and waveform. Pending or rejected reviews block human sign-off. Missing simulator or waveform evidence remains an open gap. AI must leave human review fields pending until the engineer records a decision.
+- Why: the reviewer needs reproducible evidence of behavior at each meaningful checkpoint.
+- Check: reconcile the test inventory, run results, waveform files and engineer review ledger.
+
+### R-098 False PASS and testcase integrity
+MUST place verification on INTEGRITY_HOLD when an engineer or other evidence confirms counterfeit tests or evidence, false PASS, or weak or vacuous tests presented as effective. Acknowledge the misleading reporting as a verification integrity failure, retract affected PASS and coverage claims, preserve original evidence, fix the cause and require fresh runs and engineer review before restoring claims. Record openly reported weak or unqualified cases as unresolved quality findings. Attribute deliberate intent only with evidence.
+- Why: a misleading claim prevents the engineer from making a sound release decision.
+- Check: the incident log identifies rejected claims, original evidence, corrective action, new run IDs and human disposition.
 
 ## Delivery
 

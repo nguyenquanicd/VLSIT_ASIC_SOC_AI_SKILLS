@@ -12,7 +12,7 @@ Writing code is cheap with an AI model; trusting it is not. Every principle belo
 
 | # | Principle | In practice | Enforced by |
 |---|---|---|---|
-| P1 | The specification is the source of truth | Checks, expected values and bins come from requirement IDs and protocol clauses; the RTL gives only interface facts | R-103, R-232, R-233 |
+| P1 | The specification is the source of truth | Plan, checks, expected values, bins and interface assumptions come from the approved specification and incorporated clauses. RTL is used separately for integration or diagnostics | R-103, R-232, R-233 |
 | P2 | Oracle before stimulus | Build and qualify the model, scoreboard and assertions before running a campaign; a test without a qualified checker proves nothing | R-125, R-263, R-128 |
 | P3 | Choose the method per obligation | Formal for bounded control logic, simulation for data paths and long sequences, both for critical logic | R-240, R-167 |
 | P4 | Every test checks everything | All applicable checkers stay on in every test, so one scenario checks many functions | R-241, R-250 |
@@ -101,7 +101,7 @@ A surviving mutant is a checker gap, not a coverage gap: strengthen the checker 
 
 | Pitfall | Countermeasure |
 |---|---|
-| The same model writes the RTL and the checker, so both carry the same mistake | Write the oracle from the specification in a separate context without RTL bodies (R-232) |
+| The same model writes the RTL and the checker, so both carry the same mistake | Write the oracle from the specification in a clean authoring context without RTL or RTL-derived inputs (R-232) |
 | The agent edits the checker until the test passes | R-243; review every oracle change made after a failure |
 | A vacuous assertion that never triggers | A cover for each antecedent and non-vacuity counters (R-203) |
 | A coverage bin that is trivial to hit | Review every AI-generated bin (R-236) |

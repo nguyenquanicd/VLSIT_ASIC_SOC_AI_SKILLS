@@ -229,17 +229,17 @@ MUST describe each waveform as an adjacent WaveJSON `.json` file (the WaveDrom f
 - Check: `scripts/vlsit_waveform_svg.py check <WaveJSON>` prints PASS for every WaveJSON; manual - any legacy exemption meets its date and plan conditions.
 
 ### R-018 draw.io first
-MUST draw the block diagram of section 5.2 as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from sections 5, 6 and 14.2 of the specification; the draw.io file MUST contain exactly two tabs in this order: `BLOCK_DIAGRAM` and `BLOCK_INFORMATION`. `BLOCK_DIAGRAM` contains only the diagram; `BLOCK_INFORMATION` contains the block-function table, interface table and symbol legend. LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.
+MUST draw every required block diagram as a draw.io file with `scripts/vlsit_spec_diagram.py` from a JSON diagram spec that is filled from the applicable architecture, interface and hierarchy sections of the specification; the draw.io file contains exactly two tabs in this order: `BLOCK_DIAGRAM` and `BLOCK_INFORMATION`. `BLOCK_DIAGRAM` contains only the diagram; `BLOCK_INFORMATION` contains the block-function table, interface table and symbol legend. LaTeX (`scripts/vlsit_block_diagram.py`) is the fallback only when the user asks for it or the draw.io build fails.
 - Why: the editable source carries review information without crowding the figure embedded in the specification.
 - Check: `scripts/vlsit_spec_diagram.py check` and `build` print PASS; manual - the `.drawio` contains exactly the two named tabs in order and each tab has only its assigned content.
 
 ### R-019 Library only
-MUST build every shape of a draw.io diagram as a clone of the VLSIT library `reference/drawio/VLSIT_DRAWIO_LIB_V1.drawio.xml` (blocks and frames entry 32, text entry 0, connectors entry 1, IO pads entry 5), the only exception being the two native description tables on `BLOCK_INFORMATION`.
+MUST build every shape of a draw.io block diagram as a clone of the VLSIT library `reference/drawio/VLSIT_DRAWIO_LIB_V1.drawio.xml` (blocks and frames entry 32, text entry 0, connectors entry 1, IO pads entry 5), the only exception being the two native description tables on `BLOCK_INFORMATION`.
 - Why: the user fixed that library as the only symbol source, and the script keeps the provenance of every shape.
 - Check: `scripts/vlsit_library_symbols.py validate --diagram FILE` prints PASS (run by `vlsit_spec_diagram.py build`).
 
 ### R-020 draw.io style
-MUST follow `reference/drawio/vlsit_diagram_rules.md` (the drawing rules of the skill vlsit-rtl-hierarchy-diagram adapted to the specification) in every draw.io diagram: black and white only, 18 pt text, two-line block labels, the top module as an enclosing frame, one connector per interface with a mnemonic of at most 5 upper-case characters, straight boundary stubs, no grid; keep the diagram alone on `BLOCK_DIAGRAM`, and put the two native tables and symbol legend on `BLOCK_INFORMATION`.
+MUST follow `reference/drawio/vlsit_diagram_rules.md` (the drawing rules of the skill vlsit-rtl-hierarchy-diagram adapted to the specification) in every draw.io block diagram: black and white only, 18 pt text, two-line block labels, the top module as an enclosing frame, one connector per interface with a mnemonic of at most 5 upper-case characters, straight boundary stubs, no grid; keep the diagram alone on `BLOCK_DIAGRAM`, and put the two native tables and symbol legend on `BLOCK_INFORMATION`.
 - Why: the approved look and rules of the hierarchy-diagram skill give uniform, reviewable diagrams across IP.
 - Check: `scripts/vlsit_drawio_geometry_check.py` reports no finding (run by `vlsit_spec_diagram.py build`); manual - compare with `reference/drawio/VLSIT_daigram_reference.drawio`.
 
@@ -249,14 +249,14 @@ MUST run `vlsit_spec_diagram.py build` and fix every finding of the library vali
 - Check: the last `build` run prints PASS.
 
 ### R-028 Image in the specification
-MUST export only the `BLOCK_DIAGRAM` tab to SVG with `scripts/vlsit_drawio_to_svg.py` (run by `build`) and insert only that SVG into section 5.2 with `vlsit_spec_diagram.py insert`, which also names the two-tab `.drawio` source in the caption. `BLOCK_INFORMATION` MUST remain available in the editable `.drawio` but MUST NOT be embedded as the section 5.2 figure.
+MUST export only the `BLOCK_DIAGRAM` tab to SVG with `scripts/vlsit_drawio_to_svg.py` (run by `build`) and insert only that SVG into the applicable section (section 5.2 for the IP top), using `vlsit_spec_diagram.py insert` for the IP top, which also names the two-tab `.drawio` source in the caption. Keep `BLOCK_INFORMATION` in the editable source only.
 - Why: the specification figure should communicate the architecture directly, while the editable draw.io retains supporting tables and symbols on a separate tab.
-- Check: section 5.2 links an SVG rendered from `BLOCK_DIAGRAM`; the same-stem `.drawio` has both tabs, and no `BLOCK_INFORMATION` image is inserted.
+- Check: each block diagram links an SVG rendered from `BLOCK_DIAGRAM`; the same-stem `.drawio` has both tabs, and no `BLOCK_INFORMATION` image is inserted.
 
 ### R-029 Diagram traceable to the specification
-MUST take every block from the hierarchy of section 14.2 and every interface from sections 6 and 6.3. Put function/interface descriptions, source references and the symbol legend on `BLOCK_INFORMATION`, not on the diagram tab; write function text in design terms without signal names. When the design changes, update the specification first and redraw.
+MUST trace every top-level block and interface to sections 14.2, 6 and 6.3, and every lower-level block and interface to the documented decomposition and interfaces of its parent. Put function/interface descriptions, source references and the symbol legend on `BLOCK_INFORMATION`, not on the diagram tab; write function text in design terms without signal names. When the design changes, update the specification first and redraw.
 - Why: a diagram that disagrees with the specification misleads RTL and verification.
-- Check: `vlsit_spec_diagram.py check` reports an interface that is drawn but not in the table or the reverse; manual - the blocks match section 14.2.
+- Check: `vlsit_spec_diagram.py check` reports an interface that is drawn but not in the table or the reverse; manual - the blocks and interfaces match their sources at the diagram level.
 
 ### R-024 Waveform plan confirmed by the user
 MUST propose to the user, before drawing any waveform, a list that covers every operation of section 10.2, the success and the error case of every interface, and every special case of the IP (reset, backpressure, back-to-back, boundary and timeout cases); ask the user to confirm or change the minimum set with the question format of R-003; record the confirmed list as the waveform plan table of section 10.3 with the confirmation date; and draw every waveform of the plan.
@@ -330,25 +330,25 @@ MUST place a 32-bit read-only version register at offset `0x0` when the IP has a
 - Why: a fixed address identifies the IP revision before software trusts another register, and a defined baseline makes a new specification deterministic.
 - Check: `scripts/vlsit_csr_tool.py validate` reports a missing or wrongly named register, access type, field layout, or reset value; manual - section 11.1 states the version and the workbook lists it first.
 
-### R-068 FSM diagram for every state machine
-MUST include a state diagram at the top of section 10.1 for every finite state machine represented in its state table, generated from a JSON FSM specification using `scripts/vlsit_fsm_diagram.py`; a state machine MUST NOT be represented only by prose or by a Mermaid, Graphviz, or hand-drawn figure.
-- Why: a state table is difficult to scan for transition flow, while a generated diagram keeps every state and transition reviewable.
-- Check: `scripts/vlsit_spec_tool.py check` reports a state table without its image or source; `scripts/vlsit_fsm_diagram.py check` and `build` report PASS for each FSM.
+### R-068 Document every FSM
+MUST inventory all FSMs in the approved design, including FSMs inside sub-blocks and FSMs enabled by configuration. In section 10.1, give each FSM its own named entry with its purpose, owning block, clock/reset context, and at least one generated draw.io figure. Describe every state in a state table, including its function, outputs or side effects, and hold behavior. Describe each transition in functional terms and state the precise trigger and priority where multiple triggers can coincide. Record an explicit applicability statement when the design has no FSM.
+- Why: every controller and state must be reviewable without reading RTL.
+- Check: reconcile the architecture and configuration inventory with section 10.1. Match every FSM, state and transition to its figure or linked views and tables.
 
-### R-069 FSM state labels
-MUST render each FSM state as an oval cloned from the bundled VLSIT draw.io library and label it with the complete RTL enum member; transition labels state the event or condition that causes the transition.
-- Why: the full state name preserves traceability to the RTL, and a labelled transition exposes the actual state-machine behavior.
-- Check: `scripts/vlsit_library_symbols.py validate` reports no library violation; manual - every state-table name and labelled transition appears in the diagram.
+### R-069 Preserve FSM identity and transition meaning
+MUST use the full approved state identifier and distinguish reset, continuation, guarded transitions, implicit holds and shared overrides. Use a short English functional label for a complex condition and map it to the exact approved condition in the editable CONDITION_MAPPING tab and the specification. An implicit hold uses an unlabeled self-loop; an explicit guarded self-transition retains its condition. The approved specification and R-026 naming selection are authoritative.
+- Why: a short label stays readable while the precise trigger and behavior remain traceable.
+- Check: compare the state table, transition descriptions, JSON, diagram and mapping. Resolve missing source behavior through the specification workflow.
 
-### R-070 FSM flow order and crossings
-MUST arrange FSM states in transition-flow order from the initial state and select a layout with the fewest transition crossings among readable candidate layouts.
-- Why: ordering states by behavior makes the main path and recovery paths clear without hiding branches behind crossings.
-- Check: the layout report records the selected layout and crossing count; manual - the initial state and transitions follow the state table.
+### R-070 Apply the complete FSM drawing rules
+MUST apply all twenty requirements in [the FSM drawing rulebook](reference/drawio/vlsit_fsm_drawing_rulebook.md) and use the bundled FSM tool. Require zero crossing, touching, overlap, connector, label and node conflicts. In particular, an exit or entry arrow must stay clear of every self-loop on the same state. Inspect the final SVG at 100% and reroute until it passes. A blocker to geometry closure leaves the figure pending.
+- Why: a crossing or ambiguous attachment can conceal the actual transition.
+- Check: require PASS from the FSM build, zero geometry conflicts in the layout report and a visual review. Diagram checks establish traceability and geometry.
 
-### R-071 Compact two-dimensional FSM layout
-MUST distribute states across rows and columns when the FSM has enough states for a two-dimensional layout, keeping labels readable and the diagram compact; split an FSM into separate diagrams only when one page cannot keep its labels legible.
-- Why: a balanced layout reduces excessive width while preserving enough space for complete state names and transition labels.
-- Check: the FSM layout report shows at least two x- and y-coordinates when a two-dimensional layout is feasible, with no text-fit or label-conflict finding.
+### R-071 Keep FSM views compact and complete
+MUST rank states by transition flow from reset or continuation and keep related states close. Follow the rulebook for two-dimensional layout and the 20-state page limit. Obtain approval before partitioning or using the rulebook's linear layout provision. For approved linked views, identify continuation boundaries and show each state's complete outgoing behavior in at least one view.
+- Why: a compact layout is readable and a partition must preserve complete behavior.
+- Check: review the page counts, layout report, continuation references and the union of states and transitions against section 10.1.
 
 ### R-073 Machine-readable figure description
 MUST place immediately after the image link of each block or FSM figure a fenced `json` block that describes the displayed blocks/states and connections/transitions, and after each waveform image link a fenced `wavedrom` block that describes the displayed signals and edges; each block must agree with its adjacent source file and must not be hidden in an HTML comment, base64 data, or an image of text.
@@ -369,3 +369,8 @@ MUST use the Markdown file as the sole editable specification source, write inli
 MUST create only the DOCX and/or PDF deliverables requested or selected by the user using `scripts/vlsit_spec_export.py` from the authoritative Markdown; use Pandoc for DOCX and Pandoc with an installed PDF engine for PDF (Typst is the recommended default), treat the Markdown as the sole editable source, use `--reference-doc` only with a user-supplied style file, refuse to overwrite existing exports without authorization, and report missing tools instead of claiming success.
 - Why: derived files can drift from the design source, and PDF generation requires an external engine in addition to Pandoc.
 - Check: manual - each requested export was generated from the `.md` source, output files exist and are nonempty, existing outputs were not silently replaced, and the reported engine matches the command used.
+
+### R-075 Connect and describe every block at every level
+MUST apply the top IP diagram's documentation structure to every required block diagram. Every drawn functional block must connect to at least one distinct peer block through a genuine, labeled data or control interface documented in the specification. Self-connections, frame or boundary stubs alone, shared clock/reset distribution alone, and decorative lines do not satisfy this rule. Describe each block's function and each connection's endpoints, direction and purpose, with its interface or signal list and source. Use the block information tab for draw.io and equivalent companion tables for the permitted LaTeX fallback. If the approved architecture cannot supply a valid peer, resolve the scope or architecture with the designer before delivering the figure.
+- Why: an isolated box cannot explain how the block participates in the design.
+- Check: run the block JSON check for each view and review its rendered connectors against the information tables and source. Apply the same check to the source data for a fallback figure.

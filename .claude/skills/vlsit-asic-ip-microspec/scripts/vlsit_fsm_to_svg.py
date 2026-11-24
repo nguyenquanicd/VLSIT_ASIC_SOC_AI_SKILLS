@@ -1,0 +1,367 @@
+#!/usr/bin/env python3
+# ---------------------------------------------------------------------------
+# File     : vlsit_fsm_to_svg.py
+# Function : render an uncompressed draw.io FSM diagram to SVG
+# Author   : VLSI Technology
+# GitHub   : https://github.com/nguyenquanicd/VLSIT_ASIC_SOC_AI_SKILLS
+# ---------------------------------------------------------------------------
+"""Render an uncompressed FSM draw.io file to SVG.
+
+Purpose : create a portable vector rendering for Markdown and browser use. This renderer reads the draw.io geometry
+          and uses no third-party package, network access or external application.
+Usage   : python vlsit_drawio_to_svg.py FILE.drawio [--page NAME] [--out FILE.svg] [--force]
+          --page  : page name or 1-based index (default: the first page)
+          --out   : SVG path (default: next to the .drawio file, same stem)
+Input   : draw.io XML with compressed="false", as emitted by the bundled FSM generator.
+Output  : an SVG file; the last stdout line is "OK: wrote ...".
+Exit    : 0 success, 1 error (bad file, page not found, existing output without --force).
+Only the Python standard library is used.
+"""
+import argparse
+import html
+import re
+import sys
+import textwrap
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+FONT = 18
+CHAR_W = 10.0        # estimated width of one 18 pt character (same estimate as the generator)
+LINE_H = 22.0
+HOP = 6.0
+
+
+def style_dict(style):
+    out = {}
+    for part in (style or "").split(";"):
+        if "=" in part:
+            k, v = part.split("=", 1)
+            out[k] = v
+        elif part:
+            out[part] = ""
+    return out
+
+
+def esc(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def html_lines(value):
+    """Split an html label into (text, bold) lines."""
+    bold = "<b>" in value
+    text = re.sub(r"<br\s*/?>", "\n", value, flags=re.I)
+    text = re.sub(r"</?b>", "", text, flags=re.I)
+    text = html.unescape(text)
+    return [(ln, bold) for ln in text.split("\n")]
+
+
+def wrap(text, width):
+    """Wrap table text, including long unbroken Boolean expressions."""
+    cap = max(4, int((width - 8) / CHAR_W))
+    lines = []
+    for para in text.split("\n"):
+        lines.extend(textwrap.wrap(para, width=cap, break_long_words=True,
+                                   break_on_hyphens=False) or [""])
+    return lines
+
+
+def smooth_points(points, samples=12):
+    """Sample the same Catmull-Rom curve used by the FSM layout checker."""
+    if len(points) < 3:
+        return list(points)
+    output = [points[0]]
+    for index in range(len(points) - 1):
+        p0 = points[index - 1] if index > 0 else points[index]
+        p1, p2 = points[index], points[index + 1]
+        p3 = points[index + 2] if index + 2 < len(points) else points[index + 1]
+        for step in range(1, samples + 1):
+            t = step / float(samples)
+            t2, t3 = t * t, t * t * t
+            x = 0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t
+                       + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2
+                       + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3)
+            y = 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t
+                       + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2
+                       + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)
+            output.append((x, y))
+    return output
+
+
+def point_along(points, fraction):
+    total = sum(((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5 for a, b in zip(points, points[1:]))
+    target = total * fraction
+    travelled = 0.0
+    for first, second in zip(points, points[1:]):
+        length = ((second[0] - first[0]) ** 2 + (second[1] - first[1]) ** 2) ** 0.5
+        if travelled + length >= target and length > 1e-9:
+            ratio = (target - travelled) / length
+            return (first[0] + (second[0] - first[0]) * ratio,
+                    first[1] + (second[1] - first[1]) * ratio)
+        travelled += length
+    return points[-1]
+
+
+class Svg:
+    def __init__(self):
+        self.parts, self.minx, self.miny, self.maxx, self.maxy = [], 1e9, 1e9, -1e9, -1e9
+
+    def box(self, x, y, w, h):
+        self.minx, self.miny = min(self.minx, x), min(self.miny, y)
+        self.maxx, self.maxy = max(self.maxx, x + w), max(self.maxy, y + h)
+
+    def rect(self, x, y, w, h, sw=2, dash=False):
+        self.box(x, y, w, h)
+        d = ' stroke-dasharray="8 4"' if dash else ""
+        self.parts.append(f'<rect x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}" fill="#FFFFFF" stroke="#000000" stroke-width="{sw}"{d}/>')
+
+    def ellipse(self, x, y, w, h, sw=2):
+        self.box(x, y, w, h)
+        self.parts.append(f'<ellipse cx="{x + w / 2:g}" cy="{y + h / 2:g}" rx="{w / 2:g}" ry="{h / 2:g}" fill="#FFFFFF" stroke="#000000" stroke-width="{sw}"/>')
+
+    def edge_label(self, pts, label, offset=(0.0, 0.0)):
+        """Place a multiline edge label near the curve midpoint on a white background."""
+        lines = html_lines(label)
+        if not lines:
+            return
+        mx, my = point_along(pts, 0.5)
+        mx, my = mx + offset[0], my + offset[1]
+        width = max(len(ln) for ln, _ in lines) * FONT * 0.55 + 8
+        height = len(lines) * LINE_H + 6
+        x, y = mx - width / 2, my - height / 2
+        self.box(x, y, width, height)
+        self.parts.append(f'<rect x="{x:g}" y="{y:g}" width="{width:g}" height="{height:g}" fill="#FFFFFF" stroke="none"/>')
+        self.text(x, y, width, height, lines)
+
+    def text(self, x, y, w, h, lines, align="center", valign="middle", bold_all=False):
+        n = len(lines)
+        total = n * LINE_H
+        if valign == "top":
+            y0 = y + 4
+        else:
+            y0 = y + (h - total) / 2
+        for i, (ln, bold) in enumerate(lines):
+            if not ln:
+                continue
+            if align == "left":
+                tx, anchor = x + 4, "start"
+            elif align == "right":
+                tx, anchor = x + w - 4, "end"
+            else:
+                tx, anchor = x + w / 2, "middle"
+            ty = y0 + i * LINE_H + FONT
+            wt = ' font-weight="bold"' if (bold or bold_all) else ""
+            self.parts.append(f'<text x="{tx:g}" y="{ty:g}" text-anchor="{anchor}"{wt}>{esc(ln)}</text>')
+        self.box(x, y, w, h)
+
+    def polyline(self, pts, sw, jumps, arrow):
+        d = f"M {pts[0][0]:g} {pts[0][1]:g}"
+        for i in range(1, len(pts)):
+            (x1, y1), (x2, y2) = pts[i - 1], pts[i]
+            hops = sorted(jumps.get(i - 1, []), key=lambda p: ((p[0] - x1) ** 2 + (p[1] - y1) ** 2))
+            for hx, hy in hops:
+                if y1 == y2:       # horizontal segment: hop upward
+                    sgn = 1 if x2 > x1 else -1
+                    d += f" L {hx - sgn * HOP:g} {hy:g} A {HOP:g} {HOP:g} 0 0 {1 if sgn > 0 else 0} {hx + sgn * HOP:g} {hy:g}"
+                else:              # vertical segment: hop to the right
+                    sgn = 1 if y2 > y1 else -1
+                    d += f" L {hx:g} {hy - sgn * HOP:g} A {HOP:g} {HOP:g} 0 0 {0 if sgn > 0 else 1} {hx:g} {hy + sgn * HOP:g}"
+            d += f" L {x2:g} {y2:g}"
+        self.parts.append(f'<path d="{d}" fill="none" stroke="#000000" stroke-width="{sw}"/>')
+        for x, y in pts:
+            self.minx, self.miny, self.maxx, self.maxy = min(self.minx, x), min(self.miny, y), max(self.maxx, x), max(self.maxy, y)
+        if arrow and len(pts) >= 2:
+            (x1, y1), (x2, y2) = pts[-2], pts[-1]
+            dx, dy = x2 - x1, y2 - y1
+            ln = (dx * dx + dy * dy) ** 0.5 or 1.0
+            ux, uy = dx / ln, dy / ln
+            bx, by = x2 - ux * 12, y2 - uy * 12
+            px, py = -uy * 6, ux * 6
+            self.parts.append(f'<polygon points="{x2:g},{y2:g} {bx + px:g},{by + py:g} {bx - px:g},{by - py:g}" fill="#000000" stroke="#000000" stroke-width="1"/>')
+
+    def render(self, margin=30):
+        w, h = self.maxx - self.minx + 2 * margin, self.maxy - self.miny + 2 * margin
+        head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w:g}" height="{h:g}" viewBox="{self.minx - margin:g} '
+                f'{self.miny - margin:g} {w:g} {h:g}" font-family="Arial, Helvetica, sans-serif" font-size="{FONT}">')
+        bg = f'<rect x="{self.minx - margin:g}" y="{self.miny - margin:g}" width="{w:g}" height="{h:g}" fill="#FFFFFF"/>'
+        return "\n".join([head, bg] + self.parts + ["</svg>"]) + "\n"
+
+
+def seg_cross(a, b):
+    """Intersection point of an axis-parallel segment a with an axis-parallel segment b, or None."""
+    (ax1, ay1), (ax2, ay2), (bx1, by1), (bx2, by2) = a[0], a[1], b[0], b[1]
+    if ay1 == ay2 and bx1 == bx2:
+        if min(ax1, ax2) < bx1 < max(ax1, ax2) and min(by1, by2) < ay1 < max(by1, by2):
+            return (bx1, ay1)
+    if ax1 == ax2 and by1 == by2:
+        if min(ay1, ay2) < by1 < max(ay1, ay2) and min(bx1, bx2) < ax1 < max(bx1, bx2):
+            return (ax1, by1)
+    return None
+
+
+def render_page(page):
+    root = page.find(".//root")
+    cells = {c.get("id"): c for c in root.findall("mxCell")}
+    svg = Svg()
+
+    def geo(c):
+        g = c.find("mxGeometry")
+        if g is None:
+            return None
+        return (float(g.get("x", 0)), float(g.get("y", 0)), float(g.get("width", 0)), float(g.get("height", 0)))
+
+    def absolute(c):
+        """Absolute x, y of a cell: sum of the geometry offsets of the parent chain."""
+        x = y = 0.0
+        cur = c
+        while cur is not None and cur.get("id") not in ("0", "1"):
+            g = geo(cur)
+            if g:
+                x, y = x + g[0], y + g[1]
+            cur = cells.get(cur.get("parent"))
+        return x, y
+
+    # frames and blocks first, then text, pads, tables, edges (the generator emits in this order)
+    for c in root.findall("mxCell"):
+        if c.get("vertex") != "1" or c.get("vlsit_native_table") or c.get("parent") != "1":
+            continue
+        st = style_dict(c.get("style"))
+        g = geo(c)
+        if not g:
+            continue
+        x, y, w, h = g
+        if "group" in st:                       # IO pad (library entry 5): square with two diagonals
+            svg.rect(x, y, w, h, 2)
+            svg.parts.append(f'<line x1="{x:g}" y1="{y:g}" x2="{x + w:g}" y2="{y + h:g}" stroke="#000000" stroke-width="2"/>')
+            svg.parts.append(f'<line x1="{x + w:g}" y1="{y:g}" x2="{x:g}" y2="{y + h:g}" stroke="#000000" stroke-width="2"/>')
+            continue
+        value = c.get("value") or ""
+        lines = html_lines(value) if value else []
+        if st.get("text") is not None or "text" in st:
+            svg.text(x, y, w, h, lines, align=st.get("align", "center"))
+            continue
+        dashed = st.get("dashed") == "1"
+        if "ellipse" in st:
+            svg.ellipse(x, y, w, h, 2)
+        else:
+            svg.rect(x, y, w, h, 2, dashed)
+        if lines:
+            svg.text(x, y, w, h, lines, align=st.get("align", "center"), valign=st.get("verticalAlign", "middle"))
+    # native tables
+    for t in root.findall("mxCell"):
+        if style_dict(t.get("style")).get("shape") != "table":
+            continue
+        tx, ty = absolute(t)
+        g = geo(t)
+        st = style_dict(t.get("style"))
+        start = float(st.get("startSize", 30))
+        svg.rect(tx, ty, g[2], g[3], 2)
+        svg.text(tx, ty, g[2], start, [(t.get("value") or "", True)], align="center")
+        for r in root.findall("mxCell"):
+            if r.get("parent") != t.get("id"):
+                continue
+            ry = ty + float(geo(r)[1])
+            for c in root.findall("mxCell"):
+                if c.get("parent") != r.get("id"):
+                    continue
+                cg = geo(c)
+                cst = style_dict(c.get("style"))
+                x, y, w, h = tx + cg[0], ry, cg[2], cg[3]
+                svg.rect(x, y, w, h, 1)
+                lines = [(ln, "fontStyle" in cst and cst["fontStyle"] == "1") for ln in wrap(re.sub(r"<[^>]+>", "", c.get("value") or ""), w)]
+                svg.text(x, y, w, h, lines, align="left", valign="middle")
+    # edges
+    drawn = []
+    for c in root.findall("mxCell"):
+        if c.get("edge") != "1" or c.get("parent") != "1":
+            continue
+        g = c.find("mxGeometry")
+        sp, tp = g.find("mxPoint[@as='sourcePoint']"), g.find("mxPoint[@as='targetPoint']")
+        st = style_dict(c.get("style"))
+        if sp is not None:
+            source_point = (float(sp.get("x")), float(sp.get("y")))
+        else:
+            source_cell = cells.get(c.get("source"))
+            source_geo = geo(source_cell) if source_cell is not None else None
+            if source_geo is None:
+                continue
+            sx, sy = absolute(source_cell)
+            source_point = (sx + float(st.get("exitX", 0.5)) * source_geo[2],
+                            sy + float(st.get("exitY", 0.5)) * source_geo[3])
+        if tp is not None:
+            target_point = (float(tp.get("x")), float(tp.get("y")))
+        else:
+            target_cell = cells.get(c.get("target"))
+            target_geo = geo(target_cell) if target_cell is not None else None
+            if target_geo is None:
+                continue
+            tx, ty = absolute(target_cell)
+            target_point = (tx + float(st.get("entryX", 0.5)) * target_geo[2],
+                            ty + float(st.get("entryY", 0.5)) * target_geo[3])
+        pts = [source_point]
+        arr = g.find("Array")
+        if arr is not None:
+            pts += [(float(p.get("x")), float(p.get("y"))) for p in arr.findall("mxPoint")]
+        pts.append(target_point)
+        if st.get("curved") == "1":
+            pts = smooth_points(pts)
+        jumps = {}
+        if st.get("jumpStyle") == "arc":
+            for i in range(1, len(pts)):
+                for other in drawn:
+                    for j in range(1, len(other)):
+                        p = seg_cross((pts[i - 1], pts[i]), (other[j - 1], other[j]))
+                        if p:
+                            jumps.setdefault(i - 1, []).append(p)
+        svg.polyline(pts, float(st.get("strokeWidth", 2)), jumps, st.get("endArrow", "block") != "none")
+        drawn.append(pts)
+        if c.get("value"):
+            offset = g.find("mxPoint[@as='offset']")
+            point_offset = (float(offset.get("x", 0)), float(offset.get("y", 0))) if offset is not None else (0.0, 0.0)
+            svg.edge_label(pts, c.get("value"), point_offset)
+        for label_cell in root.findall("mxCell"):
+            if label_cell.get("parent") != c.get("id") or not label_cell.get("value"):
+                continue
+            if "edgeLabel" not in label_cell.get("style", ""):
+                continue
+            label_geometry = label_cell.find("mxGeometry")
+            offset = label_geometry.find("mxPoint[@as='offset']") if label_geometry is not None else None
+            point_offset = (float(offset.get("x", 0)), float(offset.get("y", 0))) if offset is not None else (0.0, 0.0)
+            svg.edge_label(pts, label_cell.get("value"), point_offset)
+    return svg
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("drawio")
+    ap.add_argument("--page")
+    ap.add_argument("--out")
+    ap.add_argument("--force", action="store_true")
+    a = ap.parse_args()
+    try:
+        tree = ET.parse(a.drawio)
+    except (OSError, ET.ParseError) as exc:
+        print(f"error: cannot read {a.drawio}: {exc}", file=sys.stderr)
+        return 1
+    pages = tree.getroot().findall("diagram")
+    if not pages:
+        print("error: no diagram page (is the file compressed?)", file=sys.stderr)
+        return 1
+    page = pages[0]
+    if a.page:
+        match = [p for i, p in enumerate(pages, 1) if p.get("name") == a.page or str(i) == a.page]
+        if not match:
+            print(f"error: page {a.page} not found", file=sys.stderr)
+            return 1
+        page = match[0]
+    out = Path(a.out) if a.out else Path(a.drawio).with_suffix(".svg")
+    if out.exists() and not a.force:
+        print(f"error: {out} exists; use --force", file=sys.stderr)
+        return 1
+    svg = render_page(page)
+    out.write_text(svg.render(), encoding="utf-8")
+    print(f"OK: wrote {out}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

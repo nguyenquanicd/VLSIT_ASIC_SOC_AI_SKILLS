@@ -124,15 +124,30 @@ def check_spec(spec):
         if i not in used:
             err.append(f"interface {i} has a row but is not drawn (RHD-058)")
     for i in spec["interfaces"]:
+        for field in ("name", "active", "signals"):
+            if not str(i.get(field) or "").strip():
+                err.append(f"interface {i['id']}: missing {field} description (R-075)")
         if not re.fullmatch(r"[A-Z0-9]{2,5}", i["id"]) and not re.fullmatch(r"[a-z][a-z0-9_]*", i["id"]):
             err.append(f"interface id {i['id']}: a mnemonic has 2 to 5 upper-case characters; a single-signal "
                        "interface uses the signal name (RHD-059)")
         if "signals" not in i or re.search(r"\.\.\.|\betc\b|\*", i.get("signals", "")):
             err.append(f"interface {i['id']}: list every signal name, no etc., ... or * (RHD-089)")
+    connected_blocks = set()
+    if not keys:
+        err.append("block diagram has no detail blocks (R-075)")
     for c in spec["connectors"]:
+        if c["src"] == c["dst"]:
+            err.append(f"connector {c['id']}: source and destination must be distinct blocks (R-075)")
+        elif c["src"] in keys and c["dst"] in keys:
+            connected_blocks.update((c["src"], c["dst"]))
         for k in ("src", "dst"):
             if c[k] not in keys:
                 err.append(f"connector {c['id']}: unknown block {c[k]}")
+    for b in spec["blocks"]:
+        if b.get("key") not in connected_blocks:
+            err.append(f"block {b.get('key')}: no connector to another block (R-075)")
+        if not str(b.get("function") or "").strip():
+            err.append(f"block {b.get('key')}: missing function description (R-075)")
     for e in spec["externals"]:
         if e["block"] not in keys:
             err.append(f"external {e['id']}: unknown block {e['block']}")
@@ -296,7 +311,12 @@ def action_insert(a):
         print(f"error: diagram JSON source not found: {json_path}", file=sys.stderr)
         return 1
     src = src_path.as_posix()
-    json_text = json.dumps(json.loads(json_path.read_text(encoding="utf-8-sig")), indent=2)
+    diagram_spec = load(json_path)
+    findings = check_spec(diagram_spec)
+    if findings:
+        print("\n".join(findings), file=sys.stderr)
+        return 1
+    json_text = json.dumps(diagram_spec, indent=2)
     caption = a.caption or "Block diagram of the top module"
     body = (f"\n![{caption}]({fig})\n\n```json\n{json_text}\n```\n\n"
             f"*Figure 5-1. {caption}. Source: `{src}` (draw.io, VLSIT library, drawn by "

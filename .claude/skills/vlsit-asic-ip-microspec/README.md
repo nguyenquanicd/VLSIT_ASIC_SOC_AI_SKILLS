@@ -43,3 +43,13 @@
 ## Use / Cách dùng
 
 Claude Code: `/vlsit-asic-ip-microspec`; Codex: `$vlsit-asic-ip-microspec`; DeepSeek Harness: `/vlsit-asic-ip-microspec`; or describe the task naturally. / Claude Code: `/vlsit-asic-ip-microspec`; Codex: `$vlsit-asic-ip-microspec`; DeepSeek Harness: `/vlsit-asic-ip-microspec`; hoặc mô tả yêu cầu bằng ngôn ngữ tự nhiên.
+
+## Diagram coverage / Phạm vi sơ đồ
+
+**EN** — Section 10.1 covers every FSM with a checked diagram, its purpose, each state function and abstract transition events mapped to exact conditions. Every required block diagram, including detail views, connects each block to a distinct peer and describes the blocks and interfaces.
+
+**VI** — Mục 10.1 có hình đã kiểm tra cho từng FSM, mô tả chức năng FSM, chức năng từng trạng thái và ánh xạ sự kiện chuyển trạng thái sang điều kiện chính xác. Ở mọi cấp sơ đồ khối được yêu cầu, mỗi khối phải nối với ít nhất một khối khác và có mô tả chức năng cùng giao diện kết nối.
+
+## FSM draw.io example / Ví dụ FSM bằng draw.io
+
+Open the editable [Moore transfer controller](reference/examples/vlsit_fsm_moore_transfer.drawio) example to see reset entry, hold loops and labeled transitions. / Mở ví dụ để xem đường vào do reset, vòng lặp giữ trạng thái và các điều kiện chuyển trạng thái. Tệp có thể chỉnh sửa trực tiếp trong draw.io.

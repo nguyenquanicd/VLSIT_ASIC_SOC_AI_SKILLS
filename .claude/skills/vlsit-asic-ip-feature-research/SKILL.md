@@ -114,3 +114,7 @@ Command syntax and required metadata flags are documented in [reference/vlsit_so
 ## Output
 
 The user supplies the output directory. The bundle contains an English Markdown research report, `vlsit_source_manifest.csv`, a `vlsit_sources/` folder for approved local copies, and draw.io/visual files when useful. Existing content is preserved; the final response links the report and states evidence-gate status, qualifying counts, search date and limits.
+
+## FSM draw.io example
+
+Use the [Moore transfer controller](reference/examples/vlsit_fsm_moore_transfer.drawio) as a visual example when state behavior helps explain a feature. Derive any research figure from the cited sources and label any unknown behavior.

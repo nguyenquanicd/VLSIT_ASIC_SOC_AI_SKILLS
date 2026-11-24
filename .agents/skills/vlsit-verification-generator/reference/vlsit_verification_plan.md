@@ -10,6 +10,8 @@ Guidance only; the mandatory requirements are in [rule.md](../rule.md). Read thi
 
 A testlist answers "what do we run?" A vplan answers "what must be true, how do we know, and what evidence proves it?" A testlist can look complete while a requirement is untested; a vplan shows the gap.
 
+For each testcase, list at least five distinct specification-linked checkpoint or assertion IDs in the readable plan and link the inventory by test ID from the vplan. Use only the approved specification and incorporated clauses when authoring both artifacts (R-103, R-286).
+
 The vplan is the single source of truth for scope, traceability, coverage commitments and evidence links. It is approved at gate G0 and updated at every later gate.
 
 ## 2. Traceability graph
