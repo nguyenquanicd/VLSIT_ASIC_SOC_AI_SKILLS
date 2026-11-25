@@ -286,7 +286,7 @@ MUST name every specification created or revised with this skill exactly `VLSIT_
 - Check: manual - the specification basename matches `^VLSIT_[A-Z0-9]+(?:_[A-Z0-9]+)*_HDS\.md$`, and repository links resolve to the renamed file.
 
 ### R-043 Software programming and use flow
-MUST include in section 11.2 a basic flowchart for programming and using the IP and a matching step-by-step table, and keep both artifacts required even when the section appears inapplicable; do not mark it `Not required`.
+MUST include in section 11.2 a basic flowchart for programming and using the IP and a matching step-by-step table, plus the individual sequence tables required by R-076 and R-077, and keep both artifacts required even when the section appears inapplicable; do not mark it `Not required`.
 - Why: software, integration and verification teams need a concrete sequence that shows which actions are required, which modes are optional, how the IP is accessed, and what each configuration step accomplishes.
 - Check: manual - section 11.2 contains both artifacts, their steps agree, and the section is not marked `Not required`.
 
@@ -296,7 +296,7 @@ MUST write the section 11.2 flowchart as a Mermaid `flowchart` and label every s
 - Check: manual - each flowchart node has a unique ID and one of the two required labels.
 
 ### R-061 Step-table columns
-MUST use exactly these columns in the section 11.2 step table: `No.`, `Step`, `Option (M/O)`, `Interface`, `CSR`, and `Description`.
+MUST use exactly these columns in every section 11.2 step table: `No.`, `Step`, `Option (M/O)`, `Interface`, `CSR`, and `Description`.
 - Why: a fixed table shape makes flows comparable and keeps interface and register actions visible.
 - Check: manual - the table header contains exactly the six named columns in order.
 
@@ -311,19 +311,29 @@ MUST state in the `Interface` column how the master interacts with the IP, inclu
 - Check: manual - each `Interface` cell names the protocol/action or the required `N/A` rationale and integration point.
 
 ### R-064 CSR and non-CSR actions
-MUST name the exact workbook register and field plus the value/action software writes, reads or polls in the `CSR` column; when the IP has no software-visible CSR, write `N/A` with the reason, name the non-CSR interface in `Interface`, and document the normal use sequence.
+MUST name the exact workbook register and field plus the value/action software writes, reads or polls in the `CSR` column; when a step has no register access, write N/A with the reason and name the relevant action or integration interface. If the IP has no software-visible CSR, document its normal use through the actual interface. External controller register references follow R-077.
 - Why: exact register actions make the flow implementable and prevent invented register semantics.
-- Check: manual - each CSR action matches the workbook, or the non-CSR case has all three required explanations.
+- Check: manual - each IP CSR action matches the workbook, each external register action cites the owner and approved source, and each non-register step gives its reason and interface action.
 
 ### R-065 Flow consistency
-MUST keep the flowchart and table in one-to-one agreement and use only register names and values present in the workbook.
+MUST keep each flowchart and its matching table in one-to-one agreement. Use the workbook for IP register names and values and the approved external documentation identified by R-077 for external controller references.
 - Why: mismatched artifacts or invented register data would mislead implementation and software teams.
-- Check: manual - each flowchart node has exactly one matching table row and every register name/value traces to the workbook.
+- Check: manual - each flowchart step has exactly one matching row in its table, and each register name and value traces to its approved source.
 
 ### R-066 Step descriptions
 MUST write each `Description` cell in the section 11.2 step table to explain why the action is performed and what IP function it serves, consistent with the flowchart and specified functional behavior.
 - Why: a step's purpose lets software and verification teams understand its role instead of seeing only an unexplained action.
 - Check: manual - each `Description` cell states the action's purpose and IP function and agrees with the corresponding flowchart step and specification behavior.
+
+### R-076 Required software sequences and operating modes
+MUST document separate sequences in section 11.2 for initialization, interrupt service, Direct Memory Access (DMA), and at least five distinct supported operating modes. Initialization covers prerequisites, basic configuration, enable and readiness. Interrupt service covers routing or masking, enabling, identifying the cause, servicing, and acknowledging or clearing the source. DMA covers configuration ownership, transfer setup and ordering, trigger, completion and error recovery. Include the applicable operations defined by the approved design. Give every mode its own table and identify how software selects it, runs it, detects completion, and exits or changes mode when applicable.
+- Why: software users need concrete procedures for bringing the IP up and operating each supported path.
+- Check: review three named sequence entries and at least five distinct mode tables. If interrupt or DMA is explicitly unsupported, keep its entry, state why it is not applicable, and describe any approved alternative. If the IP supports fewer than five modes, document all confirmed modes and record the designer-approved shortfall with its rationale. Do not count duplicate variants or unsupported modes, or treat missing information as confirmed lack of support.
+
+### R-077 Sequence subsections, scope, limitations and step tables
+MUST give each software sequence its own named, numbered subsection under 11.2 using a level-four heading such as `#### 11.2.2 Initialization`. In that subsection, state the intended use, supported configurations, prerequisites or entry state, and applicable limitations. Give each applicable sequence its own ordered table with the six columns of R-061. For an unsupported sequence, keep its subsection and state the applicability rationale and any approved alternative. Include configuration restrictions, unsupported combinations, ordering constraints and applicable platform dependencies. If the design has no known sequence-specific limitation, state that explicitly after checking the approved scope. Name each step, identify exactly which register and field software accesses and how, and explain its purpose and observable effect. Use N/A with a reason when the step has no register access or the IP has no software-visible registers. Keep register definitions in the workbook; for external DMA or interrupt controllers, identify the owning component and cite its approved interface or register documentation.
+- Why: clear usage boundaries and actionable steps help users program the IP correctly.
+- Check: each sequence has a unique subsection identifier. Every applicable subsection states scope, prerequisites and limitations and contains a complete step table. Unsupported subsections state why they do not apply. Check register actions against their source, order against the approved behavior, and every step in the overview flowchart against its matching row.
 
 ### R-067 Version register at offset 0x0
 MUST place a 32-bit read-only version register at offset `0x0` when the IP has a software-visible register block, named `<prefix>_version`, with the major version in bits `[31:16]` and the minor version in bits `[15:0]`, reset to `0x00010000` (version 1.0) when the user gives no IP version and to the user's numbers when they are given, with no other register at offset `0x0`.

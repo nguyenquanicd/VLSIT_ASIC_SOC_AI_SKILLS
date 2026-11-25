@@ -61,7 +61,7 @@ Walk through the template sections with the user in groups, using [reference/vls
 
 For section 6.2, describe every input and output with its function, its clock domain and its signal type: level, pulse (with the width in cycles), clock, reset, data (with the qualifier that makes it valid) or static (rule R-025). Ask the user about each port whose type or clock domain is not clear; the signal-type questions are in the question bank.
 
-For section 11.2, agree on the ordinary programming/use sequence and any optional mode paths. The flowchart and matching step table are required by R-043 and R-060 to R-066 even when the IP has no CSR; in that case identify the non-CSR interface and explain why the CSR column is N/A. Do not mark a step optional unless its condition and alternate path are clear.
+For section 11.2, agree on initialization, interrupt and DMA applicability, and at least five distinct operating modes. Confirm each sequence scope, prerequisites, limitations and register actions with the designer (R-076, R-077). The flowchart and matching step table are required by R-043 and R-060 to R-066 even when the IP has no CSR; in that case identify the non-CSR interface and explain why the CSR column is N/A. Do not mark a step optional unless its condition and alternate path are clear.
 
 ### 8. Write the specification
 
@@ -83,7 +83,7 @@ If the IP has software-visible registers, the register RTL will be built by APB-
 <python> "<skill folder>\scripts\vlsit_csr_tool.py" ports regs.json
 ```
 
-Use the module name required by the selected project naming rule (R-026, R-054 to R-056) in the JSON. Ask for the design prefix of register names (question bank 25) and follow R-032 to R-034, R-037 and R-051 for naming and field descriptions: `<prefix>_<function>` registers, fields of at most 20 characters, a one-line register description and a field description with `Usage: `, a hexadecimal `Values:` block, `Unit: ` and `Limits: `; `validate` checks these. Fill sections 11.1, 11.3 and 11.4 from the `ports` output and generator reference; ask the user about `i_protect_en`, `i_slverr_en`, field connections and each applicable generator limit (R-031, R-049 and R-050). Then write the 11.2 Mermaid programming/use flowchart and six-column step table under R-043 and R-060 to R-066; if there is no software-visible CSR, state why the CSR column is N/A and document the actual usage interface.
+Use the module name required by the selected project naming rule (R-026, R-054 to R-056) in the JSON. Ask for the design prefix of register names (question bank 25) and follow R-032 to R-034, R-037 and R-051 for naming and field descriptions: `<prefix>_<function>` registers, fields of at most 20 characters, a one-line register description and a field description with `Usage: `, a hexadecimal `Values:` block, `Unit: ` and `Limits: `; `validate` checks these. Fill sections 11.1, 11.3 and 11.4 from the `ports` output and generator reference; ask the user about `i_protect_en`, `i_slverr_en`, field connections and each applicable generator limit (R-031, R-049 and R-050). Then write the 11.2 Mermaid programming/use flowchart and six-column step table under R-043 and R-060 to R-066; then give each sequence its own numbered subsection under 11.2 with scope, limitations and a step table for each applicable sequence (R-076, R-077). If there is no software-visible CSR, explain N/A and document the actual usage interface.
 
 ### 10. Waveform plan, block diagram and waveforms
 
@@ -104,9 +104,11 @@ Generate DOCX and/or PDF from the Markdown source with `scripts/vlsit_spec_expor
 
 ### 13. Verify against the rules
 
-Check the result against every rule ID in [rule.md](rule.md), using script outputs where supported and otherwise inspecting the conversation and files. Include every applicable rule from R-046 to R-066 in this review. Report which rules were verified and how, and say plainly what could not be verified.
+Check the result against every rule ID in [rule.md](rule.md), using script outputs where supported and otherwise inspecting the conversation and files. Include every applicable rule from R-046 to R-066 and review sequence coverage and tables against R-076 and R-077. Report which rules were verified and how, and say plainly what could not be verified.
 
 ## Reference
+
+See the [Digital Signature IP software sequence example](reference/examples/digital_signature_software_sequences.md) for the 11.2 subsection layout, register actions and how to document unresolved integration limits.
 
 Read a file only when the step needs it.
 
@@ -125,7 +127,7 @@ Read a file only when the step needs it.
 | [reference/drawio/README.md](reference/drawio/README.md) | Step 10 with draw.io: the library and the reference diagram |
 | [reference/templates/VLSIT_ASIC_IP_Design_Specification_Template.md](reference/templates/VLSIT_ASIC_IP_Design_Specification_Template.md) | Step 8: the template (copied by `vlsit_spec_tool.py init`) |
 | [reference/templates/VLSIT_RTL_Design_Rule.md](reference/templates/VLSIT_RTL_Design_Rule.md) | Steps 3, 7 and 8: naming and coding rules the specification must follow (R-026 and R-054 to R-056) |
-| [reference/templates/README.md](reference/templates/README.md) | Step 8: the original README of the spec_template folder (the three template files here are exact copies; the draw.io library is in `reference/drawio/`) |
+| [reference/templates/README.md](reference/templates/README.md) | Step 8: the original README of the spec_template folder (the bundled Markdown template includes the section 11.2 sequence requirements; the draw.io library is in `reference/drawio/`) |
 | [reference/templates/VLSIT_CSR_Specification_Template.xlsx](reference/templates/VLSIT_CSR_Specification_Template.xlsx) | Step 9: the workbook template (copied by `vlsit_csr_tool.py fill`) |
 | [reference/org_doc/README.md](reference/org_doc/README.md) | Step 5: where original documents are kept and why |
 | [example/apb_tlul_bridge/README.md](example/apb_tlul_bridge/README.md) | Step 8: a finished specification with block diagram and waveforms |

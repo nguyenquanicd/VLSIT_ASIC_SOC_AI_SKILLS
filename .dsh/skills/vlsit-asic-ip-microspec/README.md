@@ -34,6 +34,12 @@
 - The block diagram draw.io source has two tabs: `BLOCK_DIAGRAM` for the diagram only and `BLOCK_INFORMATION` for block functions, interfaces and the symbol legend. The specification embeds only the diagram tab / File draw.io sơ đồ khối có hai tab: `BLOCK_DIAGRAM` chỉ chứa sơ đồ và `BLOCK_INFORMATION` chứa chức năng block, interface và chú giải ký hiệu. Đặc tả chỉ nhúng hình từ tab sơ đồ.
 - Optional DOCX and/or PDF exports selected by the user / xuất DOCX/PDF tuỳ chọn theo lựa chọn của người dùng.
 
+## Software sequences / Trình tự sử dụng IP
+
+**EN** — Section 11.2 covers initialization, interrupt service, direct memory access (DMA), and at least five supported operating modes. Each sequence has a numbered subsection under 11.2. Applicable sequences include scope, prerequisites, limitations and a separate step table. See the [Digital Signature IP software sequence example](reference/examples/digital_signature_software_sequences.md). Unsupported functions and approved mode-count shortfalls are recorded explicitly.
+
+**VI** — Mục 11.2 mô tả trình tự khởi tạo, xử lý ngắt, truy cập bộ nhớ trực tiếp (DMA) và tối thiểu 5 chế độ sử dụng được hỗ trợ. Mỗi trình tự có một mục con riêng trong 11.2. Mỗi trình tự áp dụng có bảng riêng, ghi số bước, tên bước, giao diện, thanh ghi cần thao tác và mục đích của từng bước, cùng phạm vi, điều kiện và giới hạn sử dụng. Ghi rõ chức năng không hỗ trợ và lý do đã được duyệt nếu IP có ít hơn 5 chế độ.
+
 ## Requirements / Yêu cầu
 
 **EN** — Python 3.8 or later. Most scripts use the standard library. `openpyxl` is needed for CSR workbooks; PyMuPDF, Pandoc, Typst or LaTeX are optional for selected import/export paths. The skill asks before installing packages or tools. Network access is used for reference research or downloads the user approves.

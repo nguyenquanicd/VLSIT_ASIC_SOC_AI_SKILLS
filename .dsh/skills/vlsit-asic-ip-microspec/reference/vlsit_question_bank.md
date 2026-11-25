@@ -61,6 +61,12 @@ C. Other: write your own idea.
 25. Which keyword represents this design in register names (rule R-032)? (A: the short name of the design, 2 to 8 lower-case characters, example `axi2apb`, so registers are `axi2apb_ctrl`, `axi2apb_sts`, recommended; B: another keyword of the user; C: you decide.) The prefix also lengthens the generated port names `o_<register>_<field>`, which must stay within 30 characters, so a short prefix is better.
 26. For each field: when may software program it and when is it written or cleared? (Example: before enable only, any time, only while the IP is idle; written by software, cleared by hardware at completion.) The answer goes to line 2 "Usage: " of the field description (rule R-034), then the programmable values as hexadecimal value lines (rule R-037), the unit and the limits.
 
+## Software sequences (R-076 and R-077)
+
+- What reset, clock, configuration and enable steps bring the IP to its ready state?
+- Does the IP support interrupts and DMA? For each supported path, which components own setup, trigger, service, completion and recovery?
+- What are the distinct approved operating modes, how are they selected and exited, and which configurations, prerequisites and limitations apply? If fewer than five exist, confirm and record the actual mode count and rationale.
+
 ## Signals and waveforms
 
 12. Which waveforms must the specification show at minimum? (A: the proposed list with one waveform for every operation, the success and the error case of every interface and the special cases, recommended; B: only one success and one error per interface, smaller but key functions are not shown; C: the proposed list plus extra corner cases; D: other. Example for a FIFO: write, read, full, empty, simultaneous write and read, reset.)

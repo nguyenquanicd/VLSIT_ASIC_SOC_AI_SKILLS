@@ -347,7 +347,25 @@ Workbook requirements:
 
 ### 11.2 Software sequences
 
-Use register and field names exactly as written in the workbook. Document initialization, enable/disable, interrupt service, error clearing, safe reconfiguration, ordering, completion polling, and updates while active. This subsection must contain at least one Mermaid programming/use flowchart and a matching step-by-step table following R-043 and R-060 to R-066, even when the IP has no CSR; in that case explain why the CSR column is N/A and describe the normal interface-use sequence.
+Document separate initialization, interrupt service and Direct Memory Access (DMA) sequences, followed by one separate sequence for each of at least five distinct supported operating modes (R-076). Show reset and basic configuration through enable and readiness for initialization. For interrupt service, show setup, cause detection, servicing and acknowledgement. For DMA, show ownership, buffer or descriptor setup as applicable, trigger, completion and error handling. For each mode, give its selection, operation, completion and exit or mode-switch conditions where applicable. Ask the designer about gaps. Keep an explicit applicability entry for unsupported interrupts or DMA. If fewer than five modes exist, document all supported modes and the designer-approved shortfall.
+
+Give each sequence its own numbered level-four subsection under 11.2. Within each applicable subsection, put its scope, entry prerequisites and limitations before its step table (R-077). For an unsupported sequence, keep its subsection and explain why it does not apply. Document the exact interface action and register or field references. Use N/A with a reason for non-register actions. Keep the basic Mermaid overview and its matching table. Use the same six columns for each additional sequence table.
+
+Use register and field names exactly as written in the workbook. Describe error clearing, safe reconfiguration, ordering, completion polling, and updates while active when applicable.
+
+This subsection must contain at least one Mermaid programming/use flowchart and a matching step-by-step table following R-043 and R-060 to R-066, even when the IP has no CSR; in that case explain why the CSR column is N/A and describe the normal interface-use sequence.
+
+Repeat the subsection structure for each sequence. Replace the heading, scope, limitations and sample step with specification-derived content.
+
+#### 11.2.1 Initialization
+
+**Scope and prerequisites:** Identify the supported configuration and required entry state.
+
+**Limitations:** Describe the restrictions on this sequence or state that no sequence-specific restrictions apply.
+
+| No. | Step | Option (M/O) | Interface | CSR | Description |
+|---|---|---|---|---|---|
+| Sequence step ID | Step name | M or O | Protocol and action | Register.field, access and value, or N/A with reason | Purpose and observable effect |
 
 Mark every flowchart node with a unique step ID and `[M]` or `[O]`, and use the same ID and option in the table. `M` means mandatory for the shown operating path; `O` means optional or conditional, with its selection condition shown in the flowchart. The Interface column names the master-facing protocol and action. The CSR column names the exact workbook register/field and software write/read/poll value or action, or `N/A` with a reason if there are no software-visible CSRs. The Description column explains the purpose and role of the step.
 
