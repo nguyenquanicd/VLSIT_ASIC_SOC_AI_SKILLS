@@ -26,6 +26,8 @@ Tạo RTL SystemVerilog tổng hợp được từ specification theo mẫu ASIC
 
 **VI** — Bàn giao RTL kèm ít nhất 10 testcase tích hợp bao phủ mọi chức năng chính. Testcase được viết từ đặc tả đã duyệt, có header mô tả luồng phần mềm, ít nhất 5 điểm kiểm tra thực thi được, bằng chứng bắt lỗi và waveform riêng để kỹ sư review. Báo PASS giả hoặc trình bày test yếu như đã đạt sẽ chặn sign-off.
 
+**EN / VI:** ARI-05 forbids `%` and `%=` in synthesizable RTL. Choose the smallest equivalent combinational logic for the specified bounds. / Cấm `%` và `%=` trong RTL tổng hợp. Chọn mạch tổ hợp tương đương nhỏ nhất theo miền giá trị đã đặc tả.
+
 ## Inputs and output / Đầu vào và đầu ra
 
 - Input: the specification file (template structure), an optional external rule file (the bundled VLSIT rule is the default), the output folder, the project name and the user name for the file headers; for a change request also the RTL folder. / Đầu vào: file specification (cấu trúc mẫu), file rule, thư mục output, tên project và tên người dùng cho header; với yêu cầu sửa còn cần thư mục RTL.

@@ -77,6 +77,7 @@ COVERAGE = OrderedDict([
     ("COM-06", ("script", "functions are automatic (P9 side effects stay manual)")),
     ("ARI-01", ("lint", "explicit operand sizes (width warnings)")),
     ("ARI-04", ("script", "for loop index is an int declared in the for header")),
+    ("ARI-05", ("script", "no remainder operator in synthesizable RTL")),
     ("SEQ-01", ("script", "always_ff, nonblocking, one clock per process")),
     ("SEQ-02", ("manual", "next-state in always_comb, registered in always_ff")),
     ("SEQ-04", ("manual", "control and valid state are reset")),
@@ -785,6 +786,13 @@ def check_file(path, f):
         f.add("WARN", "R-027", name, first, "lines %d-%d: %s" % (first, last, SIM_REASON))
     code, comments = strip_code(raw)
     raw_lines = raw.split("\n")
+    f.mark("ARI-05")
+    # A percent inside a SystemVerilog escaped identifier is part of its name.
+    arithmetic_code = re.sub(r"\\[^\s]+", lambda m: " " * len(m.group()), code)
+    for m in re.finditer(r"%=?", arithmetic_code):
+        f.add("ERROR", "ARI-05", name, line_of(code, m.start()),
+              "remainder operator in synthesizable RTL; use a bounded equivalent implementation")
+
 
     # --- FIL-03 / P29 tabs
     f.mark("FIL-03", "P29", "FIL-04")

@@ -250,6 +250,11 @@ MUST prefer direct RTL for a simple expression used once; use an `automatic`, de
 - Why: a one-use wrapper can hide simple logic, while synthesis may inline or replicate a function; the comment and usage rule keep RTL readable without implying an area benefit.
 - Check: manual - inspect each function's call sites and comment, and confirm any single-use function explains its clarity benefit; confirm no area claim relies only on using a function.
 
+### R-099 Replace remainder operators with bounded logic
+MUST apply ARI-05 to all newly written or modified synthesizable RTL, even if an external rule file is used. Reject `%` and `%=` in design expressions. Derive the replacement from specification-defined operand bounds and signedness and document why it is equivalent and resource efficient.
+- Why: a generic remainder operation can infer a wide divider or reduction network where narrow combinational logic is sufficient.
+- Check: `vlsit_rtl_check.py` reports ARI-05 as an error. Review the proof of the chosen width, bounds, wrap behavior and signed semantics. Compare synthesis area and timing when needed to choose between plausible alternatives.
+
 ### R-045 Name fixed protocol encodings
 MUST declare each fixed protocol encoding used by RTL as a width-matched `localparam logic` named `LPARA_<PROTOCOL>_<MEANING>` and use that name in case items, comparisons, and assignments instead of repeating its numeric encoding. Use `parameter` only when the specification explicitly makes an elaboration-time choice user-configurable; protocol-mandated encodings remain fixed. For example, AHB `HBURST` encodings are localparams, and a case uses `LPARA_HBURST_SINGLE` instead of `3'b000`.
 - Why: symbolic names expose the protocol meaning, reduce encoding mistakes, and prevent fixed standard values from being mistaken for design options.
